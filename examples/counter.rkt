@@ -30,7 +30,7 @@
 
 (render
  (window
-  #:label @title
+  #:title @title
   #:size (cons 100 100)
   (vpanel
    (counter @c1)

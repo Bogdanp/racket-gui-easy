@@ -9,7 +9,6 @@
 
 (reprovide "view/button.rkt"
            "view/checkbox.rkt"
-           "view/dialog.rkt"
            "view/if.rkt"
            "view/input.rkt"
            "view/label.rkt"

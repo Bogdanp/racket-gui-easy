@@ -44,7 +44,7 @@
 
 (define (window/c style/c)
   (->* ()
-       (#:label (maybe-obs/c string?)
+       (#:title (maybe-obs/c string?)
         #:size (maybe-obs/c (cons/c gui:dimension-integer? gui:dimension-integer?))
         #:position (maybe-obs/c (or/c 'center (cons/c gui:position-integer? gui:position-integer?)))
         #:style style/c)

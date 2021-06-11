@@ -10,7 +10,7 @@
 (define @p (obs (pos 0 0)))
 (render
  (window
-  #:label (@p . ~> . (λ (p)
+  #:title (@p . ~> . (λ (p)
                        (format "Pos (~s, ~s)" (car p) (cdr p))))
   #:size (cons 100 100)
   #:position @p

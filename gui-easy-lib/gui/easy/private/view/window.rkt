@@ -9,19 +9,20 @@
          "view.rkt")
 
 (provide
+ dialog
  window)
 
-(define window%
+(define (window-like% clazz)
   (class* container% (view<%>)
     (inherit-field children)
-    (init-field @label @size @position style)
+    (init-field @title @size @position style)
     (inherit child-dependencies children-for-dep
              get-children add-child get-child remove-child)
     (super-new)
 
     (define/public (dependencies)
       (remove-duplicates
-       (append (list @label @size @position)
+       (append (list @title @size @position)
                (child-dependencies))))
 
     (define/public (create parent)
@@ -31,24 +32,24 @@
         (if (eq? position 'center)
             (values #f #f)
             (values (car position) (cdr position))))
-      (define the-frame
-        (new gui:frame%
+      (define the-window
+        (new clazz
              [parent parent]
-             [label (obs-peek @label)]
+             [label (obs-peek @title)]
              [style style]
              [width (car size)]
              [height (cdr size)]
              [x x]
              [y y]))
       (when (eq? position 'center)
-        (send the-frame center 'both))
-      (begin0 the-frame
+        (send the-window center 'both))
+      (begin0 the-window
         (for ([c (in-list children)])
-          (add-child c (send c create the-frame)))
-        (send the-frame show #t)))
+          (add-child c (send c create the-window)))
+        (send the-window show #t)))
 
     (define/public (update v what val)
-      (when (eq? what @label)
+      (when (eq? what @title)
         (send v set-label val))
       (when (eq? what @size)
         (send/apply v resize val))
@@ -65,13 +66,28 @@
         (send c destroy w)
         (remove-child c)))))
 
-(define (window #:label [@label (obs "Untitled")]
+(define dialog% (window-like% gui:dialog%))
+(define window% (window-like% gui:frame%))
+
+(define (dialog #:title [@title (obs "Untitled")]
+                #:size [@size (obs (cons 100 100))]
+                #:position [@position (obs 'center)]
+                #:style [style '(close-button)]
+                . children)
+  (new dialog%
+       [@title (->obs @title)]
+       [@size (->obs @size)]
+       [@position (->obs @position)]
+       [style style]
+       [children children]))
+
+(define (window #:title [@title (obs "Untitled")]
                 #:size [@size (obs (cons 100 100))]
                 #:position [@position (obs 'center)]
                 #:style [style null]
                 . children)
   (new window%
-       [@label (->obs @label)]
+       [@title (->obs @title)]
        [@size (->obs @size)]
        [@position (->obs @position)]
        [style style]

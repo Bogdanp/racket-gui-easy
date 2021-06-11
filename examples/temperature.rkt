@@ -30,7 +30,7 @@
 
 (render
  (window
-  #:label "Temperature Converter"
+  #:title "Temperature Converter"
   #:size (cons 200 100)
   (vpanel
    (temp "Celsius: "    @tempC     )

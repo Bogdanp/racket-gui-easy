@@ -6,7 +6,7 @@
 (define @msg (@ "Hi"))
 (render
  (window
-  #:label @msg
+  #:title @msg
   (vpanel
    (input @msg (λ (_event text)
                  (@msg . := . text)))

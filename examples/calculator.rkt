@@ -58,7 +58,7 @@
 
 (render
  (window
-  #:label @out
+  #:title @out
   (hpanel (disp @out) (cls) (eq))
   (hpanel (num 7) (num 8) (num 9) (op +))
   (hpanel (num 4) (num 5) (num 6) (op -))

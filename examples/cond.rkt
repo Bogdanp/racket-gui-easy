@@ -12,7 +12,7 @@
 (void
  (render
   (window
-   #:label (@toggled? . ~> . (λ (toggled?)
+   #:title (@toggled? . ~> . (λ (toggled?)
                                (if toggled?
                                    "Toggled"
                                    "Not Toggled")))
