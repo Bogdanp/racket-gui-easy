@@ -10,7 +10,7 @@
  cond/view
  (contract-out
   [checkbox (->* ((-> any))
-                 (#:label (maybe-obs/c (or/c #f string?))
+                 (#:label (maybe-obs/c label/c)
                   #:checked? (maybe-obs/c boolean?)
                   #:enabled? (maybe-obs/c boolean?))
                  (is-a?/c view<%>))]
@@ -20,14 +20,23 @@
   [if/view (-> (maybe-obs/c any/c) (is-a?/c view<%>) (is-a?/c view<%>) (is-a?/c view<%>))]
   [input (->* ((maybe-obs/c string?))
               ((-> (or/c 'input 'return) string? any)
-               #:enabled? (maybe-obs/c boolean?))
+               #:label (maybe-obs/c label/c)
+               #:enabled? (maybe-obs/c boolean?)
+               #:background-color (maybe-obs/c (or/c #f (is-a?/c gui:color%)))
+               #:style (listof (or/c 'single 'multiple 'hscroll 'password
+                                     'vertical-label 'horizontal-label
+                                     'deleted))
+               #:font (is-a?/c gui:font%))
               (is-a?/c view<%>))]
-  [label (-> (maybe-obs/c string?) (is-a?/c view<%>))]
+  [label (-> (maybe-obs/c gui:label-string?) (is-a?/c view<%>))]
   [dialog (window/c (listof (or/c 'no-caption 'no-sheet 'resize-border 'close-button)))]
   [window (window/c (listof (or/c 'no-resize-border 'no-caption
                                   'no-system-menu 'hide-menu-bar
                                   'toolbar-button 'float 'metal
                                   'fullscreen-button 'fullscreen-aux)))]))
+
+(define label/c
+  (or/c #f gui:label-string?))
 
 (define panel/c
   (-> (is-a?/c view<%>) ... (is-a?/c view<%>)))

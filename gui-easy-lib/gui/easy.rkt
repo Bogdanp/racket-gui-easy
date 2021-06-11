@@ -5,6 +5,8 @@
     (require mod ...)
     (provide (all-from-out mod ...))))
 
-(reprovide "easy/observable.rkt"
+(reprovide "easy/color.rkt"
+           "easy/font.rkt"
+           "easy/observable.rkt"
            "easy/renderer.rkt"
            "easy/view.rkt")

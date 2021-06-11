@@ -10,6 +10,11 @@
 (define @tempC (@ 26))
 (define @tempF (@tempC . ~> . C->F))
 
+(define @background (@ #f))
+
+(define input-font
+  (font "Operator Mono" 12 #:family 'modern))
+
 (render
  (window
   #:label "Temperature Converter"
@@ -17,13 +22,31 @@
   (vpanel
    (hpanel
     (label "Celsius: ")
-    (input (@tempC . ~> . ~r)
-           (λ (_event text)
-             (define c (string->number text))
-             (when c (@tempC . := . c)))))
+    (input
+     #:font input-font
+     #:background-color @background
+     (@tempC . ~> . ~r)
+     (λ (_event text)
+       (cond
+         [(string->number text)
+          => (λ (c)
+               (@tempC . := . c)
+               (@background . := . #f))]
+
+         [else
+          (@background . := . (color "red"))]))))
    (hpanel
     (label "Fahrenheit: ")
-    (input (@tempF . ~> . ~r)
-           (λ (_event text)
-             (define f (string->number text))
-             (when f (@tempC . := . (F->C f)))))))))
+    (input
+     #:font input-font
+     #:background-color @background
+     (@tempF . ~> . ~r)
+     (λ (_event text)
+       (cond
+         [(string->number text)
+          => (λ (f)
+               (@tempC . := . (F->C f))
+               (@background . := . #f))]
+
+         [else
+          (@background . := . (color "red"))])))))))
