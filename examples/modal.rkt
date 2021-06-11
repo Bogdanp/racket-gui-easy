@@ -1,15 +1,21 @@
 #lang racket/base
 
-(require racket/gui/easy)
+(require racket/gui/easy
+         racket/gui/easy/operator)
+
+(define @msg (@ "Click the button"))
 
 (define r
   (render
    (window
-    (button
-     "Display Modal"
-     (λ ()
-       (render
-        (dialog
-         #:style '(close-button)
-         (label "Hi"))
-        (renderer-root r)))))))
+    (vpanel
+     (label @msg)
+     (button
+      "Display Modal"
+      (λ ()
+        (render
+         (dialog
+          #:style '(close-button)
+          (input @msg (λ (_ text)
+                        (@msg . := . text))))
+         (renderer-root r))))))))
