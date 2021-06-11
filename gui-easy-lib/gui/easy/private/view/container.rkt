@@ -10,32 +10,32 @@
     (init-field children)
     (super-new)
 
-    (define obs-to-children
+    (define deps-to-children
       (for*/fold ([h (hasheq)])
                  ([c (in-list children)]
                   [d (in-list (send c dependencies))])
         (hash-update h d (λ (cs) (cons c cs)) null)))
 
-    (define/public (unique-obs)
-      (hash-keys obs-to-children))
+    (define/public (child-dependencies)
+      (hash-keys deps-to-children))
 
-    (define/public (children-for-obs o)
-      (hash-ref obs-to-children o null))
+    (define/public (children-for-dep dep)
+      (hash-ref deps-to-children dep null))
 
-    (define child-frames (make-hasheq))
+    (define children-to-widgets (make-hasheq))
 
-    (define/public (get-child-frames)
-      (for/hasheq ([(k v) (in-hash child-frames)])
+    (define/public (get-children)
+      (for/hasheq ([(k v) (in-hash children-to-widgets)])
         (values k v)))
 
-    (define/public (add-child-frame c f)
-      (hash-set! child-frames c f))
+    (define/public (add-child c w)
+      (hash-set! children-to-widgets c w))
 
-    (define/public (get-child-frame c)
-      (hash-ref child-frames c))
+    (define/public (get-child c)
+      (hash-ref children-to-widgets c))
 
-    (define/public (has-child-frame? c)
-      (hash-has-key? child-frames c))
+    (define/public (has-child? c)
+      (hash-has-key? children-to-widgets c))
 
-    (define/public (remove-child-frame c)
-      (hash-remove! child-frames c))))
+    (define/public (remove-child c)
+      (hash-remove! children-to-widgets c))))

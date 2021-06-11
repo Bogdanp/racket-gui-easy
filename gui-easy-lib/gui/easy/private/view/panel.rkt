@@ -13,12 +13,12 @@
   (class* container% (view<%>)
     (inherit-field children)
     (init-field clazz)
-    (inherit children-for-obs unique-obs
-             get-child-frames add-child-frame get-child-frame remove-child-frame)
+    (inherit children-for-dep child-dependencies
+             get-children add-child get-child remove-child)
     (super-new)
 
     (define/public (dependencies)
-      (unique-obs))
+      (child-dependencies))
 
     (define/public (create parent)
       (define the-panel
@@ -26,16 +26,16 @@
              [parent parent]))
       (begin0 the-panel
         (for ([c (in-list children)])
-          (add-child-frame c (send c create the-panel)))))
+          (add-child c (send c create the-panel)))))
 
     (define/public (update _v what val)
-      (for ([c (in-list (children-for-obs what))])
-        (send c update (get-child-frame c) what val)))
+      (for ([c (in-list (children-for-dep what))])
+        (send c update (get-child c) what val)))
 
-    (define/public (destroy v)
-      (for ([(c v) (in-hash (get-child-frames))])
-        (send c destroy v)
-        (remove-child-frame c)))))
+    (define/public (destroy _v)
+      (for ([(c w) (in-hash (get-children))])
+        (send c destroy w)
+        (remove-child c)))))
 
 (define (hpanel . children)
   (new panel%

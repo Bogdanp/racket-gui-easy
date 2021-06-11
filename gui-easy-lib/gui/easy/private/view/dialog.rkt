@@ -14,7 +14,7 @@
   (class* container% (view<%>)
     (inherit-field children)
     (init-field @label @size @position style)
-    (inherit children-for-obs add-child-frame get-child-frames get-child-frame remove-child-frame)
+    (inherit children-for-dep add-child get-children get-child remove-child)
     (super-new)
 
     (define/public (dependencies)
@@ -40,8 +40,7 @@
         (send the-dialog center))
       (begin0 the-dialog
         (for ([c (in-list children)])
-          (define c-f (send c create the-dialog))
-          (add-child-frame c c-f))
+          (add-child c (send c create the-dialog)))
         (send the-dialog show #t)))
 
     (define/public (update v what val)
@@ -53,14 +52,14 @@
         (match val
           ['center (send v center 'both)]
           [(cons x y) (send v move x y)]))
-      (for ([c (in-list (children-for-obs what))])
-        (send c update (get-child-frame c) what val)))
+      (for ([c (in-list (children-for-dep what))])
+        (send c update (get-child c) what val)))
 
     (define/public (destroy v)
       (send v show #f)
-      (for ([(c v) (in-hash (get-child-frames))])
+      (for ([(c v) (in-hash (get-children))])
         (send c destroy v)
-        (remove-child-frame c)))))
+        (remove-child c)))))
 
 (define (dialog #:label [@label (obs "Untitled")]
                 #:size [@size (obs (cons 100 100))]

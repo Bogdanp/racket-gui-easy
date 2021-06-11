@@ -15,13 +15,14 @@
   (class* container% (view<%>)
     (inherit-field children)
     (init-field @label @size @position style)
-    (inherit unique-obs children-for-obs
-             get-child-frames add-child-frame get-child-frame remove-child-frame)
+    (inherit child-dependencies children-for-dep
+             get-children add-child get-child remove-child)
     (super-new)
 
     (define/public (dependencies)
       (remove-duplicates
-       (append (list @label @size @position) (unique-obs))))
+       (append (list @label @size @position)
+               (child-dependencies))))
 
     (define/public (create parent)
       (define size (obs-peek @size))
@@ -34,6 +35,7 @@
         (new gui:frame%
              [parent parent]
              [label (obs-peek @label)]
+             [style style]
              [width (car size)]
              [height (cdr size)]
              [x x]
@@ -42,8 +44,7 @@
         (send the-frame center 'both))
       (begin0 the-frame
         (for ([c (in-list children)])
-          (define c-f (send c create the-frame))
-          (add-child-frame c c-f))
+          (add-child c (send c create the-frame)))
         (send the-frame show #t)))
 
     (define/public (update v what val)
@@ -55,14 +56,14 @@
         (match val
           ['center (send v center 'both)]
           [(cons x y) (send v move x y)]))
-      (for ([c (in-list (children-for-obs what))])
-        (send c update (get-child-frame c) what val)))
+      (for ([c (in-list (children-for-dep what))])
+        (send c update (get-child c) what val)))
 
     (define/public (destroy v)
       (send v show #f)
-      (for ([(c v) (in-hash (get-child-frames))])
-        (send c destroy v)
-        (remove-child-frame c)))))
+      (for ([(c w) (in-hash (get-children))])
+        (send c destroy w)
+        (remove-child c)))))
 
 (define (window #:label [@label (obs "Untitled")]
                 #:size [@size (obs (cons 100 100))]
