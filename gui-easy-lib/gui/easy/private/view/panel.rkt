@@ -6,7 +6,6 @@
          racket/match
          "../observable.rkt"
          "container.rkt"
-         "size.rkt"
          "view.rkt")
 
 (provide
@@ -27,10 +26,8 @@
                (child-dependencies))))
 
     (define/public (create parent)
-      (match-define (size w h)
-        (obs-peek @min-size))
-      (match-define (stretch w-s? h-s?)
-        (obs-peek @stretch))
+      (match-define (list w h) (obs-peek @min-size))
+      (match-define (list w-s? h-s?) (obs-peek @stretch))
       (define the-panel
         (new clazz
              [parent parent]
@@ -47,7 +44,7 @@
 
     (define/public (update v what val)
       (when (eq? what @min-size)
-        (match-define (size w h) val)
+        (match-define (list w h) val)
         (send* v
           (min-width (or w 0))
           (min-height (or h 0))))
@@ -56,7 +53,7 @@
       (when (eq? what @enabled?)
         (send v enabled val))
       (when (eq? what @stretch)
-        (match-define (stretch w-s? h-s?) val)
+        (match-define (list w-s? h-s?) val)
         (send* v
           (stretchable-width w-s?)
           (stretchable-height h-s?)))
@@ -74,8 +71,8 @@
 (define (hpanel #:alignment [@alignment (obs '(left center))]
                 #:enabled? [@enabled? (obs #t)]
                 #:style [style null]
-                #:min-size [@min-size (obs (size #f #f))]
-                #:stretch [@stretch (obs (stretch #t #t))]
+                #:min-size [@min-size (obs '(#f #f))]
+                #:stretch [@stretch (obs '(#t #t))]
                 . children)
   (new hpanel%
        [@alignment (->obs @alignment)]
@@ -88,8 +85,8 @@
 (define (vpanel #:alignment [@alignment (obs '(center top))]
                 #:enabled? [@enabled? (obs #t)]
                 #:style [style null]
-                #:min-size [@min-size (obs (size #f #f))]
-                #:stretch [@stretch (obs (stretch #t #t))]
+                #:min-size [@min-size (obs '(#f #f))]
+                #:stretch [@stretch (obs '(#t #t))]
                 . children)
   (new vpanel%
        [@alignment (->obs @alignment)]

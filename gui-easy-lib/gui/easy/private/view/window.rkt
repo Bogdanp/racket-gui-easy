@@ -6,7 +6,6 @@
          racket/match
          "../observable.rkt"
          "container.rkt"
-         "size.rkt"
          "view.rkt")
 
 (provide
@@ -27,14 +26,14 @@
                (child-dependencies))))
 
     (define/public (create parent)
-      (match-define (size w h) (obs-peek @size))
-      (match-define (size min-w min-h) (obs-peek @min-size))
-      (match-define (stretch w-s? h-s?) (obs-peek @stretch))
+      (match-define (list w h) (obs-peek @size))
+      (match-define (list min-w min-h) (obs-peek @min-size))
+      (match-define (list w-s? h-s?) (obs-peek @stretch))
       (define position (obs-peek @position))
       (define-values (x y)
-        (if (eq? position 'center)
-            (values #f #f)
-            (values (car position) (cdr position))))
+        (match position
+          ['center (values #f #f)]
+          [(list x y) (values x y)]))
       (define the-window
         (new clazz
              [parent parent]
@@ -60,21 +59,21 @@
       (when (eq? what @title)
         (send v set-label val))
       (when (eq? what @size)
-        (match-define (size w h) val)
+        (match-define (list w h) val)
         (send v resize w h))
       (when (eq? what @alignment)
         (send v set-alignment val))
       (when (eq? what @position)
         (match val
           ['center (send v center 'both)]
-          [(cons x y) (send v move x y)]))
+          [(list x y) (send v move x y)]))
       (when (eq? what @min-size)
-        (match-define (size w h) val)
+        (match-define (list w h) val)
         (send* v
           (min-width w)
           (min-height h)))
       (when (eq? what @stretch)
-        (match-define (stretch w-s? h-s?) val)
+        (match-define (list w-s? h-s?) val)
         (send* v
           (stretchable-width w-s?)
           (stretchable-height h-s?)))
@@ -91,12 +90,12 @@
 (define window% (window-like% gui:frame%))
 
 (define (dialog #:title [@title (obs "Untitled")]
-                #:size [@size (obs (size #f #f))]
+                #:size [@size (obs '(#f #f))]
                 #:alignment [@alignment (obs '(center top))]
                 #:position [@position (obs 'center)]
                 #:style [style '(close-button)]
-                #:min-size [@min-size (obs (size #f #f))]
-                #:stretch [@stretch (obs (stretch #t #t))]
+                #:min-size [@min-size (obs '(#f #f))]
+                #:stretch [@stretch (obs '(#t #t))]
                 . children)
   (new dialog%
        [@title (->obs @title)]
@@ -109,11 +108,11 @@
        [children children]))
 
 (define (window #:title [@title (obs "Untitled")]
-                #:size [@size (obs (size #f #f))]
+                #:size [@size (obs '(#f #f))]
                 #:position [@position (obs 'center)]
                 #:alignment [@alignment (obs '(center top))]
-                #:min-size [@min-size (obs (size #f #f))]
-                #:stretch [@stretch (obs (stretch #t #t))]
+                #:min-size [@min-size (obs '(#f #f))]
+                #:stretch [@stretch (obs '(#t #t))]
                 #:style [style null]
                 . children)
   (new window%

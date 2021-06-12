@@ -43,6 +43,17 @@
 (define label/c
   (or/c #f gui:label-string?))
 
+(define position/c
+  (or/c 'center (list/c gui:position-integer?
+                        gui:position-integer?)))
+
+(define size/c
+  (list/c (or/c #f gui:dimension-integer?)
+          (or/c #f gui:dimension-integer?)))
+
+(define stretch/c
+  (list/c boolean? boolean?))
+
 (define panel/c
   (->* ()
        (#:alignment (maybe-obs/c alignment/c)
@@ -50,19 +61,19 @@
         #:style (listof (or/c 'border 'deleted
                               'hscroll 'auto-hscroll 'hide-hscroll
                               'vscroll 'auto-vscroll 'hide-vscroll))
-        #:min-size (maybe-obs/c size?)
-        #:stretch (maybe-obs/c stretch?))
+        #:min-size (maybe-obs/c size/c)
+        #:stretch (maybe-obs/c stretch/c))
        #:rest (listof (is-a?/c view<%>))
        (is-a?/c view<%>)))
 
 (define (window/c style/c)
   (->* ()
        (#:title (maybe-obs/c string?)
-        #:size (maybe-obs/c size?)
+        #:size (maybe-obs/c size/c)
         #:alignment (maybe-obs/c alignment/c)
-        #:position (maybe-obs/c (or/c 'center (cons/c gui:position-integer? gui:position-integer?)))
-        #:min-size (maybe-obs/c size?)
-        #:stretch (maybe-obs/c stretch?)
+        #:position (maybe-obs/c position/c)
+        #:min-size (maybe-obs/c size/c)
+        #:stretch (maybe-obs/c stretch/c)
         #:style style/c)
        #:rest (listof (is-a?/c view<%>))
        (is-a?/c view<%>)))

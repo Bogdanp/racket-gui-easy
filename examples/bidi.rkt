@@ -7,6 +7,7 @@
 (render
  (window
   #:title @msg
+  #:size '(200 100)
   (vpanel
    (input @msg (λ (_event text)
                  (@msg . := . text)))

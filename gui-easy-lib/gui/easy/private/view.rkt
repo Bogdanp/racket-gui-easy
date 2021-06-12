@@ -12,7 +12,6 @@
            "view/if.rkt"
            "view/input.rkt"
            "view/panel.rkt"
-           "view/size.rkt"
            "view/spacer.rkt"
            "view/text.rkt"
            "view/view.rkt"

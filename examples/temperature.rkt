@@ -2,8 +2,7 @@
 
 (require racket/format
          racket/gui/easy
-         racket/gui/easy/operator
-         racket/gui/easy/size)
+         racket/gui/easy/operator)
 
 (define (F->C f) (* (- f 32) 5/9))
 (define (C->F c) (+ (* c 9/5) 32))
@@ -32,7 +31,7 @@
 (render
  (window
   #:title "Temperature Converter"
-  #:size (size 200 100)
+  #:size '(200 100)
   (vpanel
    (temp "Celsius: "    @tempC     )
    (temp "Fahrenheit: " @tempF F->C))))
