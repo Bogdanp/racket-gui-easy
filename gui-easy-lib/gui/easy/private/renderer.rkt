@@ -31,7 +31,8 @@
                              (λ ()
                                (define maybe-dep (weak-box-value dep-box))
                                (when maybe-dep
-                                 (send tree update root maybe-dep v))))))))
+                                 (send tree update root maybe-dep v)))
+                             #f)))))
 
     (define/public (destroy)
       (send tree destroy root))))
