@@ -11,8 +11,9 @@
   (vpanel
    (text @n-str)
    (slider
-    #:style '(horizontal plain)
-    @n (λ:= @n))
+    @n (λ:= @n)
+    #:style '(horizontal plain))
+   (progress @n #:style '(vertical))
    (input @n-str (λ (_ text)
                    (define n (string->number text))
                    (when (and n (>= n 0) (<= n 100))

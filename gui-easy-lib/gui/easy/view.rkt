@@ -28,6 +28,16 @@
                                      'deleted))
                #:font (is-a?/c gui:font%))
               (is-a?/c view<%>))]
+  [progress (->* ((maybe-obs/c gui:dimension-integer?))
+                 (#:label (maybe-obs/c gui:label-string?)
+                  #:enabled? (maybe-obs/c boolean?)
+                  #:style (listof (or/c 'horizontal 'vertical 'plain
+                                        'vertical-label 'horizontal-label
+                                        'deleted))
+                  #:range gui:positive-dimension-integer?
+                  #:min-size (maybe-obs/c size/c)
+                  #:stretch (maybe-obs/c stretch/c))
+                 (is-a?/c view<%>))]
   [slider (->* ((maybe-obs/c gui:position-integer?)
                 (-> gui:position-integer? any))
                (#:label (maybe-obs/c gui:label-string?)
