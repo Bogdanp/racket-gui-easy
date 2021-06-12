@@ -12,6 +12,7 @@
            "view/if.rkt"
            "view/input.rkt"
            "view/panel.rkt"
+           "view/slider.rkt"
            "view/spacer.rkt"
            "view/text.rkt"
            "view/view.rkt"

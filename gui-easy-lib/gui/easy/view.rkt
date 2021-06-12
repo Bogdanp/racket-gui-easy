@@ -28,6 +28,18 @@
                                      'deleted))
                #:font (is-a?/c gui:font%))
               (is-a?/c view<%>))]
+  [slider (->* ((maybe-obs/c gui:position-integer?)
+                (-> gui:position-integer? any))
+               (#:label (maybe-obs/c gui:label-string?)
+                #:enabled? (maybe-obs/c boolean?)
+                #:style (listof (or/c 'horizontal 'vertical 'plain
+                                      'vertical-label 'horizontal-label
+                                      'deleted))
+                #:min-value gui:position-integer?
+                #:max-value gui:position-integer?
+                #:min-size (maybe-obs/c size/c)
+                #:stretch (maybe-obs/c stretch/c))
+               (is-a?/c view<%>))]
   [spacer (-> (is-a?/c view<%>))]
   [text (-> (maybe-obs/c gui:label-string?) (is-a?/c view<%>))]
   [dialog (window/c (listof (or/c 'no-caption 'no-sheet 'resize-border 'close-button)))]
