@@ -25,7 +25,7 @@
      (cond/view
       [@password-correct?
        (vpanel
-        (label "You're in!")
+        (text "You're in!")
         (button "Log out"
                 (λ ()
                   (@password . := . ""))))]
@@ -34,4 +34,4 @@
               (λ (_ text)
                 (@password . := . text)))])]
     [else
-     (label "Not Toggled")]))))
+     (text "Not Toggled")]))))

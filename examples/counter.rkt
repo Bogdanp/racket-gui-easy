@@ -25,7 +25,7 @@
 (define (counter @c)
   (hpanel
    (button "-" (@c . λ<~ . sub1))
-   (label (@c . ~> . number->string))
+   (text (@c . ~> . number->string))
    (button "+" (@c . λ<~ . add1))))
 
 (render

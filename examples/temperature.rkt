@@ -2,7 +2,8 @@
 
 (require racket/format
          racket/gui/easy
-         racket/gui/easy/operator)
+         racket/gui/easy/operator
+         racket/gui/easy/size)
 
 (define (F->C f) (* (- f 32) 5/9))
 (define (C->F c) (+ (* c 9/5) 32))
@@ -11,9 +12,9 @@
 (define @tempC (@ 26))
 (define @tempF (@tempC . ~> . C->F))
 
-(define (temp text @value [convert values])
+(define (temp label @value [convert values])
   (hpanel
-   (label text)
+   (text label)
    (input
     #:font (font "Operator Mono" 12 #:family 'modern)
     #:background-color @background
@@ -31,7 +32,7 @@
 (render
  (window
   #:title "Temperature Converter"
-  #:size (cons 200 100)
+  #:size (size 200 100)
   (vpanel
    (temp "Celsius: "    @tempC     )
    (temp "Fahrenheit: " @tempF F->C))))

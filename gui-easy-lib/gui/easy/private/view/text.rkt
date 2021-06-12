@@ -6,9 +6,9 @@
          "view.rkt")
 
 (provide
- label)
+ text)
 
-(define label%
+(define text%
   (class* object% (view<%>)
     (init-field @label)
     (super-new)
@@ -28,6 +28,6 @@
     (define/public (destroy _v)
       (void))))
 
-(define (label @label)
-  (new label%
+(define (text @label)
+  (new text%
        [@label (->obs @label)]))

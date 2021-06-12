@@ -7,11 +7,11 @@
   #:size (cons 400 400)
   (vpanel
    (hpanel
-    (label "A")
+    (text "A")
     (spacer)
-    (label "B"))
+    (text "B"))
    (spacer)
    (hpanel
-    (label "C")
+    (text "C")
     (spacer)
-    (label "D")))))
+    (text "D")))))

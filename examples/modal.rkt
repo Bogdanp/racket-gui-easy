@@ -9,7 +9,7 @@
   (render
    (window
     (vpanel
-     (label @msg)
+     (text @msg)
      (button
       "Display Modal"
       (λ ()

@@ -10,4 +10,4 @@
   (vpanel
    (input @msg (λ (_event text)
                  (@msg . := . text)))
-   (label @msg))))
+   (text @msg))))

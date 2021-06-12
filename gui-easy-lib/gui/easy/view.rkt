@@ -28,8 +28,8 @@
                                      'deleted))
                #:font (is-a?/c gui:font%))
               (is-a?/c view<%>))]
-  [label (-> (maybe-obs/c gui:label-string?) (is-a?/c view<%>))]
   [spacer (-> (is-a?/c view<%>))]
+  [text (-> (maybe-obs/c gui:label-string?) (is-a?/c view<%>))]
   [dialog (window/c (listof (or/c 'no-caption 'no-sheet 'resize-border 'close-button)))]
   [window (window/c (listof (or/c 'no-resize-border 'no-caption
                                   'no-system-menu 'hide-menu-bar
