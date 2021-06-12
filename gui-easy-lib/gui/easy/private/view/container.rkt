@@ -19,14 +19,16 @@
     (define/public (child-dependencies)
       (hash-keys deps-to-children))
 
-    (define/public (children-for-dep dep)
-      (hash-ref deps-to-children dep null))
+    (define/public (update-children what val)
+      (for ([c (in-list (hash-ref deps-to-children what null))])
+        (send c update (get-child c) what val)))
+
+    (define/public (destroy-children)
+      (for ([(c w) (in-hash children-to-widgets)])
+        (send c destroy w)
+        (remove-child c)))
 
     (define children-to-widgets (make-hasheq))
-
-    (define/public (get-children)
-      (for/hasheq ([(k v) (in-hash children-to-widgets)])
-        (values k v)))
 
     (define/public (add-child c w)
       (hash-set! children-to-widgets c w))

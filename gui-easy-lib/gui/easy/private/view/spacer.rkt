@@ -2,7 +2,6 @@
 
 (require racket/class
          (prefix-in gui: racket/gui)
-         "../observable.rkt"
          "view.rkt")
 
 (provide
@@ -19,7 +18,7 @@
       (new gui:panel%
            [parent parent]))
 
-    (define/public (update v _what val)
+    (define/public (update _v _what _val)
       (void))
 
     (define/public (destroy _v)

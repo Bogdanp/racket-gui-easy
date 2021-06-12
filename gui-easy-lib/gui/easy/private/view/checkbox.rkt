@@ -3,6 +3,7 @@
 (require racket/class
          (prefix-in gui: racket/gui)
          "../observable.rkt"
+         "common.rkt"
          "view.rkt")
 
 (provide
@@ -26,11 +27,10 @@
                        (action))]))
 
     (define/public (update v what val)
-      (cond
-        [(eq? what @label) (send v set-label val)]
-        [(eq? what @checked?) (send v set-value val)]
-        [(eq? what @enabled?) (send v enable val)]
-        [else (void)]))
+      (case/dep what
+        [@label (send v set-label val)]
+        [@checked? (send v set-value val)]
+        [@enabled? (send v enable val)]))
 
     (define/public (destroy _v)
       (void))))

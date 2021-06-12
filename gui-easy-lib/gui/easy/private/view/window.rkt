@@ -5,6 +5,7 @@
          racket/list
          racket/match
          "../observable.rkt"
+         "common.rkt"
          "container.rkt"
          "view.rkt")
 
@@ -16,8 +17,7 @@
   (class* container% (view<%>)
     (inherit-field children)
     (init-field @title @size @alignment @position @min-size @stretch style)
-    (inherit child-dependencies children-for-dep
-             get-children add-child get-child remove-child)
+    (inherit child-dependencies add-child update-children destroy-children)
     (super-new)
 
     (define/public (dependencies)
@@ -56,35 +56,32 @@
         (send the-window show #t)))
 
     (define/public (update v what val)
-      (when (eq? what @title)
-        (send v set-label val))
-      (when (eq? what @size)
-        (match-define (list w h) val)
-        (send v resize w h))
-      (when (eq? what @alignment)
-        (send v set-alignment val))
-      (when (eq? what @position)
-        (match val
-          ['center (send v center 'both)]
-          [(list x y) (send v move x y)]))
-      (when (eq? what @min-size)
-        (match-define (list w h) val)
-        (send* v
-          (min-width w)
-          (min-height h)))
-      (when (eq? what @stretch)
-        (match-define (list w-s? h-s?) val)
-        (send* v
-          (stretchable-width w-s?)
-          (stretchable-height h-s?)))
-      (for ([c (in-list (children-for-dep what))])
-        (send c update (get-child c) what val)))
+      (case/dep what
+        [@title (send v set-label val)]
+        [@size
+         (match-define (list w h) val)
+         (send v resize w h)]
+        [@alignment
+         (send v set-alignment val)]
+        [@position
+         (match val
+           ['center (send v center 'both)]
+           [(list x y) (send v move x y)])]
+        [@min-size
+         (match-define (list w h) val)
+         (send* v
+           (min-width w)
+           (min-height h))]
+        [@stretch
+         (match-define (list w-s? h-s?) val)
+         (send* v
+           (stretchable-width w-s?)
+           (stretchable-height h-s?))])
+      (update-children what val))
 
     (define/public (destroy v)
-      (send v show #f)
-      (for ([(c w) (in-hash (get-children))])
-        (send c destroy w)
-        (remove-child c)))))
+      (destroy-children)
+      (send v show #f))))
 
 (define dialog% (window-like% gui:dialog%))
 (define window% (window-like% gui:frame%))

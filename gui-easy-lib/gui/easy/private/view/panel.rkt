@@ -5,6 +5,7 @@
          racket/list
          racket/match
          "../observable.rkt"
+         "common.rkt"
          "container.rkt"
          "view.rkt")
 
@@ -15,17 +16,17 @@
 (define (panel% clazz)
   (class* container% (view<%>)
     (inherit-field children)
-    (init-field @alignment @enabled? @min-size @stretch style)
-    (inherit children-for-dep child-dependencies
-             get-children add-child get-child remove-child)
+    (init-field @alignment @enabled? @spacing @margin @min-size @stretch style)
+    (inherit child-dependencies add-child update-children destroy-children)
     (super-new)
 
     (define/public (dependencies)
       (remove-duplicates
-       (append (list @alignment @enabled? @min-size @stretch)
+       (append (list @alignment @enabled? @spacing @margin @min-size @stretch)
                (child-dependencies))))
 
     (define/public (create parent)
+      (match-define (list v-m h-m) (obs-peek @margin))
       (match-define (list w h) (obs-peek @min-size))
       (match-define (list w-s? h-s?) (obs-peek @stretch))
       (define the-panel
@@ -34,6 +35,9 @@
              [alignment (obs-peek @alignment)]
              [enabled (obs-peek @enabled?)]
              [style style]
+             [spacing (obs-peek @spacing)]
+             [vert-margin v-m]
+             [horiz-margin h-m]
              [min-width w]
              [min-height h]
              [stretchable-width w-s?]
@@ -43,27 +47,32 @@
           (add-child c (send c create the-panel)))))
 
     (define/public (update v what val)
-      (when (eq? what @min-size)
-        (match-define (list w h) val)
-        (send* v
-          (min-width (or w 0))
-          (min-height (or h 0))))
-      (when (eq? what @alignment)
-        (send/apply v set-alignment val))
-      (when (eq? what @enabled?)
-        (send v enabled val))
-      (when (eq? what @stretch)
-        (match-define (list w-s? h-s?) val)
-        (send* v
-          (stretchable-width w-s?)
-          (stretchable-height h-s?)))
-      (for ([c (in-list (children-for-dep what))])
-        (send c update (get-child c) what val)))
+      (case/dep what
+        [@alignment
+         (send/apply v set-alignment val)]
+        [@enabled?
+         (send v enabled val)]
+        [@spacing
+         (send v spacing val)]
+        [@margin
+         (match-define (list v-m h-m) val)
+         (send* v
+           (vert-margin v-m)
+           (horiz-margin h-m))]
+        [@min-size
+         (match-define (list w h) val)
+         (send* v
+           (min-width (or w 0))
+           (min-height (or h 0)))]
+        [@stretch
+         (match-define (list w-s? h-s?) val)
+         (send* v
+           (stretchable-width w-s?)
+           (stretchable-height h-s?))])
+      (update-children what val))
 
     (define/public (destroy _v)
-      (for ([(c w) (in-hash (get-children))])
-        (send c destroy w)
-        (remove-child c)))))
+      (destroy-children))))
 
 (define hpanel% (panel% gui:horizontal-panel%))
 (define vpanel% (panel% gui:vertical-panel%))
@@ -71,12 +80,16 @@
 (define (hpanel #:alignment [@alignment (obs '(left center))]
                 #:enabled? [@enabled? (obs #t)]
                 #:style [style null]
+                #:spacing [@spacing (obs 0)]
+                #:margin [@margin (obs '(0 0))]
                 #:min-size [@min-size (obs '(#f #f))]
                 #:stretch [@stretch (obs '(#t #t))]
                 . children)
   (new hpanel%
        [@alignment (->obs @alignment)]
        [@enabled? (->obs @enabled?)]
+       [@spacing (->obs @spacing)]
+       [@margin (->obs @margin)]
        [@min-size (->obs @min-size)]
        [@stretch (->obs @stretch)]
        [children children]
@@ -85,12 +98,16 @@
 (define (vpanel #:alignment [@alignment (obs '(center top))]
                 #:enabled? [@enabled? (obs #t)]
                 #:style [style null]
+                #:spacing [@spacing (obs 0)]
+                #:margin [@margin (obs '(0 0))]
                 #:min-size [@min-size (obs '(#f #f))]
                 #:stretch [@stretch (obs '(#t #t))]
                 . children)
   (new vpanel%
        [@alignment (->obs @alignment)]
        [@enabled? (->obs @enabled?)]
+       [@spacing (->obs @spacing)]
+       [@margin (->obs @margin)]
        [@min-size (->obs @min-size)]
        [@stretch (->obs @stretch)]
        [children children]

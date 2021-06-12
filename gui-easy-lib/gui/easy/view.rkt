@@ -74,6 +74,10 @@
 (define label/c
   (or/c #f gui:label-string?))
 
+(define margin/c
+  (list/c gui:spacing-integer?
+          gui:spacing-integer?))
+
 (define position/c
   (or/c 'center (list/c gui:position-integer?
                         gui:position-integer?)))
@@ -92,6 +96,8 @@
         #:style (listof (or/c 'border 'deleted
                               'hscroll 'auto-hscroll 'hide-hscroll
                               'vscroll 'auto-vscroll 'hide-vscroll))
+        #:spacing (maybe-obs/c gui:spacing-integer?)
+        #:margin (maybe-obs/c margin/c)
         #:min-size (maybe-obs/c size/c)
         #:stretch (maybe-obs/c stretch/c))
        #:rest (listof (is-a?/c view<%>))

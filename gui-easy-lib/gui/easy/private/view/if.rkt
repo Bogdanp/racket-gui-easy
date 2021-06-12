@@ -56,10 +56,10 @@
         (send else-view update (get-child else-view) what val)))
 
     (define/public (destroy _v)
-      (when (and (has-child? then-view))
+      (when (has-child? then-view)
         (send then-view destroy (get-child then-view))
         (remove-child then-view))
-      (when (and (has-child? else-view))
+      (when (has-child? else-view)
         (send else-view destroy (get-child else-view))
         (remove-child else-view)))))
 

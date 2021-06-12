@@ -4,6 +4,7 @@
          (prefix-in gui: racket/gui)
          racket/match
          "../observable.rkt"
+         "common.rkt"
          "view.rkt")
 
 (provide
@@ -36,22 +37,20 @@
            [stretchable-height h-s?]))
 
     (define/public (update v what val)
-      (when (eq? what @label)
-        (send v set-label val))
-      (when (eq? what @enabled?)
-        (send v enable val))
-      (when (eq? what @value)
-        (send v set-value val))
-      (when (eq? what @min-size)
-        (match-define (list w h) val)
-        (send* v
-          (min-width w)
-          (min-height h)))
-      (when (eq? what @stretch)
-        (match-define (list w-s? h-s?) val)
-        (send* v
-          (stretchable-width w-s?)
-          (stretchable-height h-s?))))
+      (case/dep what
+        [@label (send v set-label val)]
+        [@enabled? (send v enable val)]
+        [@value (send v set-value val)]
+        [@min-size
+         (match-define (list w h) val)
+         (send* v
+           (min-width w)
+           (min-height h))]
+        [@stretch
+         (match-define (list w-s? h-s?) val)
+         (send* v
+           (stretchable-width w-s?)
+           (stretchable-height h-s?))]))
 
     (define/public (destroy _v)
       (void))))
