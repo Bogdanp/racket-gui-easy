@@ -14,6 +14,15 @@
                   #:checked? (maybe-obs/c boolean?)
                   #:enabled? (maybe-obs/c boolean?))
                  (is-a?/c view<%>))]
+  [choice (->* ((maybe-obs/c (listof gui:label-string?))
+                (-> gui:label-string? any))
+               (#:selection (maybe-obs/c gui:label-string?)
+                #:label (maybe-obs/c gui:label-string?)
+                #:style (listof (or/c 'horizontal-label 'vertical-label 'deleted))
+                #:enabled? (maybe-obs/c boolean?)
+                #:min-size (maybe-obs/c size/c)
+                #:stretch (maybe-obs/c stretch/c))
+               (is-a?/c view<%>))]
   [hpanel panel/c]
   [vpanel panel/c]
   [button (-> (maybe-obs/c string?) (-> any) (is-a?/c view<%>))]
