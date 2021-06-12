@@ -13,6 +13,7 @@
            "view/input.rkt"
            "view/label.rkt"
            "view/panel.rkt"
+           "view/size.rkt"
            "view/spacer.rkt"
            "view/view.rkt"
            "view/window.rkt")

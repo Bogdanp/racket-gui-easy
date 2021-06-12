@@ -36,17 +36,33 @@
                                   'toolbar-button 'float 'metal
                                   'fullscreen-button 'fullscreen-aux)))]))
 
+(define alignment/c
+  (list/c (or/c 'left 'center 'right)
+          (or/c 'top 'center 'bottom)))
+
 (define label/c
   (or/c #f gui:label-string?))
 
 (define panel/c
-  (-> (is-a?/c view<%>) ... (is-a?/c view<%>)))
+  (->* ()
+       (#:alignment (maybe-obs/c alignment/c)
+        #:enabled? (maybe-obs/c boolean?)
+        #:style (listof (or/c 'border 'deleted
+                              'hscroll 'auto-hscroll 'hide-hscroll
+                              'vscroll 'auto-vscroll 'hide-vscroll))
+        #:min-size (maybe-obs/c size?)
+        #:stretch (maybe-obs/c stretch?))
+       #:rest (listof (is-a?/c view<%>))
+       (is-a?/c view<%>)))
 
 (define (window/c style/c)
   (->* ()
        (#:title (maybe-obs/c string?)
-        #:size (maybe-obs/c (cons/c gui:dimension-integer? gui:dimension-integer?))
+        #:size (maybe-obs/c size?)
+        #:alignment (maybe-obs/c alignment/c)
         #:position (maybe-obs/c (or/c 'center (cons/c gui:position-integer? gui:position-integer?)))
+        #:min-size (maybe-obs/c size?)
+        #:stretch (maybe-obs/c stretch?)
         #:style style/c)
        #:rest (listof (is-a?/c view<%>))
        (is-a?/c view<%>)))

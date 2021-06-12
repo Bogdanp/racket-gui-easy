@@ -31,7 +31,6 @@
 (render
  (window
   #:title @title
-  #:size (cons 100 100)
   (vpanel
    (counter @c1)
    (counter @c2))))
