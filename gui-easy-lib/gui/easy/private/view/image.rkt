@@ -2,17 +2,12 @@
 
 (require racket/class
          (prefix-in gui: racket/gui)
-         racket/match
          "../observable.rkt"
          "common.rkt"
          "view.rkt")
 
 (provide
  image)
-
-;; TODO: This should react to changes to the backing scale.
-(define scale
-  (gui:get-display-backing-scale))
 
 (define image%
   (class* object% (view<%>)
@@ -46,9 +41,7 @@
       (void))
 
     (define/private (reload! path)
-      (set! bmp (call-with-input-file path
-                  (λ (in)
-                    (make-object gui:bitmap% in 'unknown #f #f scale #f)))))))
+      (set! bmp (gui:read-bitmap path)))))
 
 (define (image @path)
   (new image%
