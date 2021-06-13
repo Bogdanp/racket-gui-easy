@@ -16,6 +16,7 @@
            "view/progress.rkt"
            "view/slider.rkt"
            "view/spacer.rkt"
+           "view/table.rkt"
            "view/text.rkt"
            "view/view.rkt"
            "view/window.rkt")

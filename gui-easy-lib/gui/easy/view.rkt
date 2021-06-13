@@ -60,6 +60,24 @@
                 #:stretch (maybe-obs/c stretch/c))
                (is-a?/c view<%>))]
   [spacer (-> (is-a?/c view<%>))]
+  [table (->* ((listof gui:label-string?)
+               (maybe-obs/c (vectorof vector?))
+               (-> (or/c 'select 'dclick 'column)
+                   (or/c #f exact-nonnegative-integer?)
+                   any))
+              (#:label (maybe-obs/c (or/c #f gui:label-string?))
+               #:selection (maybe-obs/c (or/c #f exact-nonnegative-integer? (listof exact-nonnegative-integer?)))
+               #:enabled? (maybe-obs/c boolean?)
+               #:style (listof (or/c 'single 'multiple 'extended
+                                     'vertical-label 'horizontal-label
+                                     'variable-columns 'column-headers
+                                     'clickable-headers 'reorderable-headers
+                                     'deleted))
+               #:font (is-a?/c gui:font%)
+               #:margin margin/c
+               #:min-size size/c
+               #:stretch stretch/c)
+              (is-a?/c view<%>))]
   [text (-> (maybe-obs/c gui:label-string?) (is-a?/c view<%>))]
   [dialog (window/c (listof (or/c 'no-caption 'no-sheet 'resize-border 'close-button)))]
   [window (window/c (listof (or/c 'no-resize-border 'no-caption
