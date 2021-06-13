@@ -82,9 +82,9 @@
 
              [(fit)
               (define r (/ sh sw))
-              (cond
-                [(> (* w r) h) (values (exact-ceiling (/ h r)) h)]
-                [(> (/ h r) w) (values w (exact-ceiling (* w r)))])]))
+              (if (>= (* w r) h)
+                  (values (exact-ceiling (/ h r)) h)
+                  (values w (exact-ceiling (* w r))))]))
          (define bmp-dc
            (new gui:bitmap-dc%
                 [bitmap (gui:make-bitmap w* h* #:backing-scale backing-scale)]))
