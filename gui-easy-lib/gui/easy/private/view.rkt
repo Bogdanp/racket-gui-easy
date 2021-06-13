@@ -11,6 +11,7 @@
            "view/checkbox.rkt"
            "view/choice.rkt"
            "view/if.rkt"
+           "view/image.rkt"
            "view/input.rkt"
            "view/panel.rkt"
            "view/progress.rkt"
