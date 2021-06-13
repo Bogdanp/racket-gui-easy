@@ -26,7 +26,7 @@
                (child-dependencies))))
 
     (define/public (create parent)
-      (match-define (list v-m h-m) (obs-peek @margin))
+      (match-define (list h-m v-m) (obs-peek @margin))
       (match-define (list w h) (obs-peek @min-size))
       (match-define (list w-s? h-s?) (obs-peek @stretch))
       (define the-panel
@@ -55,10 +55,10 @@
         [@spacing
          (send v spacing val)]
         [@margin
-         (match-define (list v-m h-m) val)
+         (match-define (list h-m v-m) val)
          (send* v
-           (vert-margin v-m)
-           (horiz-margin h-m))]
+           (horiz-margin h-m)
+           (vert-margin v-m))]
         [@min-size
          (match-define (list w h) val)
          (send* v
