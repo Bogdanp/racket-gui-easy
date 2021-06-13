@@ -4,8 +4,10 @@
          racket/class
          (prefix-in gui: racket/gui)
          racket/list
+         racket/match
          syntax/parse/define
          "../observable.rkt"
+         "common.rkt"
          "container.rkt"
          "view.rkt")
 
@@ -29,26 +31,31 @@
     (define/public (create parent)
       (define the-pane
         (new gui:panel%
-             [parent parent]))
+             [parent parent]
+             [min-width #f]
+             [min-height #f]
+             [stretchable-width #t]
+             [stretchable-height #t]))
       (begin0 the-pane
         (if (obs-peek @cond-e)
             (add-child then-view (send then-view create the-pane))
             (add-child else-view (send else-view create the-pane)))))
 
     (define/public (update v what val)
-      (when (eq? what @cond-e)
-        (when (and val (has-child? else-view))
-          (define w (get-child else-view))
-          (send else-view destroy w)
-          (send v delete-child w)
-          (remove-child else-view)
-          (add-child then-view (send then-view create v)))
-        (when (and (not val) (has-child? then-view))
-          (define w (get-child then-view))
-          (send then-view destroy w)
-          (send v delete-child w)
-          (remove-child then-view)
-          (add-child else-view (send else-view create v))))
+      (case/dep what
+        [@cond-e
+         (when (and val (has-child? else-view))
+           (define w (get-child else-view))
+           (send else-view destroy w)
+           (send v delete-child w)
+           (remove-child else-view)
+           (add-child then-view (send then-view create v)))
+         (when (and (not val) (has-child? then-view))
+           (define w (get-child then-view))
+           (send then-view destroy w)
+           (send v delete-child w)
+           (remove-child then-view)
+           (add-child else-view (send else-view create v)))])
 
       (when (and (has-child? then-view) (memq what (send then-view dependencies)))
         (send then-view update (get-child then-view) what val))

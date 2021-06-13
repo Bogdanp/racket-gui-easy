@@ -27,7 +27,10 @@
   [vpanel panel/c]
   [button (-> (maybe-obs/c string?) (-> any) (is-a?/c view<%>))]
   [if/view (-> (maybe-obs/c any/c) (is-a?/c view<%>) (is-a?/c view<%>) (is-a?/c view<%>))]
-  [image (-> (maybe-obs/c path-string?) (is-a?/c view<%>))]
+  [image (->* ((maybe-obs/c path-string?))
+              (#:size (maybe-obs/c size/c)
+               #:mode (maybe-obs/c (or/c 'fit 'fill)))
+              (is-a?/c view<%>))]
   [input (->* ((maybe-obs/c string?))
               ((-> (or/c 'input 'return) string? any)
                #:label (maybe-obs/c label/c)
