@@ -8,6 +8,7 @@
     (provide (all-from-out mod ...))))
 
 (reprovide "view/button.rkt"
+           "view/canvas.rkt"
            "view/checkbox.rkt"
            "view/choice.rkt"
            "view/if.rkt"
