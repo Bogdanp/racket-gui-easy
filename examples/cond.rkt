@@ -19,7 +19,7 @@
    (checkbox
     #:label "Toggle"
     #:checked? @toggled?
-    (@toggled? . λ<~ . not))
+    (λ:= @toggled?))
    (cond/view
     [@toggled?
      (cond/view

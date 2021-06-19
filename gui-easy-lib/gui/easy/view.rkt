@@ -12,7 +12,7 @@
   [canvas (-> (maybe-obs/c any/c)
               (-> (is-a?/c gui:dc<%>) any/c any)
               (is-a?/c view<%>))]
-  [checkbox (->* ((-> any))
+  [checkbox (->* ((-> boolean? any))
                  (#:label (maybe-obs/c label/c)
                   #:checked? (maybe-obs/c boolean?)
                   #:enabled? (maybe-obs/c boolean?))

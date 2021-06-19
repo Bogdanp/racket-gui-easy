@@ -23,8 +23,8 @@
            [label (obs-peek @label)]
            [value (obs-peek @checked?)]
            [enabled (obs-peek @enabled?)]
-           [callback (λ (_self _event)
-                       (action))]))
+           [callback (λ (self _event)
+                       (action (send self get-value)))]))
 
     (define/public (update v what val)
       (case/dep what
