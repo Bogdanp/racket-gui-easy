@@ -1,6 +1,7 @@
 #lang racket/base
 
-(require racket/class
+(require plot
+         racket/class
          racket/date
          racket/gui/easy
          racket/gui/easy/operator
@@ -16,29 +17,79 @@
            (sleep 1)
            (loop)))))))
 
+(define @show-graph? (obs #f))
+
 (define r 90)
 (define red (color "red"))
 (define black (color "black"))
 
-(define (draw-hand dc l w c ang)
+(define (ang v [p 30])
+  (+ pi (* v (- (/ pi p)))))
+
+(define (draw-hand dc l w c a)
   (send dc set-pen c w 'solid)
   (send dc draw-line
         r r
-        (+ r (* l (sin ang)))
-        (+ r (* l (cos ang)))))
+        (+ r (* l (sin a)))
+        (+ r (* l (cos a)))))
+
+(define (overlay s)
+  (list
+   (vrule s #:color 0)
+   (point-label
+    (list s 0)
+    (format "(~a, ~a)"
+            (round (+ r (* r (sin (ang s 30)))))
+            (round (+ r (* r (cos (ang s 30)))))))))
 
 (render
  (window
   #:title "Clock"
-  #:size (list (* 2 r) (+ (* 2 r) 30))
-  (canvas @d (λ (dc d)
-               (define h (modulo (date-hour d) 12))
-               (define m (date-minute d))
-               (define s (date-second d))
-               (send dc clear)
-               (send dc set-smoothing 'smoothed)
-               (send dc set-pen (color "black") 1 'solid)
-               (send dc draw-ellipse 0 0 (* 2 r) (* 2 r))
-               (draw-hand dc (* r 0.80) 1 red   (+ pi (* s (- (/ pi 30)))))
-               (draw-hand dc (* r 0.65) 2 black (+ pi (* m (- (/ pi 30)))))
-               (draw-hand dc (* r 0.55) 3 black (+ pi (* h (- (/ pi 6)))))))))
+  (vpanel
+   (hpanel
+    #:alignment '(center center)
+    (hpanel
+     #:stretch '(#f #f)
+     #:min-size `(,(* 2 r)
+                  ,(* 2 r))
+     (canvas @d (λ (dc d)
+                  (define h (modulo (date-hour d) 12))
+                  (define m (date-minute d))
+                  (define s (date-second d))
+                  (send dc clear)
+                  (send dc set-smoothing 'smoothed)
+                  (send dc set-pen black 1 'solid)
+                  (send dc draw-ellipse 0 0 (* 2 r) (* 2 r))
+                  (draw-hand dc (* r 0.80) 1 red   (ang s 30))
+                  (draw-hand dc (* r 0.65) 2 black (ang m 30))
+                  (draw-hand dc (* r 0.55) 3 black (ang h 6))))))
+   (checkbox
+    #:label "Show graph?"
+    #:checked? @show-graph?
+    (λ:= @show-graph?))
+   (cond/view
+    [@show-graph?
+     (snip
+      @d
+      #:min-size '(400 200)
+      (λ (d w h)
+        (define s (date-second d))
+        (define the-snip
+          (parameterize ([plot-width w]
+                         [plot-height h]
+                         [plot-x-label "Seconds"]
+                         [plot-y-label "Position"])
+            (plot-snip
+             (list
+              (lines
+               (for/list ([s (in-range 0 60)])
+                 (list s (sin (ang s 30)))))
+              (lines
+               (for/list ([s (in-range 0 60)])
+                 (list s (cos (ang s 30)))))))))
+
+        (begin0 the-snip
+          (send the-snip set-overlay-renderers (overlay s))))
+      (λ (the-snip d)
+        (send the-snip set-overlay-renderers (overlay (date-second d)))))]
+    [else (hpanel)]))))

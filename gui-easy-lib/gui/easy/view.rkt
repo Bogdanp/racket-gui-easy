@@ -66,6 +66,18 @@
                 #:min-size (maybe-obs/c size/c)
                 #:stretch (maybe-obs/c stretch/c))
                (is-a?/c view<%>))]
+  [snip (->* ((maybe-obs/c any/c)
+              (-> any/c gui:dimension-integer? gui:dimension-integer? (is-a?/c gui:snip%)))
+             ((-> (is-a?/c gui:snip%) any/c any)
+              #:label (maybe-obs/c (or/c #f gui:label-string?))
+              #:enabled? (maybe-obs/c boolean?)
+              #:style (listof (or/c 'no-border 'control-border 'combo
+                                    'resize-corner 'no-focus 'deleted
+                                    'transparent))
+              #:margin margin/c
+              #:min-size size/c
+              #:stretch stretch/c)
+             (is-a?/c view<%>))]
   [spacer (-> (is-a?/c view<%>))]
   [table (->* ((listof gui:label-string?)
                (maybe-obs/c (vectorof vector?))
