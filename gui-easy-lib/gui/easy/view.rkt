@@ -9,9 +9,18 @@
 (provide
  cond/view
  (contract-out
-  [canvas (-> (maybe-obs/c any/c)
-              (-> (is-a?/c gui:dc<%>) any/c any)
-              (is-a?/c view<%>))]
+  [canvas (->* ((maybe-obs/c any/c)
+                (-> (is-a?/c gui:dc<%>) any/c any))
+               (#:label (maybe-obs/c gui:label-string?)
+                #:enabled? (maybe-obs/c boolean?)
+                #:style (listof (or/c 'border 'control-border 'combo
+                                      'vscroll 'hscroll 'resize-corner
+                                      'gl 'no-autoclear 'transparent
+                                      'no-focus 'deleted))
+                #:margin margin/c
+                #:min-size size/c
+                #:stretch stretch/c)
+               (is-a?/c view<%>))]
   [checkbox (->* ((-> boolean? any))
                  (#:label (maybe-obs/c label/c)
                   #:checked? (maybe-obs/c boolean?)

@@ -50,19 +50,22 @@
     #:alignment '(center center)
     (hpanel
      #:stretch '(#f #f)
-     #:min-size `(,(* 2 r)
-                  ,(* 2 r))
-     (canvas @d (λ (dc d)
-                  (define h (modulo (date-hour d) 12))
-                  (define m (date-minute d))
-                  (define s (date-second d))
-                  (send dc clear)
-                  (send dc set-smoothing 'smoothed)
-                  (send dc set-pen black 1 'solid)
-                  (send dc draw-ellipse 0 0 (* 2 r) (* 2 r))
-                  (draw-hand dc (* r 0.80) 1 red   (ang s 30))
-                  (draw-hand dc (* r 0.65) 2 black (ang m 30))
-                  (draw-hand dc (* r 0.55) 3 black (ang h 6))))))
+     #:min-size `(,(+ 10 (* 2 r))
+                  ,(+ 10 (* 2 r)))
+     (canvas
+      @d
+      #:style '(transparent)
+      #:margin '(5 5)
+      (λ (dc d)
+        (define h (modulo (date-hour d) 12))
+        (define m (date-minute d))
+        (define s (date-second d))
+        (send dc set-smoothing 'smoothed)
+        (send dc set-pen black 1 'solid)
+        (send dc draw-ellipse 0 0 (* 2 r) (* 2 r))
+        (draw-hand dc (* r 0.80) 1 red   (ang s 30))
+        (draw-hand dc (* r 0.65) 2 black (ang m 30))
+        (draw-hand dc (* r 0.55) 3 black (ang h 6))))))
    (checkbox
     #:label "Show graph?"
     #:checked? @show-graph?
@@ -73,7 +76,6 @@
       @d
       #:min-size '(400 200)
       (λ (d w h)
-        (define s (date-second d))
         (define the-snip
           (parameterize ([plot-width w]
                          [plot-height h]
@@ -89,7 +91,9 @@
                  (list s (cos (ang s 30)))))))))
 
         (begin0 the-snip
-          (send the-snip set-overlay-renderers (overlay s))))
+          (send the-snip set-overlay-renderers (overlay (date-second d)))))
       (λ (the-snip d)
         (send the-snip set-overlay-renderers (overlay (date-second d)))))]
-    [else (hpanel)]))))
+
+    [else
+     (hpanel)]))))
