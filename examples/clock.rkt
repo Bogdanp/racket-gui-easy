@@ -7,7 +7,10 @@
          racket/gui/easy/operator
          racket/math)
 
-(define @d
+(define @show-graph? (obs #f))
+(define @override? (obs #f))
+(define @override-d (obs (current-date)))
+(define @current-date
   (let ([@d (obs (current-date))])
     (begin0 @d
       (thread
@@ -17,7 +20,11 @@
            (sleep 1)
            (loop)))))))
 
-(define @show-graph? (obs #f))
+(define @d
+  (obs-combine
+   (λ (override? override-d d)
+     (if override? override-d d))
+   @override? @override-d @current-date))
 
 (define r 90)
 (define red (color "red"))
@@ -41,6 +48,22 @@
     (format "(~a, ~a)"
             (round (+ r (* r (sin (ang s 30)))))
             (round (+ r (* r (cos (ang s 30)))))))))
+
+(define (hand-slider label min max accessor updater)
+  (hpanel
+   #:alignment '(left center)
+   (hpanel
+    #:min-size '(70 #f)
+    #:stretch '(#f #t)
+    #:alignment '(right center)
+    (text label))
+   (slider
+    #:min-value min
+    #:max-value max
+    #:style '(horizontal plain)
+    (@d . ~> . accessor)
+    (λ (v)
+      (@override-d . <~ . (updater v))))))
 
 (render
  (window
@@ -66,6 +89,14 @@
         (draw-hand dc (* r 0.80) 1 red   (ang s 30))
         (draw-hand dc (* r 0.65) 2 black (ang m 30))
         (draw-hand dc (* r 0.55) 3 black (ang h 6))))))
+   (vpanel
+    (checkbox
+     #:label "Override?"
+     #:checked? @override?
+     (λ:= @override?))
+    (hand-slider "Hour"   0 23 date-hour   (λ (h) (λ (d) (struct-copy date d [hour h]))))
+    (hand-slider "Minute" 0 59 date-minute (λ (m) (λ (d) (struct-copy date d [minute m]))))
+    (hand-slider "Second" 0 59 date-second (λ (s) (λ (d) (struct-copy date d [second s])))))
    (checkbox
     #:label "Show graph?"
     #:checked? @show-graph?
