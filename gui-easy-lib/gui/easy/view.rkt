@@ -17,9 +17,9 @@
                                       'vscroll 'hscroll 'resize-corner
                                       'gl 'no-autoclear 'transparent
                                       'no-focus 'deleted))
-                #:margin margin/c
-                #:min-size size/c
-                #:stretch stretch/c)
+                #:margin (maybe-obs/c margin/c)
+                #:min-size (maybe-obs/c size/c)
+                #:stretch (maybe-obs/c stretch/c))
                (is-a?/c view<%>))]
   [checkbox (->* ((-> boolean? any))
                  (#:label (maybe-obs/c label/c)
@@ -52,7 +52,10 @@
                                      'vertical-label 'horizontal-label
                                      'deleted))
                #:font (is-a?/c gui:font%)
-               #:keymap (is-a?/c gui:keymap%))
+               #:keymap (is-a?/c gui:keymap%)
+               #:margin (maybe-obs/c margin/c)
+               #:min-size (maybe-obs/c size/c)
+               #:stretch (maybe-obs/c stretch/c))
               (is-a?/c view<%>))]
   [progress (->* ((maybe-obs/c gui:dimension-integer?))
                  (#:label (maybe-obs/c gui:label-string?)
@@ -84,9 +87,9 @@
               #:style (listof (or/c 'no-border 'control-border 'combo
                                     'resize-corner 'no-focus 'deleted
                                     'transparent))
-              #:margin margin/c
-              #:min-size size/c
-              #:stretch stretch/c)
+              #:margin (maybe-obs/c margin/c)
+              #:min-size (maybe-obs/c size/c)
+              #:stretch (maybe-obs/c stretch/c))
              (is-a?/c view<%>))]
   [spacer (-> (is-a?/c view<%>))]
   [table (->* ((listof gui:label-string?)
@@ -104,16 +107,16 @@
                                      'clickable-headers 'reorderable-headers
                                      'deleted))
                #:font (is-a?/c gui:font%)
-               #:margin margin/c
-               #:min-size size/c
-               #:stretch stretch/c)
+               #:margin (maybe-obs/c margin/c)
+               #:min-size (maybe-obs/c size/c)
+               #:stretch (maybe-obs/c stretch/c))
               (is-a?/c view<%>))]
   [tabs (->* ((maybe-obs/c (listof gui:label-string?))
               (-> (or/c 'close 'reorder 'select)
                   (listof any/c)
                   (or/c #f exact-nonnegative-integer?)
                   any))
-             (#:choice->label (-> any/c gui:label-string?)
+             (#:selection->label (-> any/c gui:label-string?)
               #:selection (maybe-obs/c (or/c #f exact-nonnegative-integer?))
               #:alignment (maybe-obs/c alignment/c)
               #:enabled? (maybe-obs/c boolean?)

@@ -15,14 +15,11 @@
 (define tabs%
   (class* container% (view<%>)
     (inherit-field children)
-    (init-field @choices @selection-index @alignment @enabled? @spacing @margin @min-size @stretch style action choice->label)
+    (init-field @choices @selection-index @alignment @enabled? @spacing @margin @min-size @stretch style action selection->label)
     (inherit child-dependencies add-child update-children destroy-children)
     (super-new)
 
     (define choices (obs-peek @choices))
-    (define choice-strings (map choice->label choices))
-    (define ignore-next-cb? #f)
-    (define ignore-next-set? #f)
 
     (define/public (dependencies)
       (remove-duplicates
@@ -47,12 +44,9 @@
                (define/override (on-close-request index)
                  (action 'close choices index)))
              [parent parent]
-             [choices choice-strings]
+             [choices (map selection->label choices)]
              [callback (λ (self _event)
-                         (unless ignore-next-cb?
-                           (set! ignore-next-set? #t)
-                           (action 'select choices (send self get-selection)))
-                         (set! ignore-next-cb? #f))]
+                         (action 'select choices (send self get-selection)))]
              [alignment (obs-peek @alignment)]
              [enabled (obs-peek @enabled?)]
              [style style]
@@ -70,15 +64,34 @@
     (define/public (update v what val)
       (case/dep what
         [@choices
-         (unless (equal? choices val)
-           (set! choices val)
-           (send v set (map choice->label val)))]
+         (cond
+           ;; The choices are the same and in the same order, so do
+           ;; nothing to avoid triggering an unnecessary `select'
+           ;; action.
+           [(equal? choices val)
+            (void)]
+
+           ;; The choices are the same except for the very last one.
+           ;; Assume this means we need to append and select the new
+           ;; choice.
+           [(and (not (null? val)) (equal? choices (drop-right val 1)))
+            (set! choices val)
+            (send v append (selection->label (last val)))
+            (send v set-selection (sub1 (length val)))]
+
+           ;; Otherwise, update the choices and try to preserve the
+           ;; current selection if it's a part of the new set.
+           [else
+            (define selection (send v get-selection))
+            (define choice (and selection (list-ref choices selection)))
+            (set! choices val)
+            (send v set (map selection->label val))
+            (when selection
+              (send v set-selection (index-of choices choice)))])]
         [@selection-index
-         (unless ignore-next-set?
-           (when val
-             (set! ignore-next-cb? #t)
-             (send v set-selection val)))
-         (set! ignore-next-set? #f)]
+         (when val
+           (unless (= (send v get-selection) val)
+             (send v set-selection val)))]
         [@alignment
          (send/apply v set-alignment val)]
         [@enabled?
@@ -106,7 +119,7 @@
       (destroy-children))))
 
 (define (tabs @choices action
-              #:choice->label [choice->label values]
+              #:selection->label [selection->label values]
               #:selection [@selection-index (obs #f)]
               #:alignment [@alignment (obs '(left center))]
               #:enabled? [@enabled? (obs #t)]
@@ -128,4 +141,4 @@
        [children children]
        [style style]
        [action action]
-       [choice->label choice->label]))
+       [selection->label selection->label]))

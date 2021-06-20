@@ -16,10 +16,20 @@
 (define @buffers (@ null))
 (define @buffer-index (@ #f))
 (define @current-buffer
-  (obs-combine
-   (λ (buffers index)
-     (and index (list-ref buffers index)))
-   @buffers @buffer-index))
+  (obs-debounce
+   #:duration 100
+   (obs-combine
+    (λ (buffers index)
+      (and index
+           (< index (length buffers))
+           (list-ref buffers index)))
+    @buffers @buffer-index)))
+
+(define (remove-at-index xs idx)
+  (for/list ([x (in-list xs)]
+             [i (in-naturals)]
+             #:unless (= i idx))
+    x))
 
 (render
  (window
@@ -29,35 +39,38 @@
    (λ ()
      (define filename (gui:get-file))
      (when filename
-       (define new-buffers
-         (@buffers . <~ . (λ (buffers)
-                            (define contents (call-with-input-file filename port->string))
-                            (append buffers (list (buffer filename contents))))))
-       (@buffer-index . := . (sub1 (length new-buffers))))))
+       (thread
+        (lambda ()
+          (define contents
+            (call-with-input-file filename port->string))
+          (@buffers . <~ . (λ (buffers)
+                             (append buffers (list (buffer filename contents))))))))))
   (tabs
    #:style '(no-border can-close can-reorder)
-   #:choice->label buffer-name
+   #:selection->label buffer-name
    #:selection @buffer-index
    @buffers
-   (λ (event buffers index)
-     (case event
-       [(close)
-        (when (= (obs-peek @buffer-index) index)
-          (@buffer-index . := . 0))
-        (@buffers . := . (for/list ([b (in-list buffers)]
-                                    [i (in-naturals)]
-                                    #:unless (= i index))
-                           b))]
+   (let ([ignore-select? #f])
+     (λ (event buffers index)
+       (case event
+         [(close)
+          (when (= (obs-peek @buffer-index) index)
+            (@buffer-index . := . 0))
+          (@buffers . := . (remove-at-index buffers index))]
 
-       [(reorder)
-        (@buffer-index . := . index)
-        (@buffers . := . buffers)]
+         [(reorder)
+          (set! ignore-select? #t)
+          (@buffers . := . buffers)
+          (@buffer-index . := . index)]
 
-       [(select)
-        (@buffer-index . := . index)]))
+         [(select)
+          (unless ignore-select?
+            (@buffer-index . := . index))
+          (set! ignore-select? #f)])))
    (input
     #:font (font "Operator Mono" 12 #:weight 'light #:family 'modern)
     #:style '(multiple)
+    #:margin '(0 0)
     (@current-buffer . ~> . (λ (b)
                               (cond
                                 [b (buffer-contents b)]
