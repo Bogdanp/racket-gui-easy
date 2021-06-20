@@ -92,6 +92,7 @@
   [table (->* ((listof gui:label-string?)
                (maybe-obs/c (vectorof vector?))
                (-> (or/c 'select 'dclick 'column)
+                   (vectorof vector?)
                    (or/c #f exact-nonnegative-integer?)
                    any))
               (#:label (maybe-obs/c (or/c #f gui:label-string?))

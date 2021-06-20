@@ -34,7 +34,7 @@
    '("A" "B")
    #:selection @selection
    @entries
-   (λ (e v)
+   (λ (e _es v)
      (case e
        [(select)
         (@selection . := . v)])))))

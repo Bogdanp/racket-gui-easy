@@ -16,8 +16,8 @@
                 columns style font action)
     (super-new)
 
-    (define single?
-      (memq 'single style))
+    (define single? (memq 'single style))
+    (define entries (obs-peek @entries))
 
     (define/public (dependencies)
       (list @label @enabled? @entries @selection @margin @min-size @stretch))
@@ -39,15 +39,15 @@
              [callback (λ (self event)
                          (case (send event get-event-type)
                            [(list-box)
-                            (action 'select (if single?
-                                                (send self get-selection)
-                                                (send self get-selectoins)))]
+                            (action 'select entries (if single?
+                                                        (send self get-selection)
+                                                        (send self get-selections)))]
 
                            [(list-box-dclick)
-                            (action 'dclick (send self get-selection))]
+                            (action 'dclick entries (send self get-selection))]
 
                            [(list-box-column)
-                            (action 'column (send event get-column))]))]
+                            (action 'column entries (send event get-column))]))]
              [horiz-margin h-m]
              [vert-margin v-m]
              [min-width min-w]
@@ -55,14 +55,16 @@
              [stretchable-width w-s?]
              [stretchable-height h-s?]))
       (begin0 the-list-box
-        (set the-list-box (obs-peek @entries))
+        (set the-list-box entries)
         (when selection
           (select the-list-box selection))))
 
     (define/public (update v what val)
       (case/dep what
         [@label (send v set-label v)]
-        [@entries (set v val)]
+        [@entries
+         (set! entries val)
+         (set v val)]
         [@enabled? (send v enable val)]
         [@selection (select v val)]
         [@margin
