@@ -108,6 +108,21 @@
                #:min-size size/c
                #:stretch stretch/c)
               (is-a?/c view<%>))]
+  [tabs (->* ((maybe-obs/c (listof gui:label-string?))
+              (-> (or/c 'close 'reorder 'select)
+                  (listof gui:label-string?)
+                  (or/c #f exact-nonnegative-integer?)
+                  any))
+             (#:selection (maybe-obs/c (or/c #f exact-nonnegative-integer?))
+              #:alignment (maybe-obs/c alignment/c)
+              #:enabled? (maybe-obs/c boolean?)
+              #:style (listof (or/c 'no-border 'can-reorder 'can-close 'flat-portable 'deleted))
+              #:spacing (maybe-obs/c gui:spacing-integer?)
+              #:margin (maybe-obs/c margin/c)
+              #:min-size (maybe-obs/c size/c)
+              #:stretch (maybe-obs/c stretch/c))
+             #:rest (listof (is-a?/c view<%>))
+             (is-a?/c view<%>))]
   [text (-> (maybe-obs/c gui:label-string?) (is-a?/c view<%>))]
   [dialog (window/c (listof (or/c 'no-caption 'no-sheet 'resize-border 'close-button)))]
   [window (window/c (listof (or/c 'no-resize-border 'no-caption

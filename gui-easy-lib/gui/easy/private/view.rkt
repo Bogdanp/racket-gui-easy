@@ -20,6 +20,7 @@
            "view/snip.rkt"
            "view/spacer.rkt"
            "view/table.rkt"
+           "view/tabs.rkt"
            "view/text.rkt"
            "view/view.rkt"
            "view/window.rkt")
