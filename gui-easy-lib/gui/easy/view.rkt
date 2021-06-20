@@ -51,7 +51,8 @@
                #:style (listof (or/c 'single 'multiple 'hscroll 'password
                                      'vertical-label 'horizontal-label
                                      'deleted))
-               #:font (is-a?/c gui:font%))
+               #:font (is-a?/c gui:font%)
+               #:keymap (is-a?/c gui:keymap%))
               (is-a?/c view<%>))]
   [progress (->* ((maybe-obs/c gui:dimension-integer?))
                  (#:label (maybe-obs/c gui:label-string?)

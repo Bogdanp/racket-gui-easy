@@ -1,6 +1,7 @@
 #lang racket/base
 
-(require racket/class
+(require (only-in framework keymap:get-global)
+         racket/class
          (prefix-in gui: racket/gui)
          "../observable.rkt"
          "common.rkt"
@@ -11,7 +12,7 @@
 
 (define input%
   (class* object% (view<%>)
-    (init-field @label @content @enabled? @background-color action style font)
+    (init-field @label @content @enabled? @background-color action style font keymap)
     (super-new)
 
     (define/public (dependencies)
@@ -35,7 +36,8 @@
              [font font]))
       (begin0 the-field
         (when background-color
-          (send the-field set-field-background background-color))))
+          (send the-field set-field-background background-color))
+        (send+ the-field (get-editor) (set-keymap keymap))))
 
     (define/public (update v what val)
       (case/dep what
@@ -60,7 +62,8 @@
                #:enabled? [@enabled? (obs #t)]
                #:background-color [@background-color (obs #f)]
                #:style [style '(single)]
-               #:font [font gui:normal-control-font])
+               #:font [font gui:normal-control-font]
+               #:keymap [keymap (keymap:get-global)])
   (new input%
        [@label (->obs @label)]
        [@content (->obs @content)]
@@ -68,4 +71,5 @@
        [@background-color (->obs @background-color)]
        [action action]
        [style style]
-       [font font]))
+       [font font]
+       [keymap keymap]))
