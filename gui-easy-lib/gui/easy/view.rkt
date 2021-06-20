@@ -110,10 +110,11 @@
               (is-a?/c view<%>))]
   [tabs (->* ((maybe-obs/c (listof gui:label-string?))
               (-> (or/c 'close 'reorder 'select)
-                  (listof gui:label-string?)
+                  (listof any/c)
                   (or/c #f exact-nonnegative-integer?)
                   any))
-             (#:selection (maybe-obs/c (or/c #f exact-nonnegative-integer?))
+             (#:choice->label (-> any/c gui:label-string?)
+              #:selection (maybe-obs/c (or/c #f exact-nonnegative-integer?))
               #:alignment (maybe-obs/c alignment/c)
               #:enabled? (maybe-obs/c boolean?)
               #:style (listof (or/c 'no-border 'can-reorder 'can-close 'flat-portable 'deleted))

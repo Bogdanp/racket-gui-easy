@@ -3,8 +3,8 @@
 (require racket/gui/easy
          racket/gui/easy/operator)
 
-(define @choices (obs '("A" "B" "B")))
-(define @selection-index (obs 0))
+(define @choices (@ '("A" "B" "B")))
+(define @selection-index (@ 0))
 (define @selection
   (obs-combine
    (λ (choices index)

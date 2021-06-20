@@ -15,11 +15,14 @@
 (define tabs%
   (class* container% (view<%>)
     (inherit-field children)
-    (init-field @choices @selection-index @alignment @enabled? @spacing @margin @min-size @stretch style action)
+    (init-field @choices @selection-index @alignment @enabled? @spacing @margin @min-size @stretch style action choice->label)
     (inherit child-dependencies add-child update-children destroy-children)
     (super-new)
 
     (define choices (obs-peek @choices))
+    (define choice-strings (map choice->label choices))
+    (define ignore-next-cb? #f)
+    (define ignore-next-set? #f)
 
     (define/public (dependencies)
       (remove-duplicates
@@ -44,9 +47,12 @@
                (define/override (on-close-request index)
                  (action 'close choices index)))
              [parent parent]
-             [choices (obs-peek @choices)]
+             [choices choice-strings]
              [callback (λ (self _event)
-                         (action 'select choices (send self get-selection)))]
+                         (unless ignore-next-cb?
+                           (set! ignore-next-set? #t)
+                           (action 'select choices (send self get-selection)))
+                         (set! ignore-next-cb? #f))]
              [alignment (obs-peek @alignment)]
              [enabled (obs-peek @enabled?)]
              [style style]
@@ -66,10 +72,13 @@
         [@choices
          (unless (equal? choices val)
            (set! choices val)
-           (send v set val))]
+           (send v set (map choice->label val)))]
         [@selection-index
-         (when val
-           (send v set-selection val))]
+         (unless ignore-next-set?
+           (when val
+             (set! ignore-next-cb? #t)
+             (send v set-selection val)))
+         (set! ignore-next-set? #f)]
         [@alignment
          (send/apply v set-alignment val)]
         [@enabled?
@@ -97,6 +106,7 @@
       (destroy-children))))
 
 (define (tabs @choices action
+              #:choice->label [choice->label values]
               #:selection [@selection-index (obs #f)]
               #:alignment [@alignment (obs '(left center))]
               #:enabled? [@enabled? (obs #t)]
@@ -117,4 +127,5 @@
        [@stretch (->obs @stretch)]
        [children children]
        [style style]
-       [action action]))
+       [action action]
+       [choice->label choice->label]))
