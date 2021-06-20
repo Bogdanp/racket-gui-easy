@@ -41,6 +41,8 @@
             (add-child then-view (send then-view create the-pane))
             (add-child else-view (send else-view create the-pane)))))
 
+    (define then-pending #f)
+    (define else-pending #f)
     (define/public (update v what val)
       (case/dep what
         [@cond-e
@@ -49,18 +51,26 @@
            (send else-view destroy w)
            (send v delete-child w)
            (remove-child else-view)
-           (add-child then-view (send then-view create v)))
+           (add-child then-view (send then-view create v))
+           (when then-pending
+             (send/apply then-view update (get-child then-view) then-pending)))
          (when (and (not val) (has-child? then-view))
            (define w (get-child then-view))
            (send then-view destroy w)
            (send v delete-child w)
            (remove-child then-view)
-           (add-child else-view (send else-view create v)))])
+           (add-child else-view (send else-view create v))
+           (when else-pending
+             (send/apply else-view update (get-child else-view) else-pending)))])
 
-      (when (and (has-child? then-view) (memq what (send then-view dependencies)))
-        (send then-view update (get-child then-view) what val))
-      (when (and (has-child? else-view) (memq what (send else-view dependencies)))
-        (send else-view update (get-child else-view) what val)))
+      (when (memq what (send then-view dependencies))
+        (if (has-child? then-view)
+            (send then-view update (get-child then-view) what val)
+            (set! then-pending (list what val))))
+      (when (memq what (send else-view dependencies))
+        (if (has-child? else-view)
+            (send else-view update (get-child else-view) what val)
+            (set! else-pending (list what val)))))
 
     (define/public (destroy _v)
       (when (has-child? then-view)
