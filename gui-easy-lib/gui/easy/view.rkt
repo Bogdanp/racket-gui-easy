@@ -93,13 +93,14 @@
              (is-a?/c view<%>))]
   [spacer (-> (is-a?/c view<%>))]
   [table (->* ((listof gui:label-string?)
-               (maybe-obs/c (vectorof vector?))
+               (maybe-obs/c (vectorof any/c))
                (-> (or/c 'select 'dclick 'column)
-                   (vectorof vector?)
+                   (vectorof any/c)
                    (or/c #f exact-nonnegative-integer?)
                    any))
               (#:label (maybe-obs/c (or/c #f gui:label-string?))
                #:selection (maybe-obs/c (or/c #f exact-nonnegative-integer? (listof exact-nonnegative-integer?)))
+               #:selection->row (-> any/c vector?)
                #:enabled? (maybe-obs/c boolean?)
                #:style (listof (or/c 'single 'multiple 'extended
                                      'vertical-label 'horizontal-label

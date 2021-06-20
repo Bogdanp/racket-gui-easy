@@ -3,6 +3,7 @@
 (require racket/class
          (prefix-in gui: racket/gui)
          racket/match
+         racket/vector
          "../observable.rkt"
          "common.rkt"
          "view.rkt")
@@ -13,7 +14,7 @@
 (define table%
   (class* object% (view<%>)
     (init-field @label @enabled? @entries @selection @margin @min-size @stretch
-                columns style font action)
+                selection->row columns style font action)
     (super-new)
 
     (define single? (memq 'single style))
@@ -90,7 +91,8 @@
       (define entries-by-column
         (for/list ([idx (in-naturals)]
                    [_ (in-list columns)])
-          (for/list ([row (in-vector entries)])
+          (for/list ([data (in-vector entries)])
+            (define row (selection->row data))
             (if (> (vector-length row) idx)
                 (vector-ref row idx)
                 ""))))
@@ -113,6 +115,7 @@
            (send target select idx))]))))
 
 (define (table columns @entries action
+               #:selection->row [selection->row values]
                #:label [@label (obs #f)]
                #:selection [@selection (obs #f)]
                #:enabled? [@enabled? (obs #t)]
@@ -129,6 +132,7 @@
        [@margin (->obs @margin)]
        [@min-size (->obs @min-size)]
        [@stretch (->obs @stretch)]
+       [selection->row selection->row]
        [style style]
        [font font]
        [columns columns]
