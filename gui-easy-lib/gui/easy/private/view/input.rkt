@@ -48,7 +48,8 @@
          ;; forcing a change to the cursor position in case the input has
          ;; an action that somehow alters its own @content.
          (unless (string=? val (send v get-value))
-           (send v set-value val))]
+           (send v set-value val)
+           (send v refresh))]
         [@enabled?
          (send v enable val)]
         [@background-color
