@@ -47,7 +47,7 @@
                              (append buffers (list (buffer filename contents))))))))))
   (tabs
    #:style '(no-border can-close can-reorder)
-   #:selection->label buffer-name
+   #:choice->label buffer-name
    #:selection @buffer-index
    @buffers
    (let ([ignore-select? #f])
@@ -55,7 +55,7 @@
        (case event
          [(close)
           (when (= (obs-peek @buffer-index) index)
-            (@buffer-index . := . 0))
+            (@buffer-index . := . (max 0 (sub1 index))))
           (@buffers . := . (remove-at-index buffers index))]
 
          [(reorder)

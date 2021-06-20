@@ -14,7 +14,7 @@
 (define table%
   (class* object% (view<%>)
     (init-field @label @enabled? @entries @selection @margin @min-size @stretch
-                selection->row columns style font action)
+                entry->row columns style font action)
     (super-new)
 
     (define single? (memq 'single style))
@@ -91,8 +91,8 @@
       (define entries-by-column
         (for/list ([idx (in-naturals)]
                    [_ (in-list columns)])
-          (for/list ([data (in-vector entries)])
-            (define row (selection->row data))
+          (for/list ([entry (in-vector entries)])
+            (define row (entry->row entry))
             (if (> (vector-length row) idx)
                 (vector-ref row idx)
                 ""))))
@@ -115,7 +115,7 @@
            (send target select idx))]))))
 
 (define (table columns @entries action
-               #:selection->row [selection->row values]
+               #:entry->row [entry->row values]
                #:label [@label (obs #f)]
                #:selection [@selection (obs #f)]
                #:enabled? [@enabled? (obs #t)]
@@ -132,7 +132,7 @@
        [@margin (->obs @margin)]
        [@min-size (->obs @min-size)]
        [@stretch (->obs @stretch)]
-       [selection->row selection->row]
+       [entry->row entry->row]
        [style style]
        [font font]
        [columns columns]

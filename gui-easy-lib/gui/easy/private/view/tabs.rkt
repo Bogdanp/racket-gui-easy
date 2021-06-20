@@ -15,7 +15,7 @@
 (define tabs%
   (class* container% (view<%>)
     (inherit-field children)
-    (init-field @choices @selection-index @alignment @enabled? @spacing @margin @min-size @stretch style action selection->label)
+    (init-field @choices @selection-index @alignment @enabled? @spacing @margin @min-size @stretch style action choice->label)
     (inherit child-dependencies add-child update-children destroy-children)
     (super-new)
 
@@ -44,7 +44,7 @@
                (define/override (on-close-request index)
                  (action 'close choices index)))
              [parent parent]
-             [choices (map selection->label choices)]
+             [choices (map choice->label choices)]
              [callback (λ (self _event)
                          (action 'select choices (send self get-selection)))]
              [alignment (obs-peek @alignment)]
@@ -76,7 +76,7 @@
            ;; choice.
            [(and (not (null? val)) (equal? choices (drop-right val 1)))
             (set! choices val)
-            (send v append (selection->label (last val)))
+            (send v append (choice->label (last val)))
             (send v set-selection (sub1 (length val)))]
 
            ;; Otherwise, update the choices and try to preserve the
@@ -85,7 +85,7 @@
             (define selection (send v get-selection))
             (define choice (and selection (list-ref choices selection)))
             (set! choices val)
-            (send v set (map selection->label val))
+            (send v set (map choice->label val))
             (when selection
               (send v set-selection (index-of choices choice)))])]
         [@selection-index
@@ -119,7 +119,7 @@
       (destroy-children))))
 
 (define (tabs @choices action
-              #:selection->label [selection->label values]
+              #:choice->label [choice->label values]
               #:selection [@selection-index (obs #f)]
               #:alignment [@alignment (obs '(left center))]
               #:enabled? [@enabled? (obs #t)]
@@ -141,4 +141,4 @@
        [children children]
        [style style]
        [action action]
-       [selection->label selection->label]))
+       [choice->label choice->label]))

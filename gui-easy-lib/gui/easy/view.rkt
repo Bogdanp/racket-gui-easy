@@ -99,8 +99,8 @@
                    (or/c #f exact-nonnegative-integer?)
                    any))
               (#:label (maybe-obs/c (or/c #f gui:label-string?))
+               #:entry->row (-> any/c vector?)
                #:selection (maybe-obs/c (or/c #f exact-nonnegative-integer? (listof exact-nonnegative-integer?)))
-               #:selection->row (-> any/c vector?)
                #:enabled? (maybe-obs/c boolean?)
                #:style (listof (or/c 'single 'multiple 'extended
                                      'vertical-label 'horizontal-label
@@ -117,7 +117,7 @@
                   (listof any/c)
                   (or/c #f exact-nonnegative-integer?)
                   any))
-             (#:selection->label (-> any/c gui:label-string?)
+             (#:choice->label (-> any/c gui:label-string?)
               #:selection (maybe-obs/c (or/c #f exact-nonnegative-integer?))
               #:alignment (maybe-obs/c alignment/c)
               #:enabled? (maybe-obs/c boolean?)
