@@ -53,7 +53,10 @@
          (for ([c (in-list val)])
            (send v append c))]
         [@selection-index
-         (send v set-selection val)]
+         (cond
+           [val (send v set-selection val)]
+           [(send v get-string-selection) => action]
+           [else (action "")])]
         [@label
          (send v set-label val)]
         [@enabled?

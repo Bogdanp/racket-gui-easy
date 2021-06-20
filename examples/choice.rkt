@@ -6,8 +6,8 @@
 
 (define @choice-input (@ "a,b,c"))
 (define @choices (@choice-input . ~> . (λ (s)
-                                         (map string-trim (string-split s ",")))))
-(define @choice (@ ""))
+                                         (map string-trim (string-split s "," #:trim? #f)))))
+(define @choice (@ "a"))
 
 (render
  (window

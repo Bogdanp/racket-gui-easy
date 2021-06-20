@@ -51,11 +51,11 @@
 
 (define (hand-slider label min max accessor updater)
   (hpanel
-   #:alignment '(left center)
+   #:alignment '(left top)
    (hpanel
+    #:alignment '(right center)
     #:min-size '(70 #f)
     #:stretch '(#f #t)
-    #:alignment '(right center)
     (text label))
    (slider
     #:min-value min
