@@ -42,7 +42,7 @@
 (define (obs-update! o f)
   (define v (box-update (obs-value-box o) f))
   (begin0 v
-    (for ([obs (in-list (unbox (obs-observers-box o)))])
+    (for ([obs (in-list (reverse (unbox (obs-observers-box o))))])
       (with-handlers ([exn:fail?
                        (lambda (e)
                          ((error-display-handler) (exn-message e) e))])
