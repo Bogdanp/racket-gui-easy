@@ -12,7 +12,8 @@
  obs-update!
  obs-peek
  obs-map
- obs-combine)
+ obs-combine
+ obs-debounce)
 
 (struct obs (value-box observers-box))
 
@@ -24,31 +25,31 @@
 (define (make-obs v)
   (obs (box v) (box null)))
 
-(define (obs-observe! a observer)
+(define (obs-observe! o observer)
   (void
    (box-update
-    (obs-observers-box a)
+    (obs-observers-box o)
     (λ (obss)
       (cons observer obss)))))
 
-(define (obs-unobserve! a observer)
+(define (obs-unobserve! o observer)
   (void
    (box-update
-    (obs-observers-box a)
+    (obs-observers-box o)
     (λ (obss)
       (remq observer obss)))))
 
-(define (obs-update! a f)
-  (define v (box-update (obs-value-box a) f))
+(define (obs-update! o f)
+  (define v (box-update (obs-value-box o) f))
   (begin0 v
-    (for ([obs (in-list (unbox (obs-observers-box a)))])
+    (for ([obs (in-list (unbox (obs-observers-box o)))])
       (with-handlers ([exn:fail?
                        (lambda (e)
                          ((error-display-handler) (exn-message e) e))])
         (obs v)))))
 
-(define (obs-peek a)
-  (unbox (obs-value-box a)))
+(define (obs-peek o)
+  (unbox (obs-value-box o)))
 
 (define (obs-map a f)
   (define b (make-obs (f (obs-peek a))))
@@ -86,3 +87,37 @@
                                 (for ([o (in-list obs)]
                                       [g (in-list gs)])
                                   (obs-unobserve! o g))))))
+
+(define nothing (gensym "nothing"))
+(define stop (gensym "stop"))
+
+(define (obs-debounce a #:duration [duration 200])
+  (define b (make-obs (obs-peek a)))
+  (define b-box (make-weak-box b))
+  (define ch (make-channel))
+  (define thd
+    (thread
+     (lambda ()
+       (let loop ([pending nothing])
+         (sync
+          (handle-evt
+           ch
+           (lambda (v)
+             (unless (eq? v stop)
+               (loop v))))
+          (if (eq? pending nothing)
+              never-evt
+              (handle-evt
+               (alarm-evt (+ (current-inexact-milliseconds) duration))
+               (lambda (_)
+                 (define maybe-b (weak-box-value b-box))
+                 (when maybe-b
+                   (obs-update! maybe-b (λ (_) pending)))
+                 (loop nothing)))))))))
+  (define (f v)
+    (channel-put ch v))
+  (begin0 b
+    (obs-observe! a f)
+    (will-register executor b (λ (_)
+                                (obs-unobserve! a f)
+                                (channel-put ch stop)))))

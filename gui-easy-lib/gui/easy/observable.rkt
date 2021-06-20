@@ -14,7 +14,10 @@
   [obs-update! (-> obs? (-> any/c any/c) any/c)]
   [obs-peek (-> obs? any/c)]
   [obs-map (-> obs? (-> any/c any/c) obs?)]
-  [obs-combine (-> procedure? obs? obs? ... obs?)]))
+  [obs-combine (-> procedure? obs? obs? ... obs?)]
+  [obs-debounce (->* (obs?)
+                     (#:duration exact-nonnegative-integer?)
+                     obs?)]))
 
 (define observer/c
   (-> any/c any))
