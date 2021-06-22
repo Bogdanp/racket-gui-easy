@@ -1,6 +1,11 @@
 #lang racket/base
 
-(require net/http-easy
+(require (only-in browser/external send-url)
+         (prefix-in cl: canvas-list)
+         json
+         net/http-easy
+         (prefix-in p: pict)
+         racket/class
          racket/format
          racket/gui/easy
          racket/gui/easy/operator
@@ -11,9 +16,29 @@
 (define-syntax-rule (async e0 e ...)
   (void (thread (λ () e0 e ...))))
 
-(define (get-story id)
+(define (get-item id)
   (response-json
    (get (format "https://hacker-news.firebaseio.com/v0/item/~a.json" id))))
+
+(define (get-items ids [concurrency (length ids)])
+  (define items-ch (make-channel))
+  (define sema (make-semaphore concurrency))
+  (for ([id (in-list ids)])
+    (thread
+     (lambda ()
+       (call-with-semaphore sema
+         (lambda ()
+           (channel-put items-ch (get-item id)))))))
+  (define all-items
+    (for/list ([_ (in-range (length ids))])
+      (channel-get items-ch)))
+  (filter values
+          (for/list ([id (in-list ids)])
+            (findf
+             (λ (it)
+               (and (not (eq? it (json-null)))
+                    (= id (hash-ref it 'id))))
+             all-items))))
 
 (define (get-stories which limit [concurrency limit])
   (define ids
@@ -21,28 +46,16 @@
      (response-json
       (get (format "https://hacker-news.firebaseio.com/v0/~a.json" which)))
      limit))
-  (define stories-ch (make-channel))
-  (define sema (make-semaphore concurrency))
-  (for ([id (in-list ids)])
-    (thread
-     (lambda ()
-       (call-with-semaphore sema
-         (lambda ()
-           (channel-put stories-ch (get-story id)))))))
-  (define all-stories
-    (for/list ([_ (in-range limit)])
-      (channel-get stories-ch)))
-  (for/list ([id (in-list ids)])
-    (findf
-     (λ (s)
-       (= id (hash-ref s 'id)))
-     all-stories)))
+  (get-items ids concurrency))
 
 (define (get-top-stories limit [concurrency 20])
   (get-stories "topstories" limit concurrency))
 
 (define (get-new-stories limit [concurrency 20])
   (get-stories "newstories" limit concurrency))
+
+(define (load-children it [concurrency 20])
+  (hash-set it 'children (get-items (hash-ref it 'kids null) concurrency)))
 
 
 ;; GUI ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -110,17 +123,121 @@
       (λ (event stories index)
         (case event
           [(dclick)
-           (@mode . := . `(story ,(vector-ref stories index)))])))])))
+           (define story (vector-ref stories index))
+           (@mode . := . `(story ,story))
+           (async (@mode . := . `(story ,(load-children story))))])))])))
+
+(define title-font (font "SF Pro" 18 #:weight 'medium))
+(define subtitle-font (font "SF Pro" 14 #:weight 'medium))
+(define regular-font (font "SF Pro" 12 #:weight 'medium))
+(define highlight-color (color "blue"))
+(define points-color (color "orange"))
+(define regular-color (color 80 80 80))
+(define inverted-color (color "white"))
+
+(define (story-pict s)
+  (p:vl-append
+   5
+   (p:text (hash-ref s 'title) title-font)
+   (p:colorize (p:text (hash-ref s 'url "show") subtitle-font) highlight-color)
+   (p:hc-append
+    5
+    (p:colorize (p:text (number->string (hash-ref s 'score)) regular-font) points-color)
+    (p:colorize (p:text "points by" regular-font) regular-color)
+    (p:colorize (p:text (hash-ref s 'by) regular-font) highlight-color))))
+
+(define (comment-pict c state)
+  (define username (hash-ref c 'by "anon"))
+  (p:vl-append
+   5
+   (p:lt-superimpose
+    (p:dc
+     (λ (dc dx dy)
+       (define old-brush (send dc get-brush))
+       (define old-pen (send dc get-pen))
+       (define-values (w h _d _v)
+         (send dc get-text-extent username regular-font))
+       (send dc set-smoothing 'smoothed)
+       (send dc set-pen "black" 0 'transparent)
+       (send dc set-brush inverted-color 'solid)
+       (send dc draw-rounded-rectangle dx dy (+ w 8) (+ h 4) 5)
+       (send dc set-pen old-pen)
+       (send dc set-brush old-brush))
+     0 0)
+    (p:inset
+     (p:colorize (p:text (hash-ref c 'by "anon") regular-font) points-color)
+     4 2))
+   (p:colorize
+    (p:text (hash-ref c 'text) regular-font)
+    (case state
+      [(selected) inverted-color]
+      [else regular-color]))))
+
+(define canvas-list%
+  (class* object% (view<%>)
+    (init-field @items item->pict item-height)
+    (super-new)
+
+    (define/public (dependencies)
+      (list @items))
+
+    (define/public (create parent)
+      (new cl:canvas-list%
+           [parent parent]
+           [hover-color (color #xF9 #xF9 #xF9)]
+           [selection-color (color #x00 #x00 #xFF)]
+           [items (obs-peek @items)]
+           [item-height item-height]
+           [paint-item-callback (λ (_self item state dc _w _h)
+                                  (p:draw-pict (item->pict item state) dc 10 10))]))
+
+    (define/public (update v what val)
+      (when (eq? what @items)
+        (send v set-items val)))
+
+    (define/public (destroy _v)
+      (void))))
+
+(define (canvas-list @items item->pict
+                     #:item-height item-height)
+  (new canvas-list%
+       [@items @items]
+       [item->pict item->pict]
+       [item-height item-height]))
 
 (render
  (window
+  #:title "Hacker News"
   #:size '(800 600)
   (cond/view
    [@story
     (vpanel
      #:alignment '(left top)
-     (button "Back" (λ () (@mode . := . '(overview))))
-     (text (@story . ~> . (λ (s) (if s (hash-ref s 'title) "")))))]
+     (hpanel
+      #:stretch '(#t #f)
+      (button "Back" (λ ()
+                       (@mode . := . '(overview))))
+      (spacer)
+      (button "Visit" (λ ()
+                        (send-url (hash-ref (obs-peek @story) 'url)))))
+     (vpanel
+      (canvas
+       #:style '(transparent)
+       #:stretch '(#t #f)
+       #:min-size '(#f 90)
+       @story
+       (λ (dc story)
+         (send dc set-smoothing 'smoothed)
+         (p:draw-pict (story-pict story) dc 10 10)))
+      (canvas-list
+       (@story . ~> . (λ (story)
+                        (let ([story (or story (hash))])
+                          (for/list ([comment (in-list (hash-ref story 'children null))]
+                                     #:unless (hash-ref comment 'deleted #f))
+                            comment))))
+       #:item-height 60
+       (λ (c state)
+         (comment-pict c state)))))]
 
    [else
     (hpanel
