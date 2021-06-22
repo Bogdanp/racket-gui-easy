@@ -7,6 +7,7 @@
          "private/view.rkt")
 
 (provide
+ view<%>
  cond/view
  (contract-out
   [canvas (->* ((maybe-obs/c any/c)
