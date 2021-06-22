@@ -3,7 +3,6 @@
 (require racket/class
          (prefix-in gui: racket/gui)
          racket/match
-         racket/vector
          "../observable.rkt"
          "common.rkt"
          "view.rkt")
@@ -13,7 +12,7 @@
 
 (define table%
   (class* object% (view<%>)
-    (init-field @label @enabled? @entries @selection @margin @min-size @stretch
+    (init-field @label @enabled? @entries @selection @margin @min-size @stretch @column-widths
                 entry->row columns style font action)
     (super-new)
 
@@ -21,13 +20,14 @@
     (define entries (obs-peek @entries))
 
     (define/public (dependencies)
-      (list @label @enabled? @entries @selection @margin @min-size @stretch))
+      (list @label @enabled? @entries @selection @margin @min-size @stretch @column-widths))
 
     (define/public (create parent)
       (match-define (list h-m v-m) (obs-peek @margin))
       (match-define (list min-w min-h) (obs-peek @min-size))
       (match-define (list w-s? h-s?) (obs-peek @stretch))
       (define selection (obs-peek @selection))
+      (define column-widths (obs-peek @column-widths))
       (define the-list-box
         (new gui:list-box%
              [parent parent]
@@ -58,7 +58,8 @@
       (begin0 the-list-box
         (set the-list-box entries)
         (when selection
-          (select the-list-box selection))))
+          (select the-list-box selection))
+        (resize-columns the-list-box column-widths)))
 
     (define/public (update v what val)
       (case/dep what
@@ -82,7 +83,9 @@
          (match-define (list w-s? h-s?) val)
          (send* v
            (stretchable-width w-s?)
-           (stretchable-height h-s?))]))
+           (stretchable-height h-s?))]
+        [@column-widths
+         (resize-columns v val)]))
 
     (define/public (destroy _v)
       (void))
@@ -112,7 +115,15 @@
          (for ([idx (in-list (send target get-selections))])
            (send target select idx #f))
          (for ([idx (in-list selection)])
-           (send target select idx))]))))
+           (send target select idx))]))
+
+    (define/private (resize-columns v widths)
+      (for ([spec (in-list widths)])
+        (define-values (idx w min-w max-w)
+          (match spec
+            [`(,idx ,width) (values idx width 0 10000)]
+            [`(,idx ,width ,min-width ,max-width) (values idx width min-width max-width)]))
+        (send v set-column-width idx w min-w max-w)))))
 
 (define (table columns @entries action
                #:entry->row [entry->row values]
@@ -123,7 +134,8 @@
                #:font [font gui:view-control-font]
                #:margin [@margin (obs '(0 0))]
                #:min-size [@min-size (obs '(#f #f))]
-               #:stretch [@stretch (obs '(#t #t))])
+               #:stretch [@stretch (obs '(#t #t))]
+               #:column-widths [@column-widths (obs null)])
   (new table%
        [@label (->obs @label)]
        [@selection (->obs @selection)]
@@ -132,6 +144,7 @@
        [@margin (->obs @margin)]
        [@min-size (->obs @min-size)]
        [@stretch (->obs @stretch)]
+       [@column-widths (->obs @column-widths)]
        [entry->row entry->row]
        [style style]
        [font font]

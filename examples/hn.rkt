@@ -242,6 +242,7 @@
     [else
      (table
       '("Title" "Score" "By")
+      #:column-widths '((0 350))
       (@ss . ~> . list->vector)
       #:entry->row (λ (s)
                      (vector (story-title s)

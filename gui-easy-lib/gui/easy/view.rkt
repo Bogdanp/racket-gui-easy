@@ -111,7 +111,11 @@
                #:font (is-a?/c gui:font%)
                #:margin (maybe-obs/c margin/c)
                #:min-size (maybe-obs/c size/c)
-               #:stretch (maybe-obs/c stretch/c))
+               #:stretch (maybe-obs/c stretch/c)
+               #:column-widths (maybe-obs/c
+                                (listof
+                                 (or/c (list/c exact-nonnegative-integer? gui:dimension-integer?)
+                                       (list/c exact-nonnegative-integer? gui:dimension-integer? gui:dimension-integer? gui:dimension-integer?)))))
               (is-a?/c view<%>))]
   [tabs (->* ((maybe-obs/c (listof gui:label-string?))
               (-> (or/c 'close 'reorder 'select)
