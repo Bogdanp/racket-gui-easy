@@ -41,7 +41,7 @@
 
     (define/public (update v what val)
       (case/dep what
-        [@data (update-snip snip val)]
+        [@data (when snip (update-snip snip val))]
         [@label (send v set-label val)]
         [@enabled? (send v enable val)]
         [@margin
@@ -63,7 +63,8 @@
     (define/public (destroy _v)
       (void))))
 
-(define (snip @data make-snip [update-snip void]
+(define (snip @data make-snip
+              [update-snip void]
               #:label [@label #f]
               #:style [style '(no-border)]
               #:enabled? [@enabled? #t]
