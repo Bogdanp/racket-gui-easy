@@ -3,13 +3,12 @@
 (require (for-syntax racket/base
                      racket/format
                      syntax/parse)
+         "../logger.rkt"
          "../observable.rkt")
 
 (provide
  case/dep
  peek)
-
-(define-logger case/dep)
 
 (begin-for-syntax
   (define (trim-path p [max-length 30])
@@ -36,7 +35,7 @@
        #'(let ([what what-e])
            (cond
              [(eq? what dep-e)
-              (log-case/dep-debug "matched ~e at ~a" 'dep-e loc)
+              (log-gui-easy-debug "case/dep matched ~e at ~a" 'dep-e loc)
               e ...]
              ...)))]))
 
