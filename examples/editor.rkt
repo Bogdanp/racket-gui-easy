@@ -71,6 +71,7 @@
     #:font (font "Operator Mono" 12 #:weight 'light #:family 'modern)
     #:style '(multiple)
     #:margin '(0 0)
+    #:stretch '(#t #t)
     (@current-buffer . ~> . (λ (b)
                               (cond
                                 [b (buffer-contents b)]

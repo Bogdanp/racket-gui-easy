@@ -92,7 +92,7 @@
                #:keymap [keymap (keymap:get-global)]
                #:margin [@margin '(2 2)]
                #:min-size [@min-size '(#f #f)]
-               #:stretch [@stretch '(#t #t)])
+               #:stretch [@stretch '(#t #f)])
   (new input%
        [@label @label]
        [@content @content]
