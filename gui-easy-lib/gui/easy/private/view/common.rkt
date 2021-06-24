@@ -1,13 +1,39 @@
 #lang racket/base
 
-(require (for-syntax racket/base)
-         syntax/parse/define)
+(require (for-syntax racket/base
+                     racket/format
+                     syntax/parse))
 
 (provide
  case/dep)
 
-(define-syntax-parser case/dep
-  [(_ what-e:expr [dep-e:expr e ...] ...+)
-   #'(let ([what what-e])
-       (cond
-         [(eq? what dep-e) e ...] ...))])
+(define-logger case/dep)
+
+(begin-for-syntax
+  (define (trim-path p [max-length 30])
+    (define s (path->string p))
+    (cond
+      [(< (string-length s) max-length) s]
+      [else (~a "..." (substring s (- (string-length s) (- max-length 3))))])))
+
+(define-syntax (case/dep stx)
+  (syntax-parse stx
+    [(_ what-e:expr [dep-e:expr e ...] ...+)
+     (define-values (source line col pos)
+       (values (syntax-source stx)
+               (syntax-line stx)
+               (syntax-column stx)
+               (syntax-position stx)))
+     (define loc
+       (if (path-string? source)
+           (if (and line col)
+               (format "~a:~a:~a" (trim-path source) line col)
+               (format "~a:~a" (trim-path source) pos))
+           "unknown"))
+     (with-syntax ([loc (datum->syntax stx loc)])
+       #'(let ([what what-e])
+           (cond
+             [(eq? what dep-e)
+              (log-case/dep-debug "matched ~e at ~a" 'dep-e loc)
+              e ...]
+             ...)))]))
