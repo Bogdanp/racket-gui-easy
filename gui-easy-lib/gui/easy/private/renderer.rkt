@@ -23,7 +23,7 @@
 
     (define/public (render parent)
       (define deps (send tree dependencies))
-      (set! root (send tree create #f))
+      (set! root (send tree create parent))
       (for ([dep (in-list deps)])
         (define dep-box (make-weak-box dep))
         (obs-observe! dep (λ (v)
