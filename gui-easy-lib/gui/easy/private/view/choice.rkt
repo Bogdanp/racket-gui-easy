@@ -23,19 +23,19 @@
        @choices @selection))
 
     (define/public (dependencies)
-      (list @label @enabled? @choices @selection-index @min-size @stretch))
+      (filter obs? (list @label @enabled? @choices @selection-index @min-size @stretch)))
 
     (define/public (create parent)
-      (match-define (list min-w min-h) (obs-peek @min-size))
-      (match-define (list w-s? h-s?) (obs-peek @stretch))
-      (define selection (obs-peek @selection-index))
+      (match-define (list min-w min-h) (peek @min-size))
+      (match-define (list w-s? h-s?) (peek @stretch))
+      (define selection (peek @selection-index))
       (define the-choice
         (new gui:choice%
              [parent parent]
-             [label (obs-peek @label)]
+             [label (peek @label)]
              [style style]
-             [choices (obs-peek @choices)]
-             [enabled (obs-peek @enabled?)]
+             [choices (peek @choices)]
+             [enabled (peek @enabled?)]
              [callback (λ (self _event)
                          (action (send self get-string-selection)))]
              [min-width min-w]
@@ -76,18 +76,18 @@
       (void))))
 
 (define (choice @choices action
-                #:selection [@selection (obs 0)]
-                #:label [@label (obs #f)]
+                #:selection [@selection 0]
+                #:label [@label #f]
                 #:style [style null]
-                #:enabled? [@enabled? (obs #t)]
-                #:min-size [@min-size (obs '(#f #f))]
-                #:stretch [@stretch (obs '(#f #f))])
+                #:enabled? [@enabled? #t]
+                #:min-size [@min-size '(#f #f)]
+                #:stretch [@stretch '(#f #f)])
   (new choice%
        [@choices (->obs @choices)]
        [@selection (->obs @selection)]
-       [@label (->obs @label)]
-       [@enabled? (->obs @enabled?)]
-       [@min-size (->obs @min-size)]
-       [@stretch (->obs @stretch)]
+       [@label @label]
+       [@enabled? @enabled?]
+       [@min-size @min-size]
+       [@stretch @stretch]
        [style style]
        [action action]))

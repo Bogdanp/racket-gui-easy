@@ -17,19 +17,19 @@
     (super-new)
 
     (define/public (dependencies)
-      (list @label @content @enabled? @background-color @margin @min-size @stretch))
+      (filter obs? (list @label @content @enabled? @background-color @margin @min-size @stretch)))
 
     (define/public (create parent)
-      (match-define (list h-m v-m) (obs-peek @margin))
-      (match-define (list w h) (obs-peek @min-size))
-      (match-define (list w-s? h-s?) (obs-peek @stretch))
-      (define background-color (obs-peek @background-color))
+      (match-define (list h-m v-m) (peek @margin))
+      (match-define (list w h) (peek @min-size))
+      (match-define (list w-s? h-s?) (peek @stretch))
+      (define background-color (peek @background-color))
       (define the-field
         (new gui:text-field%
              [parent parent]
-             [label (obs-peek @label)]
-             [init-value (obs-peek @content)]
-             [enabled (obs-peek @enabled?)]
+             [label (peek @label)]
+             [init-value (peek @content)]
+             [enabled (peek @enabled?)]
              [callback (λ (self event)
                          (action
                           (case (send event get-event-type)
@@ -84,23 +84,23 @@
       (void))))
 
 (define (input @content [action void]
-               #:label [@label (obs #f)]
-               #:enabled? [@enabled? (obs #t)]
-               #:background-color [@background-color (obs #f)]
+               #:label [@label #f]
+               #:enabled? [@enabled? #t]
+               #:background-color [@background-color #f]
                #:style [style '(single)]
                #:font [font gui:normal-control-font]
                #:keymap [keymap (keymap:get-global)]
-               #:margin [@margin (obs '(2 2))]
-               #:min-size [@min-size (obs '(#f #f))]
-               #:stretch [@stretch (obs '(#t #t))])
+               #:margin [@margin '(2 2)]
+               #:min-size [@min-size '(#f #f)]
+               #:stretch [@stretch '(#t #t)])
   (new input%
-       [@label (->obs @label)]
-       [@content (->obs @content)]
-       [@enabled? (->obs @enabled?)]
-       [@background-color (->obs @background-color)]
-       [@margin (->obs @margin)]
-       [@min-size (->obs @min-size)]
-       [@stretch (->obs @stretch)]
+       [@label @label]
+       [@content @content]
+       [@enabled? @enabled?]
+       [@background-color @background-color]
+       [@margin @margin]
+       [@min-size @min-size]
+       [@stretch @stretch]
        [action action]
        [style style]
        [font font]

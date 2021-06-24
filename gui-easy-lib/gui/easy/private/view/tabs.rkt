@@ -19,17 +19,17 @@
     (inherit child-dependencies add-child update-children destroy-children)
     (super-new)
 
-    (define choices (obs-peek @choices))
+    (define choices (peek @choices))
 
     (define/public (dependencies)
-      (remove-duplicates
-       (append (list @choices @selection-index @alignment @enabled? @spacing @margin @min-size @stretch)
-               (child-dependencies))))
+      (filter obs? (remove-duplicates
+                    (append (list @choices @selection-index @alignment @enabled? @spacing @margin @min-size @stretch)
+                            (child-dependencies)))))
 
     (define/public (create parent)
-      (match-define (list h-m v-m) (obs-peek @margin))
-      (match-define (list w h) (obs-peek @min-size))
-      (match-define (list w-s? h-s?) (obs-peek @stretch))
+      (match-define (list h-m v-m) (peek @margin))
+      (match-define (list w h) (peek @min-size))
+      (match-define (list w-s? h-s?) (peek @stretch))
       (define the-panel
         (new (class gui:tab-panel%
                (inherit get-selection)
@@ -47,10 +47,10 @@
              [choices (map choice->label choices)]
              [callback (λ (self _event)
                          (action 'select choices (send self get-selection)))]
-             [alignment (obs-peek @alignment)]
-             [enabled (obs-peek @enabled?)]
+             [alignment (peek @alignment)]
+             [enabled (peek @enabled?)]
              [style style]
-             [spacing (obs-peek @spacing)]
+             [spacing (peek @spacing)]
              [vert-margin v-m]
              [horiz-margin h-m]
              [min-width w]
@@ -120,24 +120,24 @@
 
 (define (tabs @choices action
               #:choice->label [choice->label values]
-              #:selection [@selection-index (obs #f)]
-              #:alignment [@alignment (obs '(left center))]
-              #:enabled? [@enabled? (obs #t)]
+              #:selection [@selection-index #f]
+              #:alignment [@alignment '(left center)]
+              #:enabled? [@enabled? #t]
               #:style [style null]
-              #:spacing [@spacing (obs 0)]
-              #:margin [@margin (obs '(0 0))]
-              #:min-size [@min-size (obs '(#f #f))]
-              #:stretch [@stretch (obs '(#t #t))]
+              #:spacing [@spacing 0]
+              #:margin [@margin '(0 0)]
+              #:min-size [@min-size '(#f #f)]
+              #:stretch [@stretch '(#t #t)]
               . children)
   (new tabs%
-       [@choices (->obs @choices)]
-       [@selection-index (->obs @selection-index)]
-       [@alignment (->obs @alignment)]
-       [@enabled? (->obs @enabled?)]
-       [@spacing (->obs @spacing)]
-       [@margin (->obs @margin)]
-       [@min-size (->obs @min-size)]
-       [@stretch (->obs @stretch)]
+       [@choices @choices]
+       [@selection-index @selection-index]
+       [@alignment @alignment]
+       [@enabled? @enabled?]
+       [@spacing @spacing]
+       [@margin @margin]
+       [@min-size @min-size]
+       [@stretch @stretch]
        [children children]
        [style style]
        [action action]

@@ -16,22 +16,22 @@
     (super-new)
 
     (define/public (dependencies)
-      (list @data @label @enabled? @margin @min-size @stretch))
+      (filter obs? (list @data @label @enabled? @margin @min-size @stretch)))
 
     (define snip #f)
     (define/public (create parent)
-      (match-define (list h-m v-m) (obs-peek @margin))
-      (match-define (list min-w min-h) (obs-peek @min-size))
-      (match-define (list w-s? h-s?) (obs-peek @stretch))
-      (define data (obs-peek @data))
+      (match-define (list h-m v-m) (peek @margin))
+      (match-define (list min-w min-h) (peek @min-size))
+      (match-define (list w-s? h-s?) (peek @stretch))
       (new gui:snip-canvas%
            [parent parent]
-           [make-snip (λ (w h)
-                        (set! snip (make-snip data w h))
-                        snip)]
-           [label (obs-peek @label)]
+           [make-snip (let ([data (peek @data)])
+                        (λ (w h)
+                          (set! snip (make-snip data w h))
+                          snip))]
+           [label (peek @label)]
            [style style]
-           [enabled (obs-peek @enabled?)]
+           [enabled (peek @enabled?)]
            [horiz-margin h-m]
            [vert-margin v-m]
            [min-width min-w]
@@ -64,19 +64,19 @@
       (void))))
 
 (define (snip @data make-snip [update-snip void]
-              #:label [@label (obs #f)]
+              #:label [@label #f]
               #:style [style '(no-border)]
-              #:enabled? [@enabled? (obs #t)]
-              #:margin [@margin (obs '(0 0))]
-              #:min-size [@min-size (obs '(#f #f))]
-              #:stretch [@stretch (obs '(#t #t))])
+              #:enabled? [@enabled? #t]
+              #:margin [@margin '(0 0)]
+              #:min-size [@min-size '(#f #f)]
+              #:stretch [@stretch '(#t #t)])
   (new snip%
-       [@data (->obs @data)]
-       [@label (->obs @label)]
-       [@enabled? (->obs @enabled?)]
-       [@margin (->obs @margin)]
-       [@min-size (->obs @min-size)]
-       [@stretch (->obs @stretch)]
+       [@data @data]
+       [@label @label]
+       [@enabled? @enabled?]
+       [@margin @margin]
+       [@min-size @min-size]
+       [@stretch @stretch]
        [make-snip make-snip]
        [update-snip update-snip]
        [style style]))

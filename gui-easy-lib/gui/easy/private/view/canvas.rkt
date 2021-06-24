@@ -18,19 +18,19 @@
     (define input #f)
 
     (define/public (dependencies)
-      (list @input @label @enabled? @margin @min-size @stretch))
+      (filter obs? (list @input @label @enabled? @margin @min-size @stretch)))
 
     (define/public (create parent)
-      (match-define (list h-m v-m) (obs-peek @margin))
-      (match-define (list min-w min-h) (obs-peek @min-size))
-      (match-define (list w-s? h-s?) (obs-peek @stretch))
-      (set! input (obs-peek @input))
+      (match-define (list h-m v-m) (peek @margin))
+      (match-define (list min-w min-h) (peek @min-size))
+      (match-define (list w-s? h-s?) (peek @stretch))
+      (set! input (peek @input))
       (new gui:canvas%
            [parent parent]
            [paint-callback (λ (_self dc)
                              (draw dc input))]
-           [label (obs-peek @label)]
-           [enabled (obs-peek @enabled?)]
+           [label (peek @label)]
+           [enabled (peek @enabled?)]
            [style style]
            [horiz-margin h-m]
            [vert-margin v-m]
@@ -68,18 +68,18 @@
       (void))))
 
 (define (canvas @input draw
-                #:label [@label (obs #f)]
-                #:enabled? [@enabled? (obs #f)]
+                #:label [@label #f]
+                #:enabled? [@enabled? #f]
                 #:style [style null]
-                #:margin [@margin (obs '(0 0))]
-                #:min-size [@min-size (obs '(#f #f))]
-                #:stretch [@stretch (obs '(#t #t))])
+                #:margin [@margin '(0 0)]
+                #:min-size [@min-size '(#f #f)]
+                #:stretch [@stretch '(#t #t)])
   (new canvas%
-       [@input (->obs @input)]
-       [@label (->obs @label)]
-       [@enabled? (->obs @enabled?)]
-       [@margin (->obs @margin)]
-       [@min-size (->obs @min-size)]
-       [@stretch (->obs @stretch)]
+       [@input @input]
+       [@label @label]
+       [@enabled? @enabled?]
+       [@margin @margin]
+       [@min-size @min-size]
+       [@stretch @stretch]
        [draw draw]
        [style style]))

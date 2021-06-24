@@ -15,14 +15,14 @@
     (super-new)
 
     (define/public (dependencies)
-      (list @label @checked? @enabled?))
+      (filter obs? (list @label @checked? @enabled?)))
 
     (define/public (create parent)
       (new gui:check-box%
            [parent parent]
-           [label (obs-peek @label)]
-           [value (obs-peek @checked?)]
-           [enabled (obs-peek @enabled?)]
+           [label (peek @label)]
+           [value (peek @checked?)]
+           [enabled (peek @enabled?)]
            [callback (λ (self _event)
                        (action (send self get-value)))]))
 
@@ -36,11 +36,11 @@
       (void))))
 
 (define (checkbox action
-                  #:label [@label (obs #f)]
-                  #:checked? [@checked? (obs #f)]
-                  #:enabled? [@enabled? (obs #t)])
+                  #:label [@label #f]
+                  #:checked? [@checked? #f]
+                  #:enabled? [@enabled? #t])
   (new checkbox%
-       [@label (->obs @label)]
-       [@checked? (->obs @checked?)]
-       [@enabled? (->obs @enabled?)]
+       [@label @label]
+       [@checked? @checked?]
+       [@enabled? @enabled?]
        [action action]))

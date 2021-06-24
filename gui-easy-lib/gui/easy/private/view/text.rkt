@@ -3,6 +3,7 @@
 (require racket/class
          (prefix-in gui: racket/gui)
          "../observable.rkt"
+         "common.rkt"
          "view.rkt")
 
 (provide
@@ -14,20 +15,21 @@
     (super-new)
 
     (define/public (dependencies)
-      (list @label))
+      (filter obs? (list @label)))
 
     (define/public (create parent)
       (new gui:message%
            [parent parent]
-           [label (obs-peek @label)]
+           [label (peek @label)]
            [auto-resize #t]))
 
-    (define/public (update v _what val)
-      (send v set-label val))
+    (define/public (update v what val)
+      (case/dep what
+        [@label (send v set-label val)]))
 
     (define/public (destroy _v)
       (void))))
 
 (define (text @label)
   (new text%
-       [@label (->obs @label)]))
+       [@label @label]))

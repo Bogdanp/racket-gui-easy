@@ -16,24 +16,24 @@
     (super-new)
 
     (define/public (dependencies)
-      (list @label @enabled? @range @value @min-size @stretch))
+      (filter obs? (list @label @enabled? @range @value @min-size @stretch)))
 
     (define/public (create parent)
-      (match-define (list min-w min-h) (obs-peek @min-size))
-      (match-define (list w-s? h-s?) (obs-peek @stretch))
+      (match-define (list min-w min-h) (peek @min-size))
+      (match-define (list w-s? h-s?) (peek @stretch))
       (define the-gauge
         (new gui:gauge%
              [parent parent]
-             [label (obs-peek @label)]
+             [label (peek @label)]
              [style style]
-             [range (obs-peek @range)]
-             [enabled (obs-peek @enabled?)]
+             [range (peek @range)]
+             [enabled (peek @enabled?)]
              [min-width min-w]
              [min-height min-h]
              [stretchable-width w-s?]
              [stretchable-height h-s?]))
       (begin0 the-gauge
-        (send the-gauge set-value (obs-peek @value))))
+        (send the-gauge set-value (peek @value))))
 
     (define/public (update v what val)
       (case/dep what
@@ -56,18 +56,18 @@
       (void))))
 
 (define (progress @value
-                  #:label [@label (obs #f)]
+                  #:label [@label #f]
                   #:style [style '(horizontal)]
-                  #:enabled? [@enabled? (obs #t)]
-                  #:range [@range (obs 100)]
-                  #:min-size [@min-size (obs '(#f #f))]
-                  #:stretch [@stretch (obs (list (memq 'horizontal style)
-                                                 (memq 'vertical style)))])
+                  #:enabled? [@enabled? #t]
+                  #:range [@range 100]
+                  #:min-size [@min-size '(#f #f)]
+                  #:stretch [@stretch (list (memq 'horizontal style)
+                                            (memq 'vertical style))])
   (new progress%
-       [@value (->obs @value)]
-       [@label (->obs @label)]
+       [@value @value]
+       [@label @label]
        [style style]
-       [@enabled? (->obs @enabled?)]
-       [@range (->obs @range)]
-       [@min-size (->obs @min-size)]
-       [@stretch (->obs @stretch)]))
+       [@enabled? @enabled?]
+       [@range @range]
+       [@min-size @min-size]
+       [@stretch @stretch]))

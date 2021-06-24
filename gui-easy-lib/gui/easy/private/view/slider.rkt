@@ -16,19 +16,19 @@
     (super-new)
 
     (define/public (dependencies)
-      (list @label @enabled? @value @min-size @stretch))
+      (filter obs? (list @label @enabled? @value @min-size @stretch)))
 
     (define/public (create parent)
-      (match-define (list min-w min-h) (obs-peek @min-size))
-      (match-define (list w-s? h-s?) (obs-peek @stretch))
+      (match-define (list min-w min-h) (peek @min-size))
+      (match-define (list w-s? h-s?) (peek @stretch))
       (new gui:slider%
            [parent parent]
-           [label (obs-peek @label)]
+           [label (peek @label)]
            [style style]
-           [init-value (obs-peek @value)]
+           [init-value (peek @value)]
            [min-value min-value]
            [max-value max-value]
-           [enabled (obs-peek @enabled?)]
+           [enabled (peek @enabled?)]
            [callback (λ (self _event)
                        (action (send self get-value)))]
            [min-width min-w]
@@ -56,21 +56,21 @@
       (void))))
 
 (define (slider @value action
-                #:label [@label (obs #f)]
+                #:label [@label #f]
                 #:style [style '(horizontal)]
-                #:enabled? [@enabled? (obs #t)]
+                #:enabled? [@enabled? #t]
                 #:min-value [min-value 0]
                 #:max-value [max-value 100]
-                #:min-size [@min-size (obs '(#f #f))]
-                #:stretch [@stretch (obs (list (memq 'horizontal style)
-                                               (memq 'vertical style)))])
+                #:min-size [@min-size '(#f #f)]
+                #:stretch [@stretch (list (memq 'horizontal style)
+                                          (memq 'vertical style))])
   (new slider%
-       [@value (->obs @value)]
-       [@label (->obs @label)]
+       [@value @value]
+       [@label @label]
        [style style]
-       [@enabled? (->obs @enabled?)]
+       [@enabled? @enabled?]
        [min-value min-value]
        [max-value max-value]
-       [@min-size (->obs @min-size)]
-       [@stretch (->obs @stretch)]
+       [@min-size @min-size]
+       [@stretch @stretch]
        [action action]))

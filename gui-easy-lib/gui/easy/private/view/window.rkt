@@ -21,15 +21,15 @@
     (super-new)
 
     (define/public (dependencies)
-      (remove-duplicates
-       (append (list @title @size @alignment @position @min-size @stretch)
-               (child-dependencies))))
+      (filter obs? (remove-duplicates
+                    (append (list @title @size @alignment @position @min-size @stretch)
+                            (child-dependencies)))))
 
     (define/public (create parent)
-      (match-define (list w h) (obs-peek @size))
-      (match-define (list min-w min-h) (obs-peek @min-size))
-      (match-define (list w-s? h-s?) (obs-peek @stretch))
-      (define position (obs-peek @position))
+      (match-define (list w h) (peek @size))
+      (match-define (list min-w min-h) (peek @min-size))
+      (match-define (list w-s? h-s?) (peek @stretch))
+      (define position (peek @position))
       (define-values (x y)
         (match position
           ['center (values #f #f)]
@@ -37,8 +37,8 @@
       (define the-window
         (new clazz
              [parent parent]
-             [label (obs-peek @title)]
-             [alignment (obs-peek @alignment)]
+             [label (peek @title)]
+             [alignment (peek @alignment)]
              [style style]
              [width w]
              [height h]
@@ -86,38 +86,38 @@
 (define dialog% (window-like% gui:dialog%))
 (define window% (window-like% gui:frame%))
 
-(define (dialog #:title [@title (obs "Untitled")]
-                #:size [@size (obs '(#f #f))]
-                #:alignment [@alignment (obs '(center top))]
-                #:position [@position (obs 'center)]
+(define (dialog #:title [@title "Untitled"]
+                #:size [@size '(#f #f)]
+                #:alignment [@alignment '(center top)]
+                #:position [@position 'center]
                 #:style [style '(close-button)]
-                #:min-size [@min-size (obs '(#f #f))]
-                #:stretch [@stretch (obs '(#t #t))]
+                #:min-size [@min-size '(#f #f)]
+                #:stretch [@stretch '(#t #t)]
                 . children)
   (new dialog%
-       [@title (->obs @title)]
-       [@size (->obs @size)]
-       [@alignment (->obs @alignment)]
-       [@position (->obs @position)]
-       [@min-size (->obs @min-size)]
-       [@stretch (->obs @stretch)]
+       [@title @title]
+       [@size @size]
+       [@alignment @alignment]
+       [@position @position]
+       [@min-size @min-size]
+       [@stretch @stretch]
        [style style]
        [children children]))
 
-(define (window #:title [@title (obs "Untitled")]
-                #:size [@size (obs '(#f #f))]
-                #:position [@position (obs 'center)]
-                #:alignment [@alignment (obs '(center top))]
-                #:min-size [@min-size (obs '(#f #f))]
-                #:stretch [@stretch (obs '(#t #t))]
+(define (window #:title [@title "Untitled"]
+                #:size [@size '(#f #f)]
+                #:position [@position 'center]
+                #:alignment [@alignment '(center top)]
+                #:min-size [@min-size '(#f #f)]
+                #:stretch [@stretch '(#t #t)]
                 #:style [style null]
                 . children)
   (new window%
-       [@title (->obs @title)]
-       [@size (->obs @size)]
-       [@alignment (->obs @alignment)]
-       [@position (->obs @position)]
-       [@min-size (->obs @min-size)]
-       [@stretch (->obs @stretch)]
+       [@title @title]
+       [@size @size]
+       [@alignment @alignment]
+       [@position @position]
+       [@min-size @min-size]
+       [@stretch @stretch]
        [style style]
        [children children]))

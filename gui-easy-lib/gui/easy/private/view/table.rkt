@@ -17,26 +17,26 @@
     (super-new)
 
     (define single? (memq 'single style))
-    (define entries (obs-peek @entries))
+    (define entries (peek @entries))
 
     (define/public (dependencies)
-      (list @label @enabled? @entries @selection @margin @min-size @stretch @column-widths))
+      (filter obs? (list @label @enabled? @entries @selection @margin @min-size @stretch @column-widths)))
 
     (define/public (create parent)
-      (match-define (list h-m v-m) (obs-peek @margin))
-      (match-define (list min-w min-h) (obs-peek @min-size))
-      (match-define (list w-s? h-s?) (obs-peek @stretch))
-      (define selection (obs-peek @selection))
-      (define column-widths (obs-peek @column-widths))
+      (match-define (list h-m v-m) (peek @margin))
+      (match-define (list min-w min-h) (peek @min-size))
+      (match-define (list w-s? h-s?) (peek @stretch))
+      (define selection (peek @selection))
+      (define column-widths (peek @column-widths))
       (define the-list-box
         (new gui:list-box%
              [parent parent]
-             [label (obs-peek @label)]
+             [label (peek @label)]
              [choices null]
              [style style]
              [font font]
              [columns columns]
-             [enabled (obs-peek @enabled?)]
+             [enabled (peek @enabled?)]
              [callback (λ (self event)
                          (case (send event get-event-type)
                            [(list-box)
@@ -127,24 +127,24 @@
 
 (define (table columns @entries action
                #:entry->row [entry->row values]
-               #:label [@label (obs #f)]
-               #:selection [@selection (obs #f)]
-               #:enabled? [@enabled? (obs #t)]
+               #:label [@label #f]
+               #:selection [@selection #f]
+               #:enabled? [@enabled? #t]
                #:style [style '(single column-headers clickable-headers reorderable-headers)]
                #:font [font gui:view-control-font]
-               #:margin [@margin (obs '(0 0))]
-               #:min-size [@min-size (obs '(#f #f))]
-               #:stretch [@stretch (obs '(#t #t))]
-               #:column-widths [@column-widths (obs null)])
+               #:margin [@margin '(0 0)]
+               #:min-size [@min-size '(#f #f)]
+               #:stretch [@stretch '(#t #t)]
+               #:column-widths [@column-widths null])
   (new table%
-       [@label (->obs @label)]
-       [@selection (->obs @selection)]
-       [@enabled? (->obs @enabled?)]
-       [@entries (->obs @entries)]
-       [@margin (->obs @margin)]
-       [@min-size (->obs @min-size)]
-       [@stretch (->obs @stretch)]
-       [@column-widths (->obs @column-widths)]
+       [@label @label]
+       [@selection @selection]
+       [@enabled? @enabled?]
+       [@entries  @entries]
+       [@margin @margin]
+       [@min-size @min-size]
+       [@stretch @stretch]
+       [@column-widths @column-widths]
        [entry->row entry->row]
        [style style]
        [font font]

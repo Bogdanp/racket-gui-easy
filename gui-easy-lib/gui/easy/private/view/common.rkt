@@ -2,10 +2,12 @@
 
 (require (for-syntax racket/base
                      racket/format
-                     syntax/parse))
+                     syntax/parse)
+         "../observable.rkt")
 
 (provide
- case/dep)
+ case/dep
+ peek)
 
 (define-logger case/dep)
 
@@ -37,3 +39,6 @@
               (log-case/dep-debug "matched ~e at ~a" 'dep-e loc)
               e ...]
              ...)))]))
+
+(define (peek @v)
+  (if (obs? @v) (obs-peek @v) @v))

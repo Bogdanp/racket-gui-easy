@@ -21,21 +21,21 @@
     (super-new)
 
     (define/public (dependencies)
-      (remove-duplicates
-       (append (list @alignment @enabled? @spacing @margin @min-size @stretch)
-               (child-dependencies))))
+      (filter obs? (remove-duplicates
+                    (append (list @alignment @enabled? @spacing @margin @min-size @stretch)
+                            (child-dependencies)))))
 
     (define/public (create parent)
-      (match-define (list h-m v-m) (obs-peek @margin))
-      (match-define (list w h) (obs-peek @min-size))
-      (match-define (list w-s? h-s?) (obs-peek @stretch))
+      (match-define (list h-m v-m) (peek @margin))
+      (match-define (list w h) (peek @min-size))
+      (match-define (list w-s? h-s?) (peek @stretch))
       (define the-panel
         (new clazz
              [parent parent]
-             [alignment (obs-peek @alignment)]
-             [enabled (obs-peek @enabled?)]
+             [alignment (peek @alignment)]
+             [enabled (peek @enabled?)]
              [style style]
-             [spacing (obs-peek @spacing)]
+             [spacing (peek @spacing)]
              [vert-margin v-m]
              [horiz-margin h-m]
              [min-width w]
@@ -77,38 +77,38 @@
 (define hpanel% (panel% gui:horizontal-panel%))
 (define vpanel% (panel% gui:vertical-panel%))
 
-(define (hpanel #:alignment [@alignment (obs '(left center))]
-                #:enabled? [@enabled? (obs #t)]
+(define (hpanel #:alignment [@alignment '(left center)]
+                #:enabled? [@enabled? #t]
                 #:style [style null]
-                #:spacing [@spacing (obs 0)]
-                #:margin [@margin (obs '(0 0))]
-                #:min-size [@min-size (obs '(#f #f))]
-                #:stretch [@stretch (obs '(#t #t))]
+                #:spacing [@spacing 0]
+                #:margin [@margin '(0 0)]
+                #:min-size [@min-size '(#f #f)]
+                #:stretch [@stretch '(#t #t)]
                 . children)
   (new hpanel%
-       [@alignment (->obs @alignment)]
-       [@enabled? (->obs @enabled?)]
-       [@spacing (->obs @spacing)]
-       [@margin (->obs @margin)]
-       [@min-size (->obs @min-size)]
-       [@stretch (->obs @stretch)]
+       [@alignment @alignment]
+       [@enabled? @enabled?]
+       [@spacing @spacing]
+       [@margin @margin]
+       [@min-size @min-size]
+       [@stretch @stretch]
        [children children]
        [style style]))
 
-(define (vpanel #:alignment [@alignment (obs '(center top))]
-                #:enabled? [@enabled? (obs #t)]
+(define (vpanel #:alignment [@alignment '(center top)]
+                #:enabled? [@enabled? #t]
                 #:style [style null]
-                #:spacing [@spacing (obs 0)]
-                #:margin [@margin (obs '(0 0))]
-                #:min-size [@min-size (obs '(#f #f))]
-                #:stretch [@stretch (obs '(#t #t))]
+                #:spacing [@spacing 0]
+                #:margin [@margin '(0 0)]
+                #:min-size [@min-size '(#f #f)]
+                #:stretch [@stretch '(#t #t)]
                 . children)
   (new vpanel%
-       [@alignment (->obs @alignment)]
-       [@enabled? (->obs @enabled?)]
-       [@spacing (->obs @spacing)]
-       [@margin (->obs @margin)]
-       [@min-size (->obs @min-size)]
-       [@stretch (->obs @stretch)]
+       [@alignment @alignment]
+       [@enabled? @enabled?]
+       [@spacing @spacing]
+       [@margin @margin]
+       [@min-size @min-size]
+       [@stretch @stretch]
        [children children]
        [style style]))

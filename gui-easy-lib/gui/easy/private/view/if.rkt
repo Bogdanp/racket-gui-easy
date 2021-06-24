@@ -22,11 +22,11 @@
     (super-new)
 
     (define/public (dependencies)
-      (remove-duplicates
-       (append
-        (list @cond-e)
-        (send then-view dependencies)
-        (send else-view dependencies))))
+      (filter obs? (remove-duplicates
+                    (append
+                     (list @cond-e)
+                     (send then-view dependencies)
+                     (send else-view dependencies)))))
 
     (define/public (create parent)
       (define the-pane
@@ -37,7 +37,7 @@
              [stretchable-width #t]
              [stretchable-height #t]))
       (begin0 the-pane
-        (if (obs-peek @cond-e)
+        (if (peek @cond-e)
             (add-child then-view (send then-view create the-pane))
             (add-child else-view (send else-view create the-pane)))))
 
@@ -82,7 +82,7 @@
 
 (define (if/view @cond-e then-view else-view)
   (new if-view%
-       [@cond-e (->obs @cond-e)]
+       [@cond-e @cond-e]
        [then-view then-view]
        [else-view else-view]
        [children null]))

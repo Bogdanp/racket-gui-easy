@@ -28,13 +28,12 @@
       (obs-combine list @path @size @mode))
 
     (define/public (dependencies)
-      (list @path+size+mode))
+      (filter obs? (list @path+size+mode)))
 
     (define/public (create parent)
-      (load! (obs-peek @path)
-             (obs-peek @size)
-             (obs-peek @mode))
-      (define-values (w h) (get-effective-size))
+      (apply load! (peek @path+size+mode))
+      (define-values (w h)
+        (get-effective-size))
       (new gui:canvas%
            [parent parent]
            [min-width w]
@@ -62,7 +61,7 @@
        (send bmp/scaled get-width)
        (send bmp/scaled get-height)))
 
-    (define/private (load! path size mode)
+    (define (load! path size mode)
       (unless (equal? bmp-path path)
         (set! bmp (gui:read-bitmap path))
         (set! bmp-path path))
