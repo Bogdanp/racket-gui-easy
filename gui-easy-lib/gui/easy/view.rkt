@@ -28,7 +28,7 @@
                   #:enabled? (maybe-obs/c boolean?))
                  (is-a?/c view<%>))]
   [choice (->* ((maybe-obs/c (listof gui:label-string?))
-                (-> gui:label-string? any))
+                (-> (or/c #f gui:label-string?) any))
                (#:selection (maybe-obs/c gui:label-string?)
                 #:label (maybe-obs/c gui:label-string?)
                 #:style (listof (or/c 'horizontal-label 'vertical-label 'deleted))

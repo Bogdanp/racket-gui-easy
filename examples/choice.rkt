@@ -17,4 +17,5 @@
   (choice
    @choices
    #:selection @choice
-   (λ:= @choice))))
+   (λ (c)
+     (@choice . := . (if c c "<no choices>"))))))

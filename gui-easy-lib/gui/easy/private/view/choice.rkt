@@ -16,25 +16,27 @@
     (init-field @label @enabled? @choices @selection @min-size @stretch style action)
     (super-new)
 
-    (define @selection-index
+    (define last-choices null)
+    (define last-selection #f)
+    (define @choices&index
       (obs-combine
        (λ (choices selection)
-         (index-of choices selection))
+         (list choices (index-of choices selection)))
        @choices @selection))
 
     (define/public (dependencies)
-      (filter obs? (list @label @enabled? @choices @selection-index @min-size @stretch)))
+      (filter obs? (list @label @enabled? @choices&index @min-size @stretch)))
 
     (define/public (create parent)
       (match-define (list min-w min-h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
-      (define selection (peek @selection-index))
+      (match-define (list choices selection) (peek @choices&index))
       (define the-choice
         (new gui:choice%
              [parent parent]
              [label (peek @label)]
              [style style]
-             [choices (peek @choices)]
+             [choices choices]
              [enabled (peek @enabled?)]
              [callback (λ (self _event)
                          (action (send self get-string-selection)))]
@@ -43,20 +45,38 @@
              [stretchable-width w-s?]
              [stretchable-height h-s?]))
       (begin0 the-choice
+        (set! last-choices choices)
         (when selection
+          (set! last-selection (send the-choice get-string-selection))
           (send the-choice set-selection selection))))
 
     (define/public (update v what val)
       (case/dep what
-        [@choices
-         (send v clear)
-         (for ([c (in-list val)])
-           (send v append c))]
-        [@selection-index
+        [@choices&index
+         (match-define (list choices index) val)
+         (unless (equal? choices last-choices)
+           (send v clear)
+           (for ([i (in-naturals)]
+                 [c (in-list (remove-duplicates choices))])
+             (send v append c)
+             (when (equal? c last-selection)
+               (send v set-selection i))))
          (cond
-           [val (send v set-selection val)]
-           [(send v get-string-selection) => action]
-           [else (action "")])]
+           [(null? choices)
+            (unless (null? last-choices)
+              (set! last-selection #f)
+              (action #f))]
+           [(and index (< index (send v get-number)))
+            (define current-selection (send v get-string index))
+            (unless (equal? current-selection last-selection)
+              (set! last-selection current-selection)
+              (send v set-selection index))]
+           [else
+            (define current-selection (send v get-string-selection))
+            (unless (equal? current-selection last-selection)
+              (set! last-selection current-selection)
+              (action current-selection))])
+         (set! last-choices choices)]
         [@label
          (send v set-label val)]
         [@enabled?
