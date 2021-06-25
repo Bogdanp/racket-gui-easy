@@ -35,7 +35,7 @@
        #'(let ([what what-e])
            (cond
              [(eq? what dep-e)
-              (log-gui-easy-debug "case/dep matched ~e at ~a" 'dep-e loc)
+              (log-gui-easy-debug "case/dep matched ~.s at ~a" 'dep-e loc)
               e ...]
              ...)))]))
 
