@@ -1,8 +1,8 @@
 #lang racket/base
 
 (require "common.rkt"
-         "logger.rkt"
-         "executor.rkt")
+         "executor.rkt"
+         "logger.rkt")
 
 (provide
  (rename-out [make-obs obs])
