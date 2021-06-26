@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require "common.rkt"
+         "logger.rkt"
          "executor.rkt")
 
 (provide
@@ -62,6 +63,7 @@
   (begin0 b
     (obs-observe! a g)
     (will-register executor b (λ (_)
+                                (log-gui-easy-debug "obs-map: unobserve ~.s" f)
                                 (obs-unobserve! a g)))))
 
 (define (obs-combine f . os)
@@ -84,7 +86,8 @@
         (obs-observe! o g))))
   (begin0 b
     (will-register executor b (λ (_)
-                                (for ([o (in-list obs)]
+                                (log-gui-easy-debug "obs-combine: unobserve ~.s" f)
+                                (for ([o (in-list os)]
                                       [g (in-list gs)])
                                   (obs-unobserve! o g))))))
 
@@ -95,29 +98,29 @@
   (define b (make-obs (obs-peek a)))
   (define b-box (make-weak-box b))
   (define ch (make-channel))
-  (define thd
-    (thread
-     (lambda ()
-       (let loop ([pending nothing])
-         (sync
-          (handle-evt
-           ch
-           (lambda (v)
-             (unless (eq? v stop)
-               (loop v))))
-          (if (eq? pending nothing)
-              never-evt
-              (handle-evt
-               (alarm-evt (+ (current-inexact-milliseconds) duration))
-               (lambda (_)
-                 (define maybe-b (weak-box-value b-box))
-                 (when maybe-b
-                   (obs-update! maybe-b (λ (_) pending)))
-                 (loop nothing)))))))))
+  (thread
+   (lambda ()
+     (let loop ([pending nothing])
+       (sync
+        (handle-evt
+         ch
+         (lambda (v)
+           (unless (eq? v stop)
+             (loop v))))
+        (if (eq? pending nothing)
+            never-evt
+            (handle-evt
+             (alarm-evt (+ (current-inexact-milliseconds) duration))
+             (lambda (_)
+               (define maybe-b (weak-box-value b-box))
+               (when maybe-b
+                 (obs-update! maybe-b (λ (_) pending)))
+               (loop nothing))))))))
   (define (f v)
     (channel-put ch v))
   (begin0 b
     (obs-observe! a f)
     (will-register executor b (λ (_)
+                                (log-gui-easy-debug "obs-debounce: unobserve ~.s" f)
                                 (obs-unobserve! a f)
                                 (channel-put ch stop)))))
