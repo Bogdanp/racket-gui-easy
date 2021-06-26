@@ -16,6 +16,8 @@
         (render
          (dialog
           #:style '(close-button)
-          (input @msg (λ (_ text)
-                        (@msg . := . text))))
+          (vpanel
+           (text @msg)
+           (input @msg (λ (_ text)
+                         (@msg . := . text)))))
          (renderer-root r))))))))

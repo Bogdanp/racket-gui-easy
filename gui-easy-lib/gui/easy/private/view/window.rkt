@@ -11,6 +11,7 @@
 
 (provide
  dialog
+ dialog%
  window)
 
 (define (window-like% clazz)
@@ -53,7 +54,8 @@
       (begin0 the-window
         (for ([c (in-list children)])
           (add-child c (send c create the-window)))
-        (send the-window show #t)))
+        (unless (eq? clazz gui:dialog%)
+          (send the-window show #t))))
 
     (define/public (update v what val)
       (case/dep what
