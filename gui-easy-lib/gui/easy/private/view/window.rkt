@@ -12,7 +12,8 @@
 (provide
  dialog
  dialog%
- window)
+ window
+ window%)
 
 (define (window-like% clazz)
   (class* container% (view<%>)
@@ -53,9 +54,7 @@
         (send the-window center 'both))
       (begin0 the-window
         (for ([c (in-list children)])
-          (add-child c (send c create the-window)))
-        (unless (eq? clazz gui:dialog%)
-          (send the-window show #t))))
+          (add-child c (send c create the-window)))))
 
     (define/public (update v what val)
       (case/dep what

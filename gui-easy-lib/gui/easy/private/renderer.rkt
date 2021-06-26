@@ -58,8 +58,8 @@
   (log-gui-easy-debug "rendered renderer ~a" id)
   (begin0 r
     (hash-set! renderers id r)
+    (send root show #t)
     (when (is-a? tree dialog%)
-      (send root show #t)
       (send r destroy)
       (log-gui-easy-debug "destroyed renderer ~s" id))))
 
