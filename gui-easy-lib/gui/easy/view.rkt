@@ -163,7 +163,8 @@
                               'no-focus 'deleted))
         #:margin (maybe-obs/c margin/c)
         #:min-size (maybe-obs/c size/c)
-        #:stretch (maybe-obs/c stretch/c))
+        #:stretch (maybe-obs/c stretch/c)
+        #:mouse-action (-> (is-a?/c gui:mouse-event%) any))
        (is-a?/c view<%>)))
 
 (define panel/c

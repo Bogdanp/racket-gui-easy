@@ -14,7 +14,7 @@
 
 (define canvas%
   (class* object% (view<%>)
-    (init-field @input @label @enabled? @margin @min-size @stretch draw style)
+    (init-field @input @label @enabled? @margin @min-size @stretch draw style mouse-action)
     (super-new)
 
     (define input #f)
@@ -27,7 +27,10 @@
       (match-define (list min-w min-h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
       (set! input (peek @input))
-      (new gui:canvas%
+      (new (class gui:canvas%
+             (super-new)
+             (define/override (on-event e)
+               (mouse-action e)))
            [parent parent]
            [paint-callback (λ (_self dc)
                              (draw dc input))]
@@ -71,11 +74,12 @@
 
 (define (canvas @input draw
                 #:label [@label #f]
-                #:enabled? [@enabled? #f]
+                #:enabled? [@enabled? #t]
                 #:style [style null]
                 #:margin [@margin '(0 0)]
                 #:min-size [@min-size '(#f #f)]
-                #:stretch [@stretch '(#t #t)])
+                #:stretch [@stretch '(#t #t)]
+                #:mouse-action [mouse-action void])
   (new canvas%
        [@input @input]
        [@label @label]
@@ -84,13 +88,15 @@
        [@min-size @min-size]
        [@stretch @stretch]
        [draw draw]
-       [style style]))
+       [style style]
+       [mouse-action mouse-action]))
 
 (define pict-canvas
   (procedure-rename
    (make-keyword-procedure
     (λ (kws kw-args @data make-pict . args)
       (define (draw dc v)
+        (send dc set-smoothing 'smoothed)
         (p:draw-pict (make-pict v) dc 0 0))
       (keyword-apply canvas kws kw-args @data draw args)))
    'pict-canvas))
