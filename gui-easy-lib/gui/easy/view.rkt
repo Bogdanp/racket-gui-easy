@@ -1,6 +1,7 @@
 #lang racket/base
 
-(require racket/class
+(require (prefix-in p: pict)
+         racket/class
          racket/contract
          (prefix-in gui: racket/gui)
          "observable.rkt"
@@ -10,18 +11,8 @@
  view<%>
  cond/view
  (contract-out
-  [canvas (->* ((maybe-obs/c any/c)
-                (-> (is-a?/c gui:dc<%>) any/c any))
-               (#:label (maybe-obs/c gui:label-string?)
-                #:enabled? (maybe-obs/c boolean?)
-                #:style (listof (or/c 'border 'control-border 'combo
-                                      'vscroll 'hscroll 'resize-corner
-                                      'gl 'no-autoclear 'transparent
-                                      'no-focus 'deleted))
-                #:margin (maybe-obs/c margin/c)
-                #:min-size (maybe-obs/c size/c)
-                #:stretch (maybe-obs/c stretch/c))
-               (is-a?/c view<%>))]
+  [canvas (canvas/c (-> (is-a?/c gui:dc<%>) any/c any))]
+  [pict-canvas (canvas/c (-> any/c p:pict?))]
   [checkbox (->* ((-> boolean? any))
                  (#:label (maybe-obs/c label/c)
                   #:checked? (maybe-obs/c boolean?)
@@ -161,6 +152,19 @@
 
 (define stretch/c
   (list/c boolean? boolean?))
+
+(define (canvas/c draw/c)
+  (->* ((maybe-obs/c any/c) draw/c)
+       (#:label (maybe-obs/c gui:label-string?)
+        #:enabled? (maybe-obs/c boolean?)
+        #:style (listof (or/c 'border 'control-border 'combo
+                              'vscroll 'hscroll 'resize-corner
+                              'gl 'no-autoclear 'transparent
+                              'no-focus 'deleted))
+        #:margin (maybe-obs/c margin/c)
+        #:min-size (maybe-obs/c size/c)
+        #:stretch (maybe-obs/c stretch/c))
+       (is-a?/c view<%>)))
 
 (define panel/c
   (->* ()

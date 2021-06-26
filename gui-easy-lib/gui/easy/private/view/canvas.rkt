@@ -1,6 +1,7 @@
 #lang racket/base
 
-(require racket/class
+(require (prefix-in p: pict)
+         racket/class
          (prefix-in gui: racket/gui)
          racket/match
          "../observable.rkt"
@@ -8,7 +9,8 @@
          "view.rkt")
 
 (provide
- canvas)
+ canvas
+ pict-canvas)
 
 (define canvas%
   (class* object% (view<%>)
@@ -83,3 +85,12 @@
        [@stretch @stretch]
        [draw draw]
        [style style]))
+
+(define pict-canvas
+  (procedure-rename
+   (make-keyword-procedure
+    (λ (kws kw-args @data make-pict . args)
+      (define (draw dc v)
+        (p:draw-pict (make-pict v) dc 0 0))
+      (keyword-apply canvas kws kw-args @data draw args)))
+   'pict-canvas))

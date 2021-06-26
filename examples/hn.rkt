@@ -136,13 +136,6 @@
        [item-height item-height]
        [action action]))
 
-(define pict
-  (make-keyword-procedure
-   (λ (kws kw-args @data make-pict . args)
-     (define (draw dc v)
-       (p:draw-pict (make-pict v) dc 0 0))
-     (keyword-apply canvas kws kw-args @data draw args))))
-
 (define (styled-text t)
   (apply p:hbl-append (for/list ([t (in-list t)])
                         (match t
@@ -264,7 +257,7 @@
     (spacer)
     (button "Visit" (λ () (visit (obs-peek @s)))))
    (vpanel
-    (pict
+    (pict-canvas
      #:style '(transparent)
      #:stretch '(#t #f)
      #:min-size '(#f 90)

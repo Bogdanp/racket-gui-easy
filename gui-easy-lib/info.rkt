@@ -3,4 +3,5 @@
 (define version "0.0")
 (define collection "racket")
 (define deps '("base"
-               "gui-lib"))
+               "gui-lib"
+               "pict-lib"))
