@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require racket/class
+         racket/contract
          (prefix-in gui: racket/gui)
          racket/list
          racket/match
@@ -10,13 +11,21 @@
          "view.rkt")
 
 (provide
+ window-view<%>
  dialog
  dialog%
  window
  window%)
 
+(define window-view<%>
+  (interface (view<%>)
+    [create (->m (or/c (is-a?/c gui:frame%)
+                       (is-a?/c gui:dialog%)
+                       #f)
+                 (is-a?/c gui:window<%>))]))
+
 (define (window-like% clazz)
-  (class* container% (view<%>)
+  (class* container% (window-view<%>)
     (inherit-field children)
     (init-field @title @size @alignment @position @min-size @stretch style)
     (inherit child-dependencies add-child update-children destroy-children)

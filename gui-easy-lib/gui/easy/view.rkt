@@ -9,6 +9,7 @@
 
 (provide
  view<%>
+ window-view<%>
  case/dep
  cond/view
  (contract-out
@@ -173,7 +174,7 @@
         #:margin (maybe-obs/c margin/c)
         #:min-size (maybe-obs/c size/c)
         #:stretch (maybe-obs/c stretch/c)
-        #:mouse-action (-> (is-a?/c gui:mouse-event%) any))
+        #:mouse-action (-> (is-a?/c gui:canvas%) (is-a?/c gui:mouse-event%) any))
        (is-a?/c view<%>)))
 
 (define panel/c
