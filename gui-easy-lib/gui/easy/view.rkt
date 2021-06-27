@@ -9,6 +9,7 @@
 
 (provide
  view<%>
+ case/dep
  cond/view
  (contract-out
   [canvas (canvas/c (-> (is-a?/c gui:dc<%>) any/c any))]

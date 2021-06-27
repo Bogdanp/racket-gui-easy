@@ -11,6 +11,7 @@
            "view/canvas.rkt"
            "view/checkbox.rkt"
            "view/choice.rkt"
+           "view/common.rkt"
            "view/if.rkt"
            "view/image.rkt"
            "view/input.rkt"
