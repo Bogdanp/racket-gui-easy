@@ -13,5 +13,10 @@
                       (is-a?/c gui:dialog%)
                       #f))
                (is-a?/c renderer<%>))]
+  [render-popup-menu (-> (is-a?/c renderer<%>)
+                         (is-a?/c popup-menu-view<%>)
+                         gui:position-integer?
+                         gui:position-integer?
+                         void?)]
   [renderer-root (-> (is-a?/c renderer<%>)
                      (or/c (is-a?/c gui:frame%) #f))]))

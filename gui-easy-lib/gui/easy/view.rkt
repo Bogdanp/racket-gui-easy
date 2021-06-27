@@ -139,7 +139,18 @@
   [window (window/c (listof (or/c 'no-resize-border 'no-caption
                                   'no-system-menu 'hide-menu-bar
                                   'toolbar-button 'float 'metal
-                                  'fullscreen-button 'fullscreen-aux)))]))
+                                  'fullscreen-button 'fullscreen-aux)))]
+  [popup-menu (-> (is-a?/c view<%>) ...
+                  (is-a?/c popup-menu-view<%>))]
+  [menu-bar (-> (is-a?/c view<%>) ...
+                (is-a?/c menu-bar-view<%>))]
+  [menu (-> (maybe-obs/c label/c)
+            (is-a?/c view<%>) ...
+            (is-a?/c menu-view<%>))]
+  [menu-item (->* ((maybe-obs/c label/c))
+                  ((-> any))
+                  (is-a?/c view<%>))]
+  [menu-item-separator (-> (is-a?/c view<%>))]))
 
 (define alignment/c
   (list/c (or/c 'left 'center 'right)

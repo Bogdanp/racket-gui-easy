@@ -9,6 +9,7 @@
 
 (provide
  render
+ render-popup-menu
  renderer<%>
  renderer-root)
 
@@ -55,13 +56,23 @@
   (define id (next-id!))
   (define r (new renderer% [id id] [tree tree]))
   (define root (send r render parent))
-  (log-gui-easy-debug "rendered renderer ~a" id)
+  (log-gui-easy-debug "rendered window ~a" id)
   (begin0 r
     (hash-set! renderers id r)
     (send root show #t)
     (when (is-a? tree dialog%)
       (send r destroy)
-      (log-gui-easy-debug "destroyed renderer ~s" id))))
+      (log-gui-easy-debug "destroyed window ~a" id))))
+
+(define (render-popup-menu r tree x y)
+  (define id (next-id!))
+  (define menu-r (new renderer% [id id] [tree tree]))
+  (define menu (send menu-r render #f))
+  (define window (send r get-root))
+  (log-gui-easy-debug "rendered popup menu ~a" id)
+  (send window popup-menu menu x y)
+  (send menu-r destroy)
+  (log-gui-easy-debug "destroyed popup menu ~a" id))
 
 (define (renderer-root r)
   (send r get-root))

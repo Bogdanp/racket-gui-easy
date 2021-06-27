@@ -15,6 +15,7 @@
            "view/if.rkt"
            "view/image.rkt"
            "view/input.rkt"
+           "view/menu.rkt"
            "view/panel.rkt"
            "view/progress.rkt"
            "view/slider.rkt"
