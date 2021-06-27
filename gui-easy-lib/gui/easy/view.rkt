@@ -29,7 +29,15 @@
                (is-a?/c view<%>))]
   [hpanel panel/c]
   [vpanel panel/c]
-  [button (-> (maybe-obs/c string?) (-> any) (is-a?/c view<%>))]
+  [button (->* ((maybe-obs/c string?)
+                (-> any))
+               (#:enabled? (maybe-obs/c boolean?)
+                #:style (listof (or/c 'border 'multi-line 'deleted))
+                #:font (is-a?/c gui:font%)
+                #:margin (maybe-obs/c margin/c)
+                #:min-size (maybe-obs/c size/c)
+                #:stretch (maybe-obs/c stretch/c))
+               (is-a?/c view<%>))]
   [if/view (-> (maybe-obs/c any/c) (is-a?/c view<%>) (is-a?/c view<%>) (is-a?/c view<%>))]
   [image (->* ((maybe-obs/c path-string?))
               (#:size (maybe-obs/c size/c)
