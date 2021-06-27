@@ -30,7 +30,7 @@
       (new (class gui:canvas%
              (super-new)
              (define/override (on-event e)
-               (mouse-action e)))
+               (mouse-action this e)))
            [parent parent]
            [paint-callback (λ (_self dc)
                              (draw dc input))]
