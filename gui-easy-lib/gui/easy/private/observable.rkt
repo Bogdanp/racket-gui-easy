@@ -135,7 +135,7 @@
 
   (define @a (make-obs 1))
   (check-equal? (obs-peek @a) 1)
-  (obs-update! @a add1)
+  (check-equal? (obs-update! @a add1) 2)
   (check-equal? (obs-peek @a) 2)
 
   (define @b (obs-map @a number->string))
@@ -144,5 +144,5 @@
    #rx"an unmapped observable"
    (λ () (obs-update! @b "3")))
   (check-equal? (obs-peek @b) "2")
-  (obs-update! @a add1)
+  (check-equal? (obs-update! @a add1) 3)
   (check-equal? (obs-peek @b) "3"))

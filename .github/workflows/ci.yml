@@ -1,0 +1,26 @@
+name: CI
+on: [push, pull_request]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@master
+    - name: Cache dependencies
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cache/racket
+          ~/.local/share/racket
+        key: ${{ runner.os }}-racket-8.1
+    - name: Install Racket
+      uses: Bogdanp/setup-racket@v1.5
+      with:
+        architecture: 'x64'
+        distribution: 'full'
+        variant: 'CS'
+        version: '8.1'
+    - name: Install Package & Deps
+      run: raco pkg install --auto --skip-installed gui-easy-lib/
+    - name: Test
+      run: raco test -j "$(nproc)" -p gui-easy-lib
