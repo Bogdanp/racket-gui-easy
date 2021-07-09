@@ -16,15 +16,15 @@
  obs-combine
  obs-debounce)
 
-(struct obs (value-box observers-box))
+(struct obs (value-box observers-box mapped?))
 
 (define (->obs v)
   (cond
     [(obs? v) v]
     [else (make-obs v)]))
 
-(define (make-obs v)
-  (obs (box v) (box null)))
+(define (make-obs v [mapped? #f])
+  (obs (box v) (box null) mapped?))
 
 (define (obs-observe! o observer)
   (void
@@ -40,7 +40,7 @@
     (λ (obss)
       (remq observer obss)))))
 
-(define (obs-update! o f)
+(define (do-obs-update! o f)
   (define v (box-update (obs-value-box o) f))
   (begin0 v
     (for ([obs (in-list (reverse (unbox (obs-observers-box o))))])
@@ -49,17 +49,22 @@
                          ((error-display-handler) (exn-message e) e))])
         (obs v)))))
 
+(define (obs-update! o f)
+  (when (obs-mapped? o)
+    (raise-argument-error 'obs-update! "an unmapped observable" o))
+  (do-obs-update! o f))
+
 (define (obs-peek o)
   (unbox (obs-value-box o)))
 
 (define (obs-map a f)
-  (define b (make-obs (f (obs-peek a))))
+  (define b (make-obs (f (obs-peek a)) #t))
   (define b-box (make-weak-box b))
   (define (g v)
     (define maybe-b (weak-box-value b-box))
     (when maybe-b
       (define w (f v))
-      (obs-update! maybe-b (λ (_) w))))
+      (do-obs-update! maybe-b (λ (_) w))))
   (begin0 b
     (obs-observe! a g)
     (will-register executor b (λ (_)
@@ -71,7 +76,7 @@
     (for/vector #:length (length os)
         ([o (in-list os)])
       (obs-peek o)))
-  (define b (make-obs (apply f (vector->list vals))))
+  (define b (make-obs (apply f (vector->list vals)) #t))
   (define b-box (make-weak-box b))
   (define gs
     (for/list ([o (in-list os)]
@@ -81,7 +86,7 @@
         (when maybe-b
           (vector-set! vals i v)
           (define w (apply f (vector->list vals)))
-          (obs-update! maybe-b (λ (_) w))))
+          (do-obs-update! maybe-b (λ (_) w))))
       (begin0 g
         (obs-observe! o g))))
   (begin0 b
@@ -95,7 +100,7 @@
 (define stop (gensym "stop"))
 
 (define (obs-debounce a #:duration [duration 200])
-  (define b (make-obs (obs-peek a)))
+  (define b (make-obs (obs-peek a) #t))
   (define b-box (make-weak-box b))
   (define ch (make-channel))
   (thread
@@ -114,7 +119,7 @@
              (lambda (_)
                (define maybe-b (weak-box-value b-box))
                (when maybe-b
-                 (obs-update! maybe-b (λ (_) pending)))
+                 (do-obs-update! maybe-b (λ (_) pending)))
                (loop nothing))))))))
   (define (f v)
     (channel-put ch v))
@@ -124,3 +129,20 @@
                                 (log-gui-easy-debug "obs-debounce: unobserve ~.s" f)
                                 (obs-unobserve! a f)
                                 (channel-put ch stop)))))
+
+(module+ test
+  (require rackunit)
+
+  (define @a (make-obs 1))
+  (check-equal? (obs-peek @a) 1)
+  (obs-update! @a add1)
+  (check-equal? (obs-peek @a) 2)
+
+  (define @b (obs-map @a number->string))
+  (check-equal? (obs-peek @b) "2")
+  (check-exn
+   #rx"an unmapped observable"
+   (λ () (obs-update! @b "3")))
+  (check-equal? (obs-peek @b) "2")
+  (obs-update! @a add1)
+  (check-equal? (obs-peek @b) "3"))
