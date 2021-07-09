@@ -21,7 +21,7 @@ jobs:
         variant: 'CS'
         version: '8.1'
     - name: Install Package & Deps
-      run: raco pkg install --auto gui-easy-lib/
+      run: raco pkg install --auto --skip-installed gui-easy-lib/
     - name: Update Package
       run: raco pkg update gui-easy-lib/
     - name: Test
