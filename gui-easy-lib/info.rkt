@@ -5,3 +5,4 @@
 (define deps '("base"
                "gui-lib"
                "pict-lib"))
+(define build-deps '("rackunit-lib"))
