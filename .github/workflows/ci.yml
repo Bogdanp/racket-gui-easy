@@ -23,4 +23,4 @@ jobs:
     - name: Install Package & Deps
       run: raco pkg install --auto --skip-installed gui-easy-lib/
     - name: Test
-      run: raco test -j "$(nproc)" -p gui-easy-lib
+      run: xvfb-run -a raco test -j "$(nproc)" -p gui-easy-lib
