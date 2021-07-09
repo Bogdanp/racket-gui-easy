@@ -11,7 +11,8 @@ jobs:
       with:
         path: |
           ~/.cache/racket
-        key: ${{ runner.os }}-racket
+          ~/.local/share/racket
+        key: ${{ runner.os }}-racket-cs-8.1
     - name: Install Racket
       uses: Bogdanp/setup-racket@v1.5
       with:
@@ -21,5 +22,7 @@ jobs:
         version: '8.1'
     - name: Install Package & Deps
       run: raco pkg install --auto gui-easy-lib/
+    - name: Update Package
+      run: raco pkg update gui-easy-lib/
     - name: Test
       run: xvfb-run -a raco test -j "$(nproc)" -p gui-easy-lib
