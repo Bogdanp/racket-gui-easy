@@ -1,8 +1,8 @@
 #lang racket/base
 
-(require racket/class
+(require box-extra
+         racket/class
          (prefix-in gui: racket/gui)
-         "common.rkt"
          "logger.rkt"
          "observable.rkt"
          "view/window.rkt")
@@ -14,8 +14,9 @@
  renderer-root)
 
 (define id-seq (box 0))
+(define update-id-seq! (make-box-update-proc id-seq))
 (define (next-id!)
-  (box-update id-seq add1))
+  (update-id-seq! add1))
 
 (define renderer<%>
   (interface () get-root render destroy))

@@ -1,6 +1,6 @@
 #lang racket/base
 
-(require "common.rkt"
+(require box-extra
          "executor.rkt"
          "logger.rkt")
 
@@ -16,7 +16,12 @@
  obs-combine
  obs-debounce)
 
-(struct obs (value-box observers-box mapped?))
+(struct obs
+  (value-box
+   update-value-box!
+   observers-box
+   update-observers-box!
+   mapped?))
 
 (define (->obs v)
   (cond
@@ -24,24 +29,30 @@
     [else (make-obs v)]))
 
 (define (make-obs v [mapped? #f])
-  (obs (box v) (box null) mapped?))
+  (define value-box (box v))
+  (define observers-box (box null))
+  (define update-value-box! (make-box-update-proc value-box))
+  (define update-observers-box! (make-box-update-proc observers-box))
+  (obs value-box
+       update-value-box!
+       observers-box
+       update-observers-box!
+       mapped?))
 
 (define (obs-observe! o observer)
   (void
-   (box-update
-    (obs-observers-box o)
+   ((obs-update-observers-box! o)
     (λ (obss)
       (cons observer obss)))))
 
 (define (obs-unobserve! o observer)
   (void
-   (box-update
-    (obs-observers-box o)
+   ((obs-update-observers-box! o)
     (λ (obss)
       (remq observer obss)))))
 
 (define (do-obs-update! o f)
-  (define v (box-update (obs-value-box o) f))
+  (define v ((obs-update-value-box! o) f))
   (begin0 v
     (for ([obs (in-list (reverse (unbox (obs-observers-box o))))])
       (with-handlers ([exn:fail?
