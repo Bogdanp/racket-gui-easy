@@ -10,6 +10,7 @@
 (provide
  view<%>
  window-view<%>
+ popup-menu-view<%>
  case/dep
  cond-view
  (contract-out

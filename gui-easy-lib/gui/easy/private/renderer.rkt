@@ -10,8 +10,7 @@
 (provide
  render
  render-popup-menu
- renderer<%>
- renderer-root)
+ renderer<%>)
 
 (define id-seq (box 0))
 (define update-id-seq! (make-box-update-proc id-seq))
@@ -56,7 +55,7 @@
 (define (render tree [parent #f])
   (define id (next-id!))
   (define r (new renderer% [id id] [tree tree]))
-  (define root (send r render parent))
+  (define root (send r render (and parent (renderer-root parent))))
   (log-gui-easy-debug "rendered window ~a" id)
   (begin0 r
     (hash-set! renderers id r)

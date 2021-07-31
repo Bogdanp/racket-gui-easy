@@ -5,7 +5,7 @@
 
 (define @msg (@ "Click the button"))
 
-(define r
+(define root-renderer
   (render
    (window
     (vpanel
@@ -20,4 +20,4 @@
            (text @msg)
            (input @msg (λ (_ text)
                          (@msg . := . text)))))
-         (renderer-root r))))))))
+         root-renderer)))))))

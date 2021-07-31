@@ -7,16 +7,16 @@
          "private/view.rkt")
 
 (provide
+ renderer?
  (contract-out
   [render (->* ((is-a?/c window-view<%>))
-               ((or/c (is-a?/c gui:frame%)
-                      (is-a?/c gui:dialog%)
-                      #f))
+               ((or/c (is-a?/c renderer<%>) #f))
                (is-a?/c renderer<%>))]
   [render-popup-menu (-> (is-a?/c renderer<%>)
                          (is-a?/c popup-menu-view<%>)
                          gui:position-integer?
                          gui:position-integer?
-                         void?)]
-  [renderer-root (-> (is-a?/c renderer<%>)
-                     (or/c (is-a?/c gui:frame%) #f))]))
+                         void?)]))
+
+(define (renderer? v)
+  (is-a? v renderer<%>))
