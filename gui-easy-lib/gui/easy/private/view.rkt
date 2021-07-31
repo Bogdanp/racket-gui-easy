@@ -12,6 +12,7 @@
            "view/checkbox.rkt"
            "view/choice.rkt"
            "view/common.rkt"
+           "view/dyn.rkt"
            "view/if.rkt"
            "view/image.rkt"
            "view/input.rkt"

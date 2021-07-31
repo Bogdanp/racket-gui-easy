@@ -40,6 +40,7 @@
                 #:min-size (maybe-obs/c size/c)
                 #:stretch (maybe-obs/c stretch/c))
                (is-a?/c view<%>))]
+  [dyn-view (-> obs? (-> any/c (is-a?/c view<%>)) (is-a?/c view<%>))]
   [if-view (-> (maybe-obs/c any/c) (is-a?/c view<%>) (is-a?/c view<%>) (is-a?/c view<%>))]
   [image (->* ((maybe-obs/c path-string?))
               (#:size (maybe-obs/c size/c)
