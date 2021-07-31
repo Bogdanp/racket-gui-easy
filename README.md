@@ -1,7 +1,7 @@
 # gui-easy-lib
 
-Declarative GUIs in Racket.  Super experimental and breaking changes
-are likely so don't use this yet.
+Declarative GUIs in Racket.  This is still a work in progress so
+expect some breaking changes.
 
 ## License
 
