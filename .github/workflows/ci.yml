@@ -21,8 +21,8 @@ jobs:
         variant: 'CS'
         version: '8.1'
     - name: Install Package & Deps
-      run: raco pkg install --auto --skip-installed gui-easy-lib/
+      run: raco pkg install --auto --skip-installed gui-easy-lib/ gui-easy/
     - name: Update Package
-      run: raco pkg update gui-easy-lib/
+      run: raco pkg update gui-easy-lib/ gui-easy/
     - name: Test
       run: xvfb-run -a raco test -j "$(nproc)" -p gui-easy-lib
