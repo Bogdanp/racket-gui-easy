@@ -20,9 +20,9 @@
     #:label "Toggle"
     #:checked? @toggled?
     (λ:= @toggled?))
-   (cond/view
+   (cond-view
     [@toggled?
-     (cond/view
+     (cond-view
       [@password-correct?
        (vpanel
         (text "You're in!")

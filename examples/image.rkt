@@ -19,7 +19,7 @@
             (when path (@path . := . path))))
   (hpanel
    #:stretch '(#f #f)
-   (cond/view
+   (cond-view
     [@path
      (vpanel
       (vpanel

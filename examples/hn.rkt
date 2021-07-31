@@ -228,7 +228,7 @@
 
 (define (story-list @m @ss)
   (hpanel
-   (cond/view
+   (cond-view
     [(@ss . ~> . null?)
      (text "Loading...")]
 
@@ -276,7 +276,7 @@
   (window
    #:title "Hacker News"
    #:size '(800 600)
-   (if/view @story
+   (if-view @story
             (story-view @mode @story)
             (hpanel
              #:alignment '(left top)

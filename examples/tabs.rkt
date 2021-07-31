@@ -31,7 +31,7 @@
         (@selection-index . := . index)]
        [(select)
         (@selection-index . := . index)]))
-   (cond/view
+   (cond-view
     [(@selection . ~> . (λ (s) (equal? s "A")))
      (text "View A")]
     [(@selection . ~> . (λ (s) (equal? s "B")))

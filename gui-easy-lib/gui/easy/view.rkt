@@ -11,7 +11,7 @@
  view<%>
  window-view<%>
  case/dep
- cond/view
+ cond-view
  (contract-out
   [canvas (canvas/c (-> (is-a?/c gui:dc<%>) any/c any))]
   [pict-canvas (canvas/c (-> any/c p:pict?))]
@@ -40,7 +40,7 @@
                 #:min-size (maybe-obs/c size/c)
                 #:stretch (maybe-obs/c stretch/c))
                (is-a?/c view<%>))]
-  [if/view (-> (maybe-obs/c any/c) (is-a?/c view<%>) (is-a?/c view<%>) (is-a?/c view<%>))]
+  [if-view (-> (maybe-obs/c any/c) (is-a?/c view<%>) (is-a?/c view<%>) (is-a?/c view<%>))]
   [image (->* ((maybe-obs/c path-string?))
               (#:size (maybe-obs/c size/c)
                #:mode (maybe-obs/c (or/c 'fit 'fill)))

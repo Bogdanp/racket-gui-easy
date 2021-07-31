@@ -101,7 +101,7 @@
     #:label "Show graph?"
     #:checked? @show-graph?
     (λ:= @show-graph?))
-   (cond/view
+   (cond-view
     [@show-graph?
      (snip
       @d

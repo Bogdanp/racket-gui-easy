@@ -4,7 +4,6 @@
          racket/class
          (prefix-in gui: racket/gui)
          racket/list
-         racket/match
          syntax/parse/define
          "../observable.rkt"
          "common.rkt"
@@ -12,8 +11,8 @@
          "view.rkt")
 
 (provide
- if/view
- cond/view)
+ if-view
+ cond-view)
 
 (define if-view%
   (class* container% (view<%>)
@@ -80,21 +79,21 @@
         (send else-view destroy (get-child else-view))
         (remove-child else-view)))))
 
-(define (if/view @cond-e then-view else-view)
+(define (if-view @cond-e then-view else-view)
   (new if-view%
        [@cond-e @cond-e]
        [then-view then-view]
        [else-view else-view]
        [children null]))
 
-(define-syntax-parser cond/view
+(define-syntax-parser cond-view
   #:literals (else)
   [(_ [@cond-e:expr view-e:expr] [else else-e:expr])
-   #'(if/view @cond-e view-e else-e)]
+   #'(if-view @cond-e view-e else-e)]
 
   [(_ [@cond-e-1:expr view-e-1:expr] [@cond-e:expr view-e:expr] ... [else else-e:expr])
-   #'(if/view @cond-e-1
+   #'(if-view @cond-e-1
               view-e-1
-              (cond/view
+              (cond-view
                [@cond-e view-e] ...
                [else else-e]))])
