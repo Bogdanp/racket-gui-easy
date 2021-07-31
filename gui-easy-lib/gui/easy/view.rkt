@@ -40,10 +40,6 @@
                 #:min-size (maybe-obs/c size/c)
                 #:stretch (maybe-obs/c stretch/c))
                (is-a?/c view<%>))]
-  [dyn-view (->* (obs? (-> any/c (is-a?/c view<%>)))
-                 (#:equal? (-> any/c any/c boolean?))
-                 (is-a?/c view<%>))]
-  [if-view (-> (maybe-obs/c any/c) (is-a?/c view<%>) (is-a?/c view<%>) (is-a?/c view<%>))]
   [image (->* ((maybe-obs/c path-string?))
               (#:size (maybe-obs/c size/c)
                #:mode (maybe-obs/c (or/c 'fit 'fill)))
@@ -153,7 +149,28 @@
   [menu-item (->* ((maybe-obs/c label/c))
                   ((-> any))
                   (is-a?/c view<%>))]
-  [menu-item-separator (-> (is-a?/c view<%>))]))
+  [menu-item-separator (-> (is-a?/c view<%>))]
+
+  [dyn-view (->* (obs? (-> any/c (is-a?/c view<%>)))
+                 (#:equal? (-> any/c any/c any/c))
+                 (is-a?/c view<%>))]
+  [if-view (-> (maybe-obs/c any/c)
+               (is-a?/c view<%>)
+               (is-a?/c view<%>)
+               (is-a?/c view<%>))]
+  [list-view (->* (obs? (-> any/c (is-a?/c view<%>)))
+                  (#:alignment (maybe-obs/c alignment/c)
+                   #:enabled? (maybe-obs/c boolean?)
+                   #:style (listof (or/c 'horizontal 'vertical 'border 'deleted
+                                         'hscroll 'auto-hscroll 'hide-hscroll
+                                         'vscroll 'auto-vscroll 'hide-vscroll))
+                   #:spacing (maybe-obs/c gui:spacing-integer?)
+                   #:margin (maybe-obs/c margin/c)
+                   #:min-size (maybe-obs/c size/c)
+                   #:stretch (maybe-obs/c stretch/c)
+                   #:key (-> any/c any/c)
+                   #:equal? (-> any/c any/c any/c))
+                  (is-a?/c view<%>))]))
 
 (define alignment/c
   (list/c (or/c 'left 'center 'right)

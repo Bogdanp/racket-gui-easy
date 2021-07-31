@@ -37,13 +37,15 @@
       (case/dep what
         [@data
          (unless (equal?-proc val current-data)
+           (send v begin-container-sequence)
            (define new-view (make-view val))
            (when (has-child? current-view)
              (send current-view destroy (get-child current-view))
              (remove-child current-view))
            (set! current-view new-view)
            (set! current-data val)
-           (add-child current-view (send current-view create v)))]))
+           (add-child current-view (send current-view create v))
+           (send v end-container-sequence))]))
 
     (define/public (destroy _v)
       (when (has-child? current-view)
