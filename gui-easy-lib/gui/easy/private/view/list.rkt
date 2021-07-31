@@ -109,7 +109,7 @@
         (send the-panel begin-container-sequence)
         (for ([e (in-list (peek @entries))])
           (define k (key-proc e))
-          (define v (make-view (make-keyed-obs k e)))
+          (define v (make-view k (make-keyed-obs k e)))
           (define w (send v create the-panel))
           (add-child-handlers! v)
           (add-child v w)
@@ -125,7 +125,7 @@
              (define k (key-proc e))
              (begin0 k
                (unless (hash-has-key? keys-to-children k)
-                 (define child-v (make-view (make-keyed-obs k e)))
+                 (define child-v (make-view k (make-keyed-obs k e)))
                  (define child-w (send child-v create v))
                  (add-child-handlers! child-v)
                  (add-child child-v child-w)

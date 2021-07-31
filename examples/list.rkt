@@ -55,12 +55,11 @@
     (list-view
      @entries
      #:key car
-     (λ (@entry)
+     (λ (k @entry)
        (input (@entry . ~> . cdr)
               (λ (event text)
                 (case event
                   [(return)
-                   (define k (car (obs-peek @entry)))
                    (update-by-key! k text)]))))))))
 
 (module+ main
