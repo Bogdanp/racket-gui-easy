@@ -32,7 +32,7 @@
                (is-a?/c view<%>))]
   [hpanel panel/c]
   [vpanel panel/c]
-  [button (->* ((maybe-obs/c string?)
+  [button (->* ((maybe-obs/c gui:label-string?)
                 (-> any))
                (#:enabled? (maybe-obs/c boolean?)
                 #:style (listof (or/c 'border 'multi-line 'deleted))
