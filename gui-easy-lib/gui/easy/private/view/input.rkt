@@ -1,11 +1,11 @@
 #lang racket/base
 
-(require (only-in framework keymap:get-global)
-         racket/class
+(require racket/class
          (prefix-in gui: racket/gui)
          racket/match
          "../observable.rkt"
          "common.rkt"
+         "keymap.rkt"
          "view.rkt")
 
 (provide
@@ -89,7 +89,7 @@
                #:background-color [@background-color #f]
                #:style [style '(single)]
                #:font [font gui:normal-control-font]
-               #:keymap [keymap (keymap:get-global)]
+               #:keymap [keymap the-default-keymap]
                #:margin [@margin '(2 2)]
                #:min-size [@min-size '(#f #f)]
                #:stretch [@stretch '(#t #f)])
