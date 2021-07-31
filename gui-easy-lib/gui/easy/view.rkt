@@ -168,8 +168,7 @@
                    #:margin (maybe-obs/c margin/c)
                    #:min-size (maybe-obs/c size/c)
                    #:stretch (maybe-obs/c stretch/c)
-                   #:key (-> any/c any/c)
-                   #:equal? (-> any/c any/c any/c))
+                   #:key (-> any/c any/c))
                   (is-a?/c view<%>))]))
 
 (define alignment/c

@@ -15,12 +15,73 @@
 (define list-view%
   (class* container% (view<%>)
     (init-field @entries @alignment @enabled? @spacing @margin @min-size @stretch
-                make-view style key-proc equal?-proc)
-    (inherit add-child get-child remove-child destroy-children)
+                make-view style key-proc)
+    (inherit add-child get-child has-child? remove-child destroy-children)
     (super-new [children null])
 
     (define keys-to-children (make-hash))
-    (define keys-to-entries  (make-hash))
+    (define deps-to-handlers (make-hash))
+
+    (define (make-keyed-obs k last-e)
+      (obs-map @entries (λ (entries)
+                          (define new-e
+                            (findf
+                             (λ (e)
+                               (equal? (key-proc e) k))
+                             entries))
+                          (cond
+                            [new-e
+                             (begin0 new-e
+                               (set! last-e new-e))]
+                            [else last-e]))))
+
+    (define (add-child-handlers! child-v)
+      (for ([dep (in-list (send child-v dependencies))])
+        (define (handle val)
+          (gui:queue-callback
+           (λ () (handle-update! child-v dep val)) #f))
+        (obs-observe! dep handle)
+        (hash-update! deps-to-handlers
+                      (cons child-v dep)
+                      (λ (handlers)
+                        (cons handle handlers))
+                      null)))
+
+    (define (remove-child-handlers! child-v)
+      (for* ([(c&dep hdls) (in-hash deps-to-handlers)]
+             [c (in-value (car c&dep))] #:when (eq? child-v c)
+             [dep (in-value (cdr c&dep))])
+        (for ([hdl (in-list hdls)])
+          (obs-unobserve! dep hdl))
+        (hash-remove! deps-to-handlers c&dep)))
+
+    (define (remove-all-child-handlers!)
+      (for* ([(c&dep hdls) (in-hash deps-to-handlers)]
+             [dep (in-value (cdr c&dep))]
+             [hdl (in-list hdls)])
+        (obs-unobserve! dep hdl))
+      (hash-clear! deps-to-handlers))
+
+    (define flush-frequency 16) ;; ms
+    (define flush-scheduled? #f)
+    (define pending-updates null)
+    (define (handle-update! v what val)
+      (set! pending-updates (cons (list v what val) pending-updates))
+      (unless flush-scheduled?
+        (set! flush-scheduled? #t)
+        (define deadline
+          (alarm-evt (+ (current-inexact-milliseconds) flush-frequency)))
+        (thread
+         (lambda ()
+           (sync deadline)
+           (gui:queue-callback flush-updates!)))))
+    (define (flush-updates!)
+      (for ([update (in-list pending-updates)])
+        (match-define (list v what val) update)
+        (when (has-child? v)
+          (send v update (get-child v) what val)))
+      (set! pending-updates null)
+      (set! flush-scheduled? #f))
 
     (define/public (dependencies)
       (filter obs? (list @entries @alignment @enabled? @spacing @margin @min-size @stretch)))
@@ -48,10 +109,11 @@
         (send the-panel begin-container-sequence)
         (for ([e (in-list (peek @entries))])
           (define k (key-proc e))
-          (define v (make-view e))
-          (add-child v (send v create the-panel))
-          (hash-set! keys-to-children k v)
-          (hash-set! keys-to-entries  k e))
+          (define v (make-view (make-keyed-obs k e)))
+          (define w (send v create the-panel))
+          (add-child-handlers! v)
+          (add-child v w)
+          (hash-set! keys-to-children k v))
         (send the-panel end-container-sequence)))
 
     (define/public (update v what val)
@@ -62,36 +124,30 @@
            (for/list ([e (in-list val)])
              (define k (key-proc e))
              (begin0 k
-               (cond
-                 [(hash-ref keys-to-children k #f)
-                  => (λ (child-v)
-                       (define child-e (hash-ref keys-to-entries k))
-                       (unless (equal?-proc e child-e)
-                         (define child-w (get-child child-v))
-                         (send child-v destroy child-w)
-                         (send v delete-child child-w)
-                         (remove-child child-v)
-
-                         (define new-child-v (make-view e))
-                         (add-child new-child-v (send new-child-v create v))
-                         (hash-set! keys-to-children k new-child-v)
-                         (hash-set! keys-to-entries k e)))]
-                 [else
-                  (define child-v (make-view e))
-                  (add-child child-v (send child-v create v))
-                  (hash-set! keys-to-children k child-v)
-                  (hash-set! keys-to-entries k e)]))))
+               (unless (hash-has-key? keys-to-children k)
+                 (define child-v (make-view (make-keyed-obs k e)))
+                 (define child-w (send child-v create v))
+                 (add-child-handlers! child-v)
+                 (add-child child-v child-w)
+                 (hash-set! keys-to-children k child-v)))))
          (for ([(old-k old-v) (in-hash keys-to-children)])
            (unless (member old-k new-keys)
              (define old-w (get-child old-v))
+             (define focused? (send old-w has-focus?))
              (send old-v destroy old-w)
              (send v delete-child old-w)
-             (remove-child old-v)))
-         (for ([w (in-list (send v get-children))])
-           (send v delete-child w))
-         (for ([k (in-list new-keys)])
-           (define child-v (hash-ref keys-to-children k))
-           (send v add-child (get-child child-v)))
+             (remove-child-handlers! old-v)
+             (remove-child old-v)
+             (hash-remove! keys-to-children old-k)
+             (when focused?
+               (define children (send v get-children))
+               (cond
+                 [(null? children) (send v focus)]
+                 [else (send (last children) focus)]))))
+         (send v change-children
+               (λ (_)
+                 (for/list ([k (in-list new-keys)])
+                   (get-child (hash-ref keys-to-children k)))))
          (send v end-container-sequence)]
         [@alignment
          (send/apply v set-alignment val)]
@@ -116,6 +172,7 @@
            (stretchable-height h-s?))]))
 
     (define/public (destroy _v)
+      (remove-all-child-handlers!)
       (destroy-children))))
 
 (define (list-view @entries make-view
@@ -126,8 +183,7 @@
                    #:margin [@margin '(0 0)]
                    #:min-size [@min-size '(#f #f)]
                    #:stretch [@stretch '(#t #t)]
-                   #:key [key-proc values]
-                   #:equal? [equal?-proc equal?])
+                   #:key [key-proc values])
   (new list-view%
        [@entries @entries]
        [@alignment @alignment]
@@ -138,5 +194,4 @@
        [@stretch @stretch]
        [make-view make-view]
        [style style]
-       [key-proc key-proc]
-       [equal?-proc equal?-proc]))
+       [key-proc key-proc]))
