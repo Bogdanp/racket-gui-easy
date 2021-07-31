@@ -1,14 +1,15 @@
 #lang racket/base
 
-(require racket/format
+(require box-extra
+         racket/format
          racket/gui/easy
          racket/gui/easy/operator
          racket/list)
 
-(define id-seq 0)
-(define (next-id!)
-  (begin0 id-seq
-    (set! id-seq (add1 id-seq))))
+(define id-box (box 0))
+(define next-id! (let ([update! (make-box-update-proc id-box)])
+                   (λ () (update! add1))))
+
 (define @entries
   (@ (for/list ([_ (in-range 5)])
        (define id (next-id!))
@@ -32,6 +33,13 @@
                      (define len (length entries))
                      (if (zero? len) null (take entries (sub1 len))))))
 
+(define (update-by-key! k text)
+  (@entries . <~ . (λ (entries)
+                     (for/list ([e (in-list entries)])
+                       (if (eq? (car e) k)
+                           (cons k text)
+                           e)))))
+
 (define app
   (window
    #:size '(800 600)
@@ -52,12 +60,8 @@
               (λ (event text)
                 (case event
                   [(return)
-                   (@entries . <~ . (λ (entries)
-                                      (define k (car (obs-peek @entry)))
-                                      (for/list ([e (in-list entries)])
-                                        (if (eq? (car e) k)
-                                            (cons k text)
-                                            e))))]))))))))
+                   (define k (car (obs-peek @entry)))
+                   (update-by-key! k text)]))))))))
 
 (module+ main
   (render app))
