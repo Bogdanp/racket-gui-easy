@@ -21,14 +21,14 @@
    update-value-box!
    observers-box
    update-observers-box!
-   mapped?))
+   derived?))
 
 (define (->obs v)
   (cond
     [(obs? v) v]
     [else (make-obs v)]))
 
-(define (make-obs v [mapped? #f])
+(define (make-obs v [derived? #f])
   (define value-box (box v))
   (define observers-box (box null))
   (define update-value-box! (make-box-update-proc value-box))
@@ -37,7 +37,7 @@
        update-value-box!
        observers-box
        update-observers-box!
-       mapped?))
+       derived?))
 
 (define (obs-observe! o observer)
   (void
@@ -61,8 +61,8 @@
         (obs v)))))
 
 (define (obs-update! o f)
-  (when (obs-mapped? o)
-    (raise-argument-error 'obs-update! "an unmapped observable" o))
+  (when (obs-derived? o)
+    (raise-argument-error 'obs-update! "a non-derived observable" o))
   (do-obs-update! o f))
 
 (define (obs-peek o)
@@ -152,7 +152,7 @@
   (define @b (obs-map @a number->string))
   (check-equal? (obs-peek @b) "2")
   (check-exn
-   #rx"an unmapped observable"
+   #rx"a non-derived observable"
    (λ () (obs-update! @b "3")))
   (check-equal? (obs-peek @b) "2")
   (check-equal? (obs-update! @a add1) 3)

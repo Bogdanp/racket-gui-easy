@@ -262,8 +262,9 @@
                                '(#t #t)]) (is-a?/c view<%>)]{
 
   Returns a representation of a panel that renders the
-  @racket[entries] by passing each one as a derived observable to
-  @racket[make-view].  Each entry must have a unique @racket[#:key].
+  @racket[entries] by passing each one as a @tech{derived observable}
+  to @racket[make-view].  Each entry must have a unique
+  @racket[#:key].
 }
 
 @subsection{Canvases & Snips}
@@ -625,8 +626,8 @@ time.  Their changes may be observed by arbitrary functions.
   (obs-update! |@ints| add1)
 ]
 
-@deftech{Mapped observables} are @tech{observables} whose values
-depend on other observables.  Mapped observables cannot be updated
+@deftech{Derived observables} are @tech{observables} whose values
+depend on other observables.  Derived observables cannot be updated
 using @racket[obs-update!].
 
 @defproc[(obs? [v any/c]) boolean?]{
@@ -665,14 +666,14 @@ using @racket[obs-update!].
 
 @defproc[(obs-map [o obs?]
                   [f (-> any/c any/c)]) obs?]{
-  Returns a new @tech{mapped observable} whose value changes every
+  Returns a new @tech{derived observable} whose value changes every
   time @racket[o]'s value does.  The values held by the new observable
-  are mapped using @racket[f].
+  are mapped via @racket[f].
 }
 
 @defproc[(obs-combine [f (-> any/c ...+ any/c)]
                       [o obs?] ...+) obs?]{
-  Returns a new @tech{mapped observable} whose value changes every
+  Returns a new @tech{derived observable} whose value changes every
   time one of the @racket[o]s change.  The values held by the new
   observable are the values of the @racket[o]s combined via
   @racket[f].
@@ -680,7 +681,7 @@ using @racket[obs-update!].
 
 @defproc[(obs-debouce [o obs?]
                       [#:duration duration-ms exact-nonnegative-integer? 200]) obs?]{
-  Returns a new @tech{mapped observable} based on @racket[o], whose
+  Returns a new @tech{derived observable} based on @racket[o], whose
   values change at most once every @racket[duration-ms] milliseconds.
 }
 
