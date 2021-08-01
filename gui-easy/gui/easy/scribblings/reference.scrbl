@@ -430,7 +430,7 @@
                 [#:style style (listof (or/c 'single 'multiple 'hscroll 'password
                                              'vertical-label 'horizontal-label
                                              'deleted)) '(single)]
-                [#:font font (is-a?/c gui:font) gui:normal-control-font]
+                [#:font font (is-a?/c gui:font%) gui:normal-control-font]
                 [#:keymap keymap (is-a?/c gui:keymap%) (new gui:keymap%)]
                 [#:margin margin
                           (maybe-obs/c
