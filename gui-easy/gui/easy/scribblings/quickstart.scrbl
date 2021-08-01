@@ -47,7 +47,7 @@ laid out horizontally by the @racket[hpanel].
 @section{Counters}
 
 Since views are at their core just descriptions of a GUI, it's easy to
-abstract over them.
+abstract over them and make them reusable.
 
 @racketblock[
   (define (counter |@count| action)
@@ -66,22 +66,13 @@ abstract over them.
      (counter |@counter-2| (λ (proc) (|@counter-1| . <~ . proc))))))
 ]
 
-Here we abstracted the counter from the previous example and made it
-reusable.
-
 @section{Dynamic Counters}
 
-Taking the previous example even further, we can render a dynamic list
-of counters.
+Taking the previous example further, we can render a dynamic list of
+counters.
 
 @racketblock[
-  (define (counter |@count| action)
-    (hpanel
-     (button "-" (λ () (action sub1)))
-     (text (|@count| . ~> . number->string))
-     (button "+" (λ () (action add1)))))
-
-  (define |@counts| (|@| '((0 . 0))))
+  (define |@counters| (|@| '((0 . 0))))
 
   (define (append-counter counts)
     (define next-id (add1 (apply max (map car counts))))
@@ -93,6 +84,13 @@ of counters.
           (cons k (proc (cdr entry)))
           entry)))
 
+  (define (counter |@count| action)
+    (hpanel
+     #:stretch '(#t #f)
+     (button "-" (λ () (action sub1)))
+     (text (|@count| . ~> . number->string))
+     (button "+" (λ () (action add1)))))
+
   (render
    (window
     #:size '(#f 200)
@@ -100,25 +98,23 @@ of counters.
      (hpanel
       #:alignment '(center top)
       #:stretch '(#t #f)
-      (button "Add counter" (λ ()
-                              (|@counts| . <~ . append-counter))))
+      (button "Add counter" (λ () (|@counters| . <~ . append-counter))))
      (list-view
-      |@counts|
+      |@counters|
       #:key car
       (λ (k |@entry|)
         (counter
          (|@entry| . ~> . cdr)
          (λ (proc)
-           (|@counts| . <~ . (λ (counts)
-                               (update-count counts k proc))))))))))
+           (|@counters| . <~ . (λ (counts) (update-count counts k proc))))))))))
 ]
 
-Here the @racket[|@counts|] observable holds a list of pairs where the
-first element of a pair is the id of the counter and the second is its
-count.  When the ``Add counter'' button is clicked, a new counter is
-added to the set.  The @racket[list-view] renders each individual
-counter by passing in a derived observable to its @racket[make-view]
-argument.
+Here the @racket[|@counters|] observable holds a list of pairs where
+the first element of a pair is the id of each counter and the second
+is its count.  When the ``Add counter'' button is clicked, a new
+counter is added to the list.  The @racket[list-view] renders each
+individual counter by passing in a derived observable to its
+@racket[make-view] argument.
 
 @section{More}
 

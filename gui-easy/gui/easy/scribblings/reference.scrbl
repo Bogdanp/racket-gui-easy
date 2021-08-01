@@ -1,7 +1,8 @@
 #lang scribble/manual
 
 @(require scribble/example
-          (for-label racket/base
+          (for-label (only-in pict pict?)
+                     racket/base
                      racket/contract
                      racket/class
                      racket/gui/easy
@@ -39,6 +40,8 @@
 
 @section{Views}
 
+@subsection{Windows & Dialogs}
+
 @defproc[(window [#:title title (maybe-obs/c string?) "Untitled"]
                  [#:size size
                          (maybe-obs/c
@@ -74,8 +77,7 @@
                           null]
                  [child (is-a?/c view<%>)] ...+) (is-a?/c window-view<%>)]{
 
-  Returns a @racket[window-view<%>] that represents a top level
-  window.
+  Returns a representation of a top-level window.
 }
 
 @defproc[(dialog [#:title title (maybe-obs/c string?) "Untitled"]
@@ -110,8 +112,38 @@
                           '(close-button)]
                  [child (is-a?/c view<%>)] ...+) (is-a?/c window-view<%>)]{
 
-  Returns a @racket[window-view<%>] that represents a dialog.
+  Returns a representation of a dialog.
 }
+
+@subsection{Menus & Menu Items}
+
+@defproc[(popup-menu [menu (is-a?/c view<%>)]) (is-a?/c popup-menu-view<%>)]{
+  Returns a representation of a popup menu.  Popup menus are rendered
+  using @racket[render-popup-menu].
+}
+
+@defproc[(menu-bar [menu (is-a?/c view<%>)]) (is-a?/c view<%>)]{
+  Returns a representation of a menu-bar menu.
+}
+
+@defproc[(menu [label (maybe-obs/c (or/c #f gui:label-string?))]
+               [item (is-a?/c view<%>)] ...) (is-a?/c view<%>)]{
+
+  Returns a representation of a menu with @racket[item]s as children.
+}
+
+@defproc[(menu-item [label (maybe-obs/c (or/c #f gui:label-string?))]
+                    [action (-> any) void]) (is-a?/c view<%>)]{
+
+  Returns a representation of a menu item that calls @racket[action]
+  when clicked.
+}
+
+@defproc[(menu-item-separator) (is-a?/c view<%>)]{
+  Returns a representation of a menu item separator.
+}
+
+@subsection{Containers}
 
 @defproc[(hpanel [#:alignment alignment
                               (maybe-obs/c
@@ -142,7 +174,8 @@
 
                  [child (is-a?/c view<%>)] ...+) (is-a?/c view<%>)]{
 
-  Returns a panel that lays out its children horizontally.
+  Returns a representation of a panel that lays out its children
+  horizontally.
 }
 
 @defproc[(vpanel [#:alignment alignment
@@ -173,36 +206,32 @@
                             '(#t #t)]
                  [child (is-a?/c view<%>)] ...+) (is-a?/c view<%>)]{
 
-  Returns a panel that lays out its children vertically.
+  Returns a representation of a panel that lays out its children
+  vertically.
 }
 
-@defproc[(button [label (maybe-obs/c gui:label-string?)]
-                 [action (-> any)]
-                 [#:enabled? enabled? (maybe-obs/c boolean?) #t]
-                 [#:style style (listof (or/c 'border 'multi-line 'deleted)) null]
-                 [#:margin margin
-                           (maybe-obs/c
-                            (list/c gui:spacing-integer?
-                                    gui:spacing-integer?))
-                           '(0 0)]
-                 [#:min-size min-size
-                             (maybe-obs/c
-                              (list/c
-                               (or/c boolean? gui:dimension-integer?)
-                               (or/c boolean? gui:dimension-integer?)))
-                             '(#f #f)]
-                 [#:stretch stretch
-                            (maybe-obs/c (list/c boolean? boolean?))
-                            '(#t #t)]) (is-a?/c view<%>)]{
+@defproc[(if-view [cond-value (maybe-obs/c any/c)]
+                  [then-view (is-a?/c view<%>)]
+                  [else-view (is-a?/c view<%>)]) (is-a?/c view<%>)]{
 
-  Returns a button that calls @racket[action] when clicked.
+  Returns a repersentation of a panel that renders @racket[then-view]
+  when the current-value of @racket[cond-value] is truthy and
+  @racket[else-view] otherwise.
 }
 
-@defproc[(text [s (maybe-obs/c gui:label-string?)]) (is-a?/c view<%>)]{
-  Returns a textual label.
+@defform[#:literals (else)
+         (cond-view
+          [cond-e view-e] ...+
+          [else view-e])
+         #:contracts ([cond-e (maybe-obs/c any/c)]
+                      [view-e (is-a?/c view<%>)])]{
+
+  Returns a representation of a panel that renders the first
+  @racket[view-e] for which the associated @racket[cond-e]'s current
+  value is truthy.
 }
 
-@defproc[(list-view [o (maybe-obs/c list?)]
+@defproc[(list-view [entries (maybe-obs/c list?)]
                     [make-view (-> any/c any/c (is-a?/c view<%>))]
                     [#:key key (-> any/c any/c) values]
                     [#:alignment alignment
@@ -231,6 +260,300 @@
                     [#:stretch stretch
                                (maybe-obs/c (list/c boolean? boolean?))
                                '(#t #t)]) (is-a?/c view<%>)]{
+
+  Returns a representation of a panel that renders the
+  @racket[entries] by passing each one as a derived observable to
+  @racket[make-view].  Each entry must have a unique @racket[#:key].
+}
+
+@subsection{Canvases & Snips}
+
+@defproc[(canvas [data (maybe-obs/c any/c)]
+                 [draw (-> (is-a?/c gui:dc<%>) any/c any)]
+                 [#:label label (maybe-obs/c (or/c #f gui:label-string?)) #f]
+                 [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                 [#:style style (listof (or/c 'border 'control-border 'combo
+                                              'vscroll 'hscroll 'resize-corner
+                                              'gl 'no-autoclear 'transparent
+                                              'no-focus 'deleted)) null]
+                 [#:margin margin
+                           (maybe-obs/c
+                            (list/c gui:spacing-integer?
+                                    gui:spacing-integer?))
+                           '(0 0)]
+                 [#:min-size min-size
+                             (maybe-obs/c
+                              (list/c
+                               (or/c boolean? gui:dimension-integer?)
+                               (or/c boolean? gui:dimension-integer?)))
+                             '(#f #f)]
+                 [#:stretch stretch
+                            (maybe-obs/c (list/c boolean? boolean?))
+                            '(#t #t)]) (is-a?/c view<%>)]{
+
+  Returns a representation of a canvas that is redrawn using
+  @racket[draw] whenever @racket[data] changes.
+}
+
+@defproc[(pict-canvas [data (maybe-obs/c any/c)]
+                      [make-pict (-> any/c pict?)]
+                      [#:label label (maybe-obs/c (or/c #f gui:label-string?)) #f]
+                      [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                      [#:style style (listof (or/c 'border 'control-border 'combo
+                                                   'vscroll 'hscroll 'resize-corner
+                                                   'gl 'no-autoclear 'transparent
+                                                   'no-focus 'deleted)) null]
+                      [#:margin margin
+                                (maybe-obs/c
+                                 (list/c gui:spacing-integer?
+                                         gui:spacing-integer?))
+                                '(0 0)]
+                      [#:min-size min-size
+                                  (maybe-obs/c
+                                   (list/c
+                                    (or/c boolean? gui:dimension-integer?)
+                                    (or/c boolean? gui:dimension-integer?)))
+                                  '(#f #f)]
+                      [#:stretch stretch
+                                 (maybe-obs/c (list/c boolean? boolean?))
+                                 '(#t #t)]) (is-a?/c view<%>)]{
+
+  Returns a representation of a canvas that is redrawn using the
+  result of @racket[make-pict] whenever @racket[data] changes.
+}
+
+@defproc[(snip [data (maybe-obs/c any/c)]
+               [make-snip (-> any/c
+                              gui:dimension-integer?
+                              gui:dimension-integer?
+                              (is-a?/c gui:snip%))]
+               [update-snip (-> (is-a?/c gui:snip%) any/c any) void]
+               [#:label label (maybe-obs/c (or/c #f gui:label-string?)) #f]
+               [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+               [#:style style (listof (or/c 'no-border 'control-border 'combo
+                                            'resize-corner 'no-focus 'deleted
+                                            'transparent)) null]
+               [#:margin margin
+                         (maybe-obs/c
+                          (list/c gui:spacing-integer?
+                                  gui:spacing-integer?))
+                         '(0 0)]
+               [#:min-size min-size
+                           (maybe-obs/c
+                            (list/c
+                             (or/c boolean? gui:dimension-integer?)
+                             (or/c boolean? gui:dimension-integer?)))
+                           '(#f #f)]
+               [#:stretch stretch
+                          (maybe-obs/c (list/c boolean? boolean?))
+                          '(#t #t)]) (is-a?/c view<%>)]{
+
+  Returns the representation of an editor that holds a snip generated
+  via @racket[make-snip].  The snip may be updated whenever
+  @racket[data] changes via @racket[update-snip].
+}
+
+@subsection{Widgets}
+
+@defproc[(button [label (maybe-obs/c gui:label-string?)]
+                 [action (-> any)]
+                 [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                 [#:style style (listof (or/c 'border 'multi-line 'deleted)) null]
+                 [#:margin margin
+                           (maybe-obs/c
+                            (list/c gui:spacing-integer?
+                                    gui:spacing-integer?))
+                           '(0 0)]
+                 [#:min-size min-size
+                             (maybe-obs/c
+                              (list/c
+                               (or/c boolean? gui:dimension-integer?)
+                               (or/c boolean? gui:dimension-integer?)))
+                             '(#f #f)]
+                 [#:stretch stretch
+                            (maybe-obs/c (list/c boolean? boolean?))
+                            '(#t #t)]) (is-a?/c view<%>)]{
+
+  Returns a representation of a button that calls @racket[action] when
+  clicked.
+}
+
+@defproc[(checkbox [action (-> boolean? any)]
+                   [#:label label (maybe-obs/c (or/c #f gui:label-string?)) #f]
+                   [#:checked? checked? (maybe-obs/c boolean?) #f]
+                   [#:enabled? enabled? (maybe-obs/c boolean?) #f]) (is-a?/c view<%>)]{
+  Returns a representation of a checkbox that calls @racket[action]
+  when toggled.
+}
+
+@defproc[(choice [choices (maybe-obs/c (listof gui:label-string?))]
+                 [action (-> (or/c #f gui:label-string?) any)]
+                 [#:selection selection (maybe-obs/c exact-nonnegative-integer?) 0]
+                 [#:label label (maybe-obs/c (or/c #f gui:label-string?)) #f]
+                 [#:style style (listof (or/c 'horizontal-label 'vertical-label 'deleted)) null]
+                 [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                 [#:min-size min-size
+                             (maybe-obs/c
+                              (list/c
+                               (or/c boolean? gui:dimension-integer?)
+                               (or/c boolean? gui:dimension-integer?)))
+                             '(#f #f)]
+                 [#:stretch stretch
+                            (maybe-obs/c (list/c boolean? boolean?))
+                            '(#t #t)]) (is-a?/c view<%>)]{
+
+  Returns a representation of a choice widget that calls
+  @racket[action] whenever the current selection changes.
+}
+
+@defproc[(image [path (maybe-obs/c path-string?)]
+                [#:size size
+                        (maybe-obs/c
+                         (list/c (or/c #f gui:dimension-integer?)
+                                 (or/c #f gui:dimension-integer?)))
+                        '(#f #f)]
+                [#:mode mode (maybe-obs/c (or/c 'fit 'fill)) 'fit]) (is-a?/c view<%>)]{
+
+  Returns a representation of an image.
+
+  The @racket[#:mode] argument controls how the image stretches to
+  fill its container.  If the mode is @racket['fit], then the image
+  will preserve its aspect ratio, otherwise it will stretch to fill
+  the container.
+}
+
+@defproc[(input [value (maybe-obs/c string?)]
+                [action (-> (or/c 'input 'return) string? any) void]
+                [#:label label (maybe-obs/c (or/c #f gui:label-string?)) #f]
+                [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                [#:background-color background-color (maybe-obs/c (or/c #f (is-a?/c gui:color%))) #f]
+                [#:style style (listof (or/c 'single 'multiple 'hscroll 'password
+                                             'vertical-label 'horizontal-label
+                                             'deleted)) '(single)]
+                [#:font font (is-a?/c gui:font) gui:normal-control-font]
+                [#:keymap keymap (is-a?/c gui:keymap%) (new gui:keymap%)]
+                [#:margin margin
+                          (maybe-obs/c
+                           (list/c gui:spacing-integer?
+                                   gui:spacing-integer?))
+                          '(0 0)]
+                [#:min-size min-size
+                            (maybe-obs/c
+                             (list/c
+                              (or/c boolean? gui:dimension-integer?)
+                              (or/c boolean? gui:dimension-integer?)))
+                            '(#f #f)]
+                [#:stretch stretch
+                           (maybe-obs/c (list/c boolean? boolean?))
+                           '(#t #t)]) (is-a?/c view<%>)]{
+  Returns a representation of a text field that calls @racket[action]
+  on change.  The first argument to the @racket[action] is the type of
+  event that caused the input to change and the second is the contents
+  of the text field.
+}
+
+@defproc[(progress [value (maybe-obs/c gui:position-integer?)]
+                   [#:label label (maybe-obs/c (or/c #f gui:label-string?)) #f]
+                   [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                   [#:style style (listof (or/c 'horizontal 'vertical 'plain
+                                                'vertical-label 'horizontal-label
+                                                'deleted)) '(horizontal)]
+                   [#:min-value min-value gui:position-integer? 0]
+                   [#:max-value max-value gui:position-integer? 100]
+                   [#:min-size min-size
+                               (maybe-obs/c
+                                (list/c
+                                 (or/c boolean? gui:dimension-integer?)
+                                 (or/c boolean? gui:dimension-integer?)))
+                               '(#f #f)]
+                   [#:stretch stretch
+                              (maybe-obs/c (list/c boolean? boolean?))
+                              (list (memq 'horizontal style)
+                                    (memq 'vertical   style))]) (is-a?/c view<%>)]{
+  Returns a representation of a progress bar.
+}
+
+@defproc[(slider [value (maybe-obs/c gui:position-integer?)]
+                 [action (-> gui:position-integer? any)]
+                 [#:label label (maybe-obs/c (or/c #f gui:label-string?)) #f]
+                 [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                 [#:style style (listof (or/c 'horizontal 'vertical 'plain
+                                              'vertical-label 'horizontal-label
+                                              'deleted)) '(horizontal)]
+                 [#:min-value min-value gui:position-integer? 0]
+                 [#:max-value max-value gui:position-integer? 100]
+                 [#:min-size min-size
+                             (maybe-obs/c
+                              (list/c
+                               (or/c boolean? gui:dimension-integer?)
+                               (or/c boolean? gui:dimension-integer?)))
+                             '(#f #f)]
+                 [#:stretch stretch
+                            (maybe-obs/c (list/c boolean? boolean?))
+                            (list (memq 'horizontal style)
+                                  (memq 'vertical   style))]) (is-a?/c view<%>)]{
+  Returns a representation of a slider that calls the @racket[action] on change.
+}
+
+@defproc[(spacer) (is-a?/c view<%>)]{
+  Returns a representation of a spacer.  Spacers extend to fill the
+  space of their parents.
+}
+
+@defproc[(table [columns (listof gui:label-string?)]
+                [entries (maybe-obs/c vector?)]
+                [action (-> (or/c 'select 'dclick 'column)
+                            vector?
+                            (or/c #f
+                                  exact-nonnegative-integer?
+                                  (listof exact-nonnegative-integer?))
+                            any)]
+                [#:entry->row entry->row (-> any/c vector?) values]
+                [#:selection selection
+                             (maybe-obs/c
+                              (or/c #f
+                                    exact-nonnegative-integer?
+                                    (listof exact-nonnegative-integer?)))
+                             #f]
+                [#:label label (maybe-obs/c (or/c #f gui:label-string?)) #f]
+                [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                [#:style style
+                         (listof (or/c 'single 'multiple 'extended
+                                       'vertical-label 'horizontal-label
+                                       'variable-columns 'column-headers
+                                       'clickable-headers 'reorderable-headers
+                                       'deleted))
+                         '(single columnn-headers clickable-headers reorderable-headers)]
+                [#:font font (is-a?/c gui:font%) gui:view-control-font]
+                [#:margin margin
+                          (maybe-obs/c
+                           (list/c gui:spacing-integer?
+                                   gui:spacing-integer?))
+                          '(0 0)]
+                [#:min-size min-size
+                            (maybe-obs/c
+                             (list/c
+                              (or/c boolean? gui:dimension-integer?)
+                              (or/c boolean? gui:dimension-integer?)))
+                            '(#f #f)]
+                [#:stretch stretch
+                           (maybe-obs/c (list/c boolean? boolean?))
+                           '(#t #t)]) (is-a?/c view<%>)]{
+
+  Returns a representation of a table that calls @racket[action] when
+  the selection changes or when one of its columns is clicked (if the
+  @racket['clickable-headers] style is set).  The action is called
+  with the type of event that occurred, the set of entries at the time
+  of the event and the current selection, if any.  The current
+  selection can either be a single index in the set of entries or a
+  list of indices in the case of a @racket['multiple] selection table.
+
+  The @racket[#:entry->row] argument converts each row in the input
+  data for display in the table.
+}
+
+@defproc[(text [s (maybe-obs/c gui:label-string?)]) (is-a?/c view<%>)]{
+  Returns a representation of a textual label.
 }
 
 @subsection{Interfaces}
@@ -388,4 +711,10 @@ using @racket[obs-update!].
 @defproc[(~> [o obs?]
              [f (-> any/c any/c)]) obs?]{
   An alias for @racket[obs-map].
+}
+
+@defproc[(λ<~ [o obs?]
+              [f (-> any/c any/c)]) (-> any/c)]{
+  Returns a function that updates @racket[o] using @racket[f] when
+  applied.
 }
