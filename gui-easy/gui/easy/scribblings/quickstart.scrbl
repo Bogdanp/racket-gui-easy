@@ -1,12 +1,17 @@
 #lang scribble/manual
 
-@(require (for-label racket/base
+@(require racket/runtime-path
+          (for-label racket/base
                      racket/gui/easy
                      racket/gui/easy/operator))
+
+@(define-runtime-path media "media")
 
 @title{Quickstart}
 
 @section{Hello, World!}
+
+@centered[@image[(build-path media "1.1-hello-world.png") #:scale 0.5]]
 
 @racketblock[
   (window
@@ -25,6 +30,8 @@ a native GUI:
 ]
 
 @section{Counter}
+
+@centered[@image[(build-path media "1.2-counter.png") #:scale 0.5]]
 
 State in @tt{gui-easy} is held by @tech{observables}.
 
@@ -46,6 +53,8 @@ laid out horizontally by the @racket[hpanel].
 
 @section{Counters}
 
+@centered[@image[(build-path media "1.3-counters.png") #:scale 0.5]]
+
 Since views are at their core just descriptions of a GUI, it's easy to
 abstract over them and make them reusable.
 
@@ -63,10 +72,12 @@ abstract over them and make them reusable.
    (window
     (vpanel
      (counter |@counter-1| (λ (proc) (|@counter-1| . <~ . proc)))
-     (counter |@counter-2| (λ (proc) (|@counter-1| . <~ . proc))))))
+     (counter |@counter-2| (λ (proc) (|@counter-2| . <~ . proc))))))
 ]
 
 @section{Dynamic Counters}
+
+@centered[@image[(build-path media "1.4-dynamic-counters.png") #:scale 0.5]]
 
 Taking the previous example further, we can render a dynamic list of
 counters.
