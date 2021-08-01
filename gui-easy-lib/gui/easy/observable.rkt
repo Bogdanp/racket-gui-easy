@@ -7,7 +7,7 @@
  observer/c
  maybe-obs/c
  (contract-out
-  [obs (->* (any/c) (boolean?) obs?)]
+  [obs (-> any/c obs?)]
   [obs? (-> any/c boolean?)]
   [obs-observe! (-> obs? observer/c void?)]
   [obs-unobserve! (-> obs? observer/c void?)]
