@@ -12,9 +12,9 @@
  canvas
  pict-canvas)
 
-(define canvas%
+(define (make-canvas% %)
   (class* object% (view<%>)
-    (init-field @input @label @enabled? @margin @min-size @stretch draw style mouse-action)
+    (init-field @input @label @enabled? @margin @min-size @stretch draw style)
     (super-new)
 
     (define input #f)
@@ -27,10 +27,7 @@
       (match-define (list min-w min-h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
       (set! input (peek @input))
-      (new (class gui:canvas%
-             (super-new)
-             (define/override (on-event e)
-               (mouse-action this e)))
+      (new %
            [parent parent]
            [paint-callback (λ (_self dc)
                              (draw dc input))]
@@ -79,8 +76,8 @@
                 #:margin [@margin '(0 0)]
                 #:min-size [@min-size '(#f #f)]
                 #:stretch [@stretch '(#t #t)]
-                #:mouse-action [mouse-action void])
-  (new canvas%
+                #:mixin [mix values])
+  (new (make-canvas% (mix gui:canvas%))
        [@input @input]
        [@label @label]
        [@enabled? @enabled?]
@@ -88,8 +85,7 @@
        [@min-size @min-size]
        [@stretch @stretch]
        [draw draw]
-       [style style]
-       [mouse-action mouse-action]))
+       [style style]))
 
 (define pict-canvas
   (procedure-rename

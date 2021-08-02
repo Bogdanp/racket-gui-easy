@@ -16,11 +16,11 @@
  cond-view
  (contract-out
   ;; Windows & Dialogs
-  [window (window/c (listof (or/c 'no-resize-border 'no-caption
-                                  'no-system-menu 'hide-menu-bar
-                                  'toolbar-button 'float 'metal
-                                  'fullscreen-button 'fullscreen-aux)))]
-  [dialog (window/c (listof (or/c 'no-caption 'no-sheet 'resize-border 'close-button)))]
+  [window (window/c gui:frame% (listof (or/c 'no-resize-border 'no-caption
+                                             'no-system-menu 'hide-menu-bar
+                                             'toolbar-button 'float 'metal
+                                             'fullscreen-button 'fullscreen-aux)))]
+  [dialog (window/c gui:dialog% (listof (or/c 'no-caption 'no-sheet 'resize-border 'close-button)))]
 
   ;; Menus & Menu Items
   [popup-menu (-> (is-a?/c view<%>) ...
@@ -192,7 +192,7 @@
         #:margin (maybe-obs/c margin/c)
         #:min-size (maybe-obs/c size/c)
         #:stretch (maybe-obs/c stretch/c)
-        #:mouse-action (-> (is-a?/c gui:canvas%) (is-a?/c gui:mouse-event%) any))
+        #:mixin (make-mixin-contract gui:canvas%))
        (is-a?/c view<%>)))
 
 (define panel/c
@@ -209,7 +209,7 @@
        #:rest (listof (is-a?/c view<%>))
        (is-a?/c view<%>)))
 
-(define (window/c style/c)
+(define (window/c % style/c)
   (->* ()
        (#:title (maybe-obs/c string?)
         #:size (maybe-obs/c size/c)
@@ -217,6 +217,7 @@
         #:position (maybe-obs/c position/c)
         #:min-size (maybe-obs/c size/c)
         #:stretch (maybe-obs/c stretch/c)
-        #:style style/c)
+        #:style style/c
+        #:mixin (make-mixin-contract %))
        #:rest (listof (is-a?/c view<%>))
        (is-a?/c view<%>)))

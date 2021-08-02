@@ -60,7 +60,7 @@
   (begin0 r
     (hash-set! renderers id r)
     (send root show #t)
-    (when (is-a? tree dialog%)
+    (when (send tree is-dialog?)
       (send r destroy)
       (log-gui-easy-debug "destroyed window ~a" id))))
 

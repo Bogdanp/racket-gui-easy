@@ -13,16 +13,15 @@
 (provide
  window-view<%>
  dialog
- dialog%
- window
- window%)
+ window)
 
 (define window-view<%>
   (interface (view<%>)
     [create (->m (or/c (is-a?/c gui:frame%)
                        (is-a?/c gui:dialog%)
                        #f)
-                 (is-a?/c gui:window<%>))]))
+                 (is-a?/c gui:window<%>))]
+    [is-dialog? (->m boolean?)]))
 
 (define (window-like% clazz)
   (class* container% (window-view<%>)
@@ -91,10 +90,18 @@
 
     (define/public (destroy v)
       (destroy-children)
-      (send v show #f))))
+      (send v show #f))
 
-(define dialog% (window-like% gui:dialog%))
-(define window% (window-like% gui:frame%))
+    (define/public (is-dialog?)
+      #f)))
+
+(define (make-dialog% mix)
+  (class (window-like% (mix gui:dialog%))
+    (super-new)
+    (define/override (is-dialog?) #t)))
+
+(define (make-window% mix)
+  (window-like% (mix gui:frame%)))
 
 (define (dialog #:title [@title "Untitled"]
                 #:size [@size '(#f #f)]
@@ -103,8 +110,9 @@
                 #:style [style '(close-button)]
                 #:min-size [@min-size '(#f #f)]
                 #:stretch [@stretch '(#t #t)]
+                #:mixin [mix values]
                 . children)
-  (new dialog%
+  (new (make-dialog% mix)
        [@title @title]
        [@size @size]
        [@alignment @alignment]
@@ -121,8 +129,9 @@
                 #:min-size [@min-size '(#f #f)]
                 #:stretch [@stretch '(#t #t)]
                 #:style [style null]
+                #:mixin [mix values]
                 . children)
-  (new window%
+  (new (make-window% mix)
        [@title @title]
        [@size @size]
        [@alignment @alignment]

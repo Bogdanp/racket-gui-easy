@@ -55,6 +55,7 @@
                                         'toolbar-button 'float 'metal
                                         'fullscreen-button 'fullscreen-aux))
                           null]
+                 [#:mixin mix (make-mixin-contract gui:frame%) values]
                  [child (is-a?/c view<%>)] ...+) (is-a?/c window-view<%>)]{
 
   Returns a representation of a top-level window.
@@ -69,6 +70,7 @@
                  [#:style style
                           (listof (or/c 'no-caption 'no-sheet 'resize-border 'close-button))
                           '(close-button)]
+                 [#:mixin mix (make-mixin-contract gui:dialog%) values]
                  [child (is-a?/c view<%>)] ...+) (is-a?/c window-view<%>)]{
 
   Returns a representation of a dialog.
@@ -192,7 +194,8 @@
                                               'no-focus 'deleted)) null]
                  [#:margin margin (maybe-obs/c margin/c) '(0 0)]
                  [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
-                 [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]) (is-a?/c view<%>)]{
+                 [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
+                 [#:mixin mix (make-mixin-contract gui:canvas%) values]) (is-a?/c view<%>)]{
 
   Returns a representation of a canvas that is redrawn using
   @racket[draw] whenever @racket[data] changes.
@@ -208,7 +211,8 @@
                                                    'no-focus 'deleted)) null]
                       [#:margin margin (maybe-obs/c margin/c) '(0 0)]
                       [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
-                      [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]) (is-a?/c view<%>)]{
+                      [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
+                      [#:mixin mix (make-mixin-contract gui:canvas%) values]) (is-a?/c view<%>)]{
 
   Returns a representation of a canvas that is redrawn using the
   result of @racket[make-pict] whenever @racket[data] changes.
@@ -425,6 +429,10 @@
                                    (is-a?/c gui:dialog%)
                                    #f)]) (is-a?/c gui:window<%>)]{
     Returns a new @racket[gui:window<%>] belonging to @racket[parent].
+  }
+
+  @defmethod[(is-dialog?) boolean?]{
+    Returns @racket[#t] if this view is a dialog.
   }
 }
 
