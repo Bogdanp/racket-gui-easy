@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require box-extra
+         racket/struct
          "executor.rkt"
          "logger.rkt")
 
@@ -21,14 +22,19 @@
    update-value-box!
    observers-box
    update-observers-box!
-   derived?))
+   derived?)
+  #:methods gen:custom-write
+  [(define write-proc
+     (make-constructor-style-printer
+      (λ (o) (if (obs-derived? o) 'obs/derived 'obs))
+      (λ (o) (list (unbox (obs-value-box o))))))])
 
 (define (->obs v)
   (cond
     [(obs? v) v]
     [else (make-obs v)]))
 
-(define (make-obs v [derived? #f])
+(define (make-obs v #:derived? [derived? #f])
   (define value-box (box v))
   (define observers-box (box null))
   (define update-value-box! (make-box-update-proc value-box))
@@ -69,7 +75,7 @@
   (unbox (obs-value-box o)))
 
 (define (obs-map a f)
-  (define b (make-obs (f (obs-peek a)) #t))
+  (define b (make-obs (f (obs-peek a)) #:derived? #t))
   (define b-box (make-weak-box b))
   (define (g v)
     (define maybe-b (weak-box-value b-box))
@@ -87,7 +93,7 @@
     (for/vector #:length (length os)
         ([o (in-list os)])
       (obs-peek o)))
-  (define b (make-obs (apply f (vector->list vals)) #t))
+  (define b (make-obs (apply f (vector->list vals)) #:derived? #t))
   (define b-box (make-weak-box b))
   (define gs
     (for/list ([o (in-list os)]
@@ -111,7 +117,7 @@
 (define stop (gensym "stop"))
 
 (define (obs-debounce a #:duration [duration 200])
-  (define b (make-obs (obs-peek a) #t))
+  (define b (make-obs (obs-peek a) #:derived? #t))
   (define b-box (make-weak-box b))
   (define ch (make-channel))
   (thread
@@ -156,4 +162,12 @@
    (λ () (obs-update! @b "3")))
   (check-equal? (obs-peek @b) "2")
   (check-equal? (obs-update! @a add1) 3)
-  (check-equal? (obs-peek @b) "3"))
+  (check-equal? (obs-peek @b) "3")
+
+  (define @c (make-obs 10))
+  (define @d (obs-combine list @a @b @c))
+  (check-equal? (obs-peek @d) (list 3 "3" 10))
+  (obs-update! @a add1)
+  (check-equal? (obs-peek @d) (list 4 "4" 10))
+  (obs-update! @c add1)
+  (check-equal? (obs-peek @d) (list 4 "4" 11)))
