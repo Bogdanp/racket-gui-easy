@@ -526,6 +526,19 @@ using @racket[obs-update!].
 }
 
 
+@section{View Helpers}
+
+@defform[(case/dep what-expr
+          [dep-expr body ...] ...+)
+         #:contracts ([what-expr obs?]
+                      [dep-expr  obs?])]{
+
+  Executes the body of the first clause @racket[body] whose
+  @racket[dep-expr] is @racket[eq?] to @racket[what-expr].  Logs the
+  @racket[dep-expr] that matched to the @racket['gui-easy] topic.
+}
+
+
 @section{Observable Operators}
 @defmodule[racket/gui/easy/operator]
 
