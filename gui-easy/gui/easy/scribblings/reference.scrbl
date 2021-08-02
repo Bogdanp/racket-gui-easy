@@ -42,7 +42,7 @@
 
 @section{Views}
 
-@subsection{Windows & Dialogs}
+@subsection[#:tag "windows&dialogs"]{Windows & Dialogs}
 
 @defproc[(window [#:title title (maybe-obs/c string?) "Untitled"]
                  [#:size size (maybe-obs/c size/c) '(#f #f)]
@@ -105,7 +105,7 @@
   Returns a representation of a menu item separator.
 }
 
-@subsection{Containers}
+@subsection[#:tag "containers"]{Containers}
 
 @defproc[(hpanel [#:alignment alignment (maybe-obs/c alignment/c) '(center top)]
                  [#:style style

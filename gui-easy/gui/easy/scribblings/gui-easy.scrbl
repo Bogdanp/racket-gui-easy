@@ -28,4 +28,5 @@ so expect some breaking changes.
 }
 
 @include-section["quickstart.scrbl"]
+@include-section["geometry.scrbl"]
 @include-section["reference.scrbl"]
