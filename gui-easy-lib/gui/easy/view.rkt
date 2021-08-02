@@ -4,6 +4,7 @@
          racket/class
          racket/contract
          (prefix-in gui: racket/gui)
+         "contract.rkt"
          "observable.rkt"
          "private/view.rkt")
 
@@ -26,10 +27,10 @@
                   (is-a?/c popup-menu-view<%>))]
   [menu-bar (-> (is-a?/c view<%>) ...
                 (is-a?/c menu-bar-view<%>))]
-  [menu (-> (maybe-obs/c label/c)
+  [menu (-> (maybe-obs/c maybe-label/c)
             (is-a?/c view<%>) ...
             (is-a?/c menu-view<%>))]
-  [menu-item (->* ((maybe-obs/c label/c))
+  [menu-item (->* ((maybe-obs/c maybe-label/c))
                   ((-> any))
                   (is-a?/c view<%>))]
   [menu-item-separator (-> (is-a?/c view<%>))]
@@ -100,14 +101,14 @@
                 #:stretch (maybe-obs/c stretch/c))
                (is-a?/c view<%>))]
   [checkbox (->* ((-> boolean? any))
-                 (#:label (maybe-obs/c label/c)
+                 (#:label (maybe-obs/c maybe-label/c)
                   #:checked? (maybe-obs/c boolean?)
                   #:enabled? (maybe-obs/c boolean?))
                  (is-a?/c view<%>))]
   [choice (->* ((maybe-obs/c (listof gui:label-string?))
                 (-> (or/c #f gui:label-string?) any))
                (#:selection (maybe-obs/c exact-nonnegative-integer?)
-                #:label (maybe-obs/c label/c)
+                #:label (maybe-obs/c maybe-label/c)
                 #:style (listof (or/c 'horizontal-label 'vertical-label 'deleted))
                 #:enabled? (maybe-obs/c boolean?)
                 #:min-size (maybe-obs/c size/c)
@@ -119,7 +120,7 @@
               (is-a?/c view<%>))]
   [input (->* ((maybe-obs/c string?))
               ((-> (or/c 'input 'return) string? any)
-               #:label (maybe-obs/c label/c)
+               #:label (maybe-obs/c maybe-label/c)
                #:enabled? (maybe-obs/c boolean?)
                #:background-color (maybe-obs/c (or/c #f (is-a?/c gui:color%)))
                #:style (listof (or/c 'single 'multiple 'hscroll 'password
@@ -179,28 +180,6 @@
                                        (list/c exact-nonnegative-integer? gui:dimension-integer? gui:dimension-integer? gui:dimension-integer?)))))
               (is-a?/c view<%>))]
   [text (-> (maybe-obs/c gui:label-string?) (is-a?/c view<%>))]))
-
-(define alignment/c
-  (list/c (or/c 'left 'center 'right)
-          (or/c 'top 'center 'bottom)))
-
-(define label/c
-  (or/c #f gui:label-string?))
-
-(define margin/c
-  (list/c gui:spacing-integer?
-          gui:spacing-integer?))
-
-(define position/c
-  (or/c 'center (list/c gui:position-integer?
-                        gui:position-integer?)))
-
-(define size/c
-  (list/c (or/c #f gui:dimension-integer?)
-          (or/c #f gui:dimension-integer?)))
-
-(define stretch/c
-  (list/c boolean? boolean?))
 
 (define (canvas/c draw/c)
   (->* ((maybe-obs/c any/c) draw/c)
