@@ -354,7 +354,7 @@
   @racket[data] changes via @racket[update-snip].
 }
 
-@subsection{Widgets}
+@subsection{Controls}
 
 @defproc[(button [label (maybe-obs/c gui:label-string?)]
                  [action (-> any)]
