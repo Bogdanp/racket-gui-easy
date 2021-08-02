@@ -18,12 +18,11 @@
 (define (num n)
   (button
    (~a n)
-   (@nums . λ<~ . (λ (nums)
-                    (match nums
-                      [`(ready ,st)
-                       `(waiting ,(cons n st))]
-                      [`(waiting ,st)
-                       `(waiting ,(cons (+ (* (car st) 10) n) (cdr st)))])))))
+   (@nums . λ<~ . (match-lambda
+                    [`(ready ,st)
+                     `(waiting ,(cons n st))]
+                    [`(waiting ,st)
+                     `(waiting ,(cons (+ (* (car st) 10) n) (cdr st)))]))))
 
 (define (op f)
   (button
@@ -31,9 +30,9 @@
    (λ ()
      (match (obs-peek @nums)
        [`(,_ (,b ,a))
-        (@op . <~ . (λ (op)
+        (@op . <~ . (λ (current-op)
                       (begin0 f
-                        (@nums . := . `(ready (,(op a b)))))))]
+                        (@nums . := . `(ready (,(current-op a b)))))))]
 
        [`(,_ ,st)
         (@nums . := . `(ready ,st))
@@ -53,14 +52,11 @@
 
                   [(_ _) (void)]))))
 
-(define (nop)
-  (button "" void))
-
 (render
  (window
   #:title @out
   (hpanel (disp @out) (cls) (eq))
-  (hpanel (num 7) (num 8) (num 9) (op +))
-  (hpanel (num 4) (num 5) (num 6) (op -))
-  (hpanel (num 1) (num 2) (num 3) (op *))
-  (hpanel (nop)   (num 0) (nop)   (op /))))
+  (hpanel (num 7)  (num 8) (num 9)  (op +))
+  (hpanel (num 4)  (num 5) (num 6)  (op -))
+  (hpanel (num 1)  (num 2) (num 3)  (op *))
+  (hpanel (spacer) (num 0) (spacer) (op /))))
