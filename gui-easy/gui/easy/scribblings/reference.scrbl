@@ -390,7 +390,7 @@
 }
 
 @subsection{Interfaces}
-
+@subsubsection{@tt{view<%>}}
 @definterface[view<%> ()]{
   A @racket[view<%>] object is a wrapper around a GUI object that
   knows what its data dependecies are and how to respond to their
@@ -421,6 +421,7 @@
   }
 }
 
+@subsubsection{@tt{window-view<%>}}
 @definterface[window-view<%> (view<%>)]{
   A @racket[window-view<%>] is like a regular @racket[view<%>] but its
   @racket[create] method has additional constraints placed on it.
@@ -436,6 +437,7 @@
   }
 }
 
+@subsubsection{@tt{popup-menu-view<%>}}
 @definterface[popup-menu-view<%> (view<%>)]{
   A @racket[popup-menu-view<%>] is like a regular @racket[view<%>] but
   its @racket[create] method has additional constraints placed on it.
