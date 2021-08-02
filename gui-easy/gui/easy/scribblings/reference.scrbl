@@ -1,7 +1,8 @@
 #lang scribble/manual
 
 @(require scribble/example
-          (for-label (only-in pict pict?)
+          (for-label (prefix-in mrlib: mrlib/snip-canvas)
+                     (only-in pict pict?)
                      racket/base
                      racket/contract
                      racket/class
@@ -231,7 +232,8 @@
                                             'transparent)) null]
                [#:margin margin (maybe-obs/c margin/c) '(0 0)]
                [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
-               [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]) (is-a?/c view<%>)]{
+               [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
+               [#:mixin mix (make-mixin-contract mrlib:snip-canvas%) values]) (is-a?/c view<%>)]{
 
   Returns the representation of an editor that holds a snip generated
   via @racket[make-snip].  The snip may be updated whenever

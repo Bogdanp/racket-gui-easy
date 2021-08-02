@@ -10,7 +10,7 @@
 (provide
  snip)
 
-(define snip%
+(define (make-snip% %)
   (class* object% (view<%>)
     (init-field @data @label @enabled? @margin @min-size @stretch style make-snip update-snip)
     (super-new)
@@ -23,7 +23,7 @@
       (match-define (list h-m v-m) (peek @margin))
       (match-define (list min-w min-h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
-      (new gui:snip-canvas%
+      (new %
            [parent parent]
            [make-snip (let ([data (peek @data)])
                         (λ (w h)
@@ -70,8 +70,9 @@
               #:enabled? [@enabled? #t]
               #:margin [@margin '(0 0)]
               #:min-size [@min-size '(#f #f)]
-              #:stretch [@stretch '(#t #t)])
-  (new snip%
+              #:stretch [@stretch '(#t #t)]
+              #:mixin [mix values])
+  (new (make-snip% (mix gui:snip-canvas%))
        [@data @data]
        [@label @label]
        [@enabled? @enabled?]

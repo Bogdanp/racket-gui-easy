@@ -1,6 +1,7 @@
 #lang racket/base
 
-(require (prefix-in p: pict)
+(require (prefix-in gui: mrlib/snip-canvas)
+         (prefix-in p: pict)
          racket/class
          racket/contract
          (prefix-in gui: racket/gui)
@@ -87,7 +88,8 @@
                                     'transparent))
               #:margin (maybe-obs/c margin/c)
               #:min-size (maybe-obs/c size/c)
-              #:stretch (maybe-obs/c stretch/c))
+              #:stretch (maybe-obs/c stretch/c)
+              #:mixin (make-mixin-contract gui:snip-canvas%))
              (is-a?/c view<%>))]
 
   ;; Widgets
