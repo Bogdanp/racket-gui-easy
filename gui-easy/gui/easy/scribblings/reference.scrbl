@@ -679,8 +679,8 @@ using @racket[obs-update!].
   @racket[f].
 }
 
-@defproc[(obs-debouce [o obs?]
-                      [#:duration duration-ms exact-nonnegative-integer? 200]) obs?]{
+@defproc[(obs-debounce [o obs?]
+                       [#:duration duration-ms exact-nonnegative-integer? 200]) obs?]{
   Returns a new @tech{derived observable} based on @racket[o], whose
   values change at most once every @racket[duration-ms] milliseconds.
 }
