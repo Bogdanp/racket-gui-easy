@@ -613,12 +613,7 @@ using @racket[obs-update!].
   can stretch horizontally and vertically, respectively.
 }
 
-@defproc[(obs/c [c contract?]) contract?]{
-  Returns a contract that accepts an @racket[obs?] whose values
-  conform to @racket[c].  Checks the initial value of the observable
-  as well as all subsequent updated values.
-}
-
 @defproc[(maybe-obs/c [c contract?]) contract?]{
-  A shorthand for @racket[(or/c c (obs/c c))].
+  Returns a contract that accepts an @racket[obs?] or a regular value
+  that conforms to to @racket[c].
 }
