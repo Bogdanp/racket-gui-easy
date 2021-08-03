@@ -27,11 +27,10 @@ this case, that would be:
    (printf "double-clicked ~s~n" item)))
 ]
 
-A @racketid[canvas-list] should take an observable of a list of
-entries, a function that knows how to draw each entry to a
-@racket[gui:dc<%>] and a callback for when the user double-clicks an
-entry.  The @racketid[canvas-list] function should probably then look
-something like this:
+A @racketid[canvas-list] takes an observable of a list of entries, a
+function that knows how to draw each entry to a @racket[gui:dc<%>] and
+a callback for when the user double-clicks an entry.  The
+@racketid[canvas-list] function should then look something like this:
 
 @racketblock[
   (define (canvas-list |@entries| draw [action void])
@@ -41,8 +40,9 @@ something like this:
          [action action]))
 ]
 
-Next, we can define a skeleton implementation of
-@racketid[canvas-list-view%]:
+All it needs to do is abstract over the instantiation of the
+underlying @racket[view<%>].  Next, we can define a skeleton
+implementation of @racketid[canvas-list-view%]:
 
 @racketblock[
   (define canvas-list-view%
@@ -64,7 +64,8 @@ Next, we can define a skeleton implementation of
 ]
 
 Views must communicate what @tech{observables} they depend on to their
-parents.  In our case, that's straightforward:
+parents.  Since the only dependency a canvas list has is its set of
+entries, that's straightforward:
 
 @racketblock[
   (define canvas-list-view%
@@ -78,8 +79,8 @@ parents.  In our case, that's straightforward:
 ]
 
 When a view is rendered, its parent is in charge of calling its
-@method[view<%> create] method.  The create method must instantiate a
-GUI object, associate it the passed-in @racketid[parent], perform any
+@method[view<%> create] method.  That method must instantiate a GUI
+object, associate it with the passed-in @racketid[parent], perform any
 initialization steps and then return it.  In our case:
 
 @racketblock[
@@ -119,9 +120,9 @@ The view is then in charge of modifying its GUI object appropriately.
 
 Finally, when a view is no longer visible, its @method[view<%>
 destroy] method is called to dispose of the GUI object and perform any
-teardown actions.  In our case, there's nothing to do.  We can let
-garbage collection take care of destroying the @racketid[canvas-list%]
-object:
+teardown actions.  In our case, there's nothing to tear down so we can
+let garbage collection take care of destroying the
+@racketid[canvas-list%] object:
 
 @racketblock[
   (define canvas-list-view%
@@ -133,7 +134,18 @@ object:
 ]
 
 When the view becomes visible again, its @method[view<%> create]
-method is called again and the whole cycle repeats itself.
+method will be called again and the whole cycle will repeat itself.
 
-That's all there is to it.  See the "hn.rkt" example for a program
-that uses a custom view.
+That's all there is to it whe it comes to custom controls.  See the
+``hn.rkt'' example for a program that uses a custom view.
+
+
+@section{Custom Containers}
+
+Containers are slightly more complicated to implement than controls.
+They must collect all their children's unique dependencies and list
+them in their @method[view<%> dependencies] method.  Additionally,
+their @method[view<%> update] method is in charge of dispatching
+updates to their children.
+
+See ``gui-easy-lib/gui/easy/private/view/panel.rkt'' for an example.
