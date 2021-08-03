@@ -265,8 +265,8 @@
 }
 
 @defproc[(choice [choices (maybe-obs/c (listof gui:label-string?))]
-                 [action (-> (or/c #f gui:label-string?) any)]
-                 [#:selection selection (maybe-obs/c exact-nonnegative-integer?) 0]
+                 [action (-> maybe-label/c any)]
+                 [#:selection selection (maybe-obs/c maybe-label/c) #f]
                  [#:label label (maybe-obs/c maybe-label/c) #f]
                  [#:style style (listof (or/c 'horizontal-label 'vertical-label 'deleted)) null]
                  [#:enabled? enabled? (maybe-obs/c boolean?) #t]
@@ -277,7 +277,7 @@
   @racket[action] whenever the current selection changes.
 }
 
-@defproc[(image [path (maybe-obs/c path-string?)]
+@defproc[(image [path (maybe-obs/c (or/c #f path-string?))]
                 [#:size size (maybe-obs/c size/c) '(#f #f)]
                 [#:mode mode (maybe-obs/c (or/c 'fit 'fill)) 'fit]) (is-a?/c view<%>)]{
 
@@ -613,7 +613,12 @@ using @racket[obs-update!].
   can stretch horizontally and vertically, respectively.
 }
 
+@defproc[(obs/c [c contract?]) contract?]{
+  Returns a contract that accepts an @racket[obs?] whose values
+  conform to @racket[c].  Checks the initial value of the observable
+  as well as all subsequent updated values.
+}
+
 @defproc[(maybe-obs/c [c contract?]) contract?]{
-  Returns a contract that accepts an @racket[obs?] or a regular value
-  that conforms to to @racket[c].
+  A shorthand for @racket[(or/c c (obs/c c))].
 }

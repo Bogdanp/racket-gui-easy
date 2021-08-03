@@ -4,7 +4,7 @@
 
 (render
  (window
-  #:size (cons 400 400)
+  #:size (list 400 400)
   (vpanel
    (hpanel
     (text "A")

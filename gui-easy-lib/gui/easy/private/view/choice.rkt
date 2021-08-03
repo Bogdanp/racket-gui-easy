@@ -21,7 +21,7 @@
     (define @choices&index
       (obs-combine
        (λ (choices selection)
-         (list choices (index-of choices selection)))
+         (list choices (and selection (index-of choices selection))))
        @choices @selection))
 
     (define/public (dependencies)
@@ -96,7 +96,7 @@
       (void))))
 
 (define (choice @choices action
-                #:selection [@selection 0]
+                #:selection [@selection #f]
                 #:label [@label #f]
                 #:style [style null]
                 #:enabled? [@enabled? #t]

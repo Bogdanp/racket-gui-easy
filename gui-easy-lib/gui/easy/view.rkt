@@ -108,15 +108,15 @@
                   #:enabled? (maybe-obs/c boolean?))
                  (is-a?/c view<%>))]
   [choice (->* ((maybe-obs/c (listof gui:label-string?))
-                (-> (or/c #f gui:label-string?) any))
-               (#:selection (maybe-obs/c exact-nonnegative-integer?)
+                (-> maybe-label/c any))
+               (#:selection (maybe-obs/c maybe-label/c)
                 #:label (maybe-obs/c maybe-label/c)
                 #:style (listof (or/c 'horizontal-label 'vertical-label 'deleted))
                 #:enabled? (maybe-obs/c boolean?)
                 #:min-size (maybe-obs/c size/c)
                 #:stretch (maybe-obs/c stretch/c))
                (is-a?/c view<%>))]
-  [image (->* ((maybe-obs/c path-string?))
+  [image (->* ((maybe-obs/c (or/c #f path-string?)))
               (#:size (maybe-obs/c size/c)
                #:mode (maybe-obs/c (or/c 'fit 'fill)))
               (is-a?/c view<%>))]

@@ -11,7 +11,7 @@
     (super-new)
 
     (define deps-to-children
-      (for*/fold ([h (hasheq)])
+      (for*/fold ([h (hash)])
                  ([c (in-list children)]
                   [d (in-list (send c dependencies))])
         (hash-update h d (λ (cs) (cons c cs)) null)))

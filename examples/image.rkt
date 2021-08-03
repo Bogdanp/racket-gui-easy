@@ -30,12 +30,12 @@
         (@mode . λ:= . (compose1 string->symbol string-downcase)))
        (slider
         #:label "Width"
-        #:min-value 0
+        #:min-value 1
         #:max-value 800
         @width (λ:= @width))
        (slider
         #:label "Height"
-        #:min-value 0
+        #:min-value 1
         #:max-value 800
         @height (λ:= @height)))
       (image @path #:size @size #:mode @mode))]

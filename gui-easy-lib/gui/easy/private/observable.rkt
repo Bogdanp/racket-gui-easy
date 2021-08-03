@@ -19,11 +19,26 @@
  obs-debounce)
 
 (struct obs
-  (value-box
+  (id
+   value-box
    [update-value-box! #:mutable]
    observers-box
    update-observers-box!
    derived?)
+
+  #:methods gen:equal+hash
+  [(define (equal-proc o1 o2 _recursive-equal?)
+     (and (obs? o1)
+          (obs? o2)
+          (eq? (obs-id o1)
+               (obs-id o2))))
+
+   (define (hash-proc o recursive-equal-hash)
+     (recursive-equal-hash (obs-id o)))
+
+   (define (hash2-proc o recursive-equal-hash)
+     (recursive-equal-hash (obs-id o)))]
+
   #:methods gen:custom-write
   [(define write-proc
      (make-constructor-style-printer
@@ -36,11 +51,13 @@
     [else (make-obs v)]))
 
 (define (make-obs v #:derived? [derived? #f])
+  (define id (gensym 'obs))
   (define value-box (box v))
   (define observers-box (box null))
   (define update-value-box! (make-box-update-proc value-box))
   (define update-observers-box! (make-box-update-proc observers-box))
-  (obs value-box
+  (obs id
+       value-box
        update-value-box!
        observers-box
        update-observers-box!

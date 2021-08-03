@@ -47,11 +47,12 @@
       (case/dep what
         [@path+size+mode
          (match-define (list path size mode) val)
-         (load! path size mode)
-         (define-values (w h) (get-effective-size))
-         (send v min-width w)
-         (send v min-height h)
-         (send v refresh-now)]))
+         (when path
+           (load! path size mode)
+           (define-values (w h) (get-effective-size))
+           (send v min-width w)
+           (send v min-height h)
+           (send v refresh-now))]))
 
     (define/public (destroy _v)
       (void))

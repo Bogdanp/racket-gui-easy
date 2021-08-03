@@ -34,7 +34,9 @@
      (with-syntax ([loc (datum->syntax stx loc)])
        #'(let ([what what-e])
            (cond
-             [(eq? what dep-e)
+             [(let ([dep dep-e])
+                (and (obs? dep)
+                     (equal? what dep)))
               (log-gui-easy-debug "case/dep matched ~.s at ~a" 'dep-e loc)
               e ...]
              ...)))]))
