@@ -7,6 +7,7 @@
 
 (provide
  (rename-out [make-obs obs])
+ impersonate-obs
  ->obs
  obs?
  obs-observe!
@@ -19,7 +20,7 @@
 
 (struct obs
   (value-box
-   update-value-box!
+   [update-value-box! #:mutable]
    observers-box
    update-observers-box!
    derived?)
@@ -44,6 +45,13 @@
        observers-box
        update-observers-box!
        derived?))
+
+(define (impersonate-obs o update-proc)
+  (impersonate-struct o
+                      obs-update-value-box!
+                      update-proc
+                      set-obs-update-value-box!!
+                      (λ (_ proc) proc)))
 
 (define (obs-observe! o observer)
   (void

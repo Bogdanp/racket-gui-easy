@@ -474,11 +474,6 @@ using @racket[obs-update!].
   Returns @racket[#t] when @racket[v] is an @tech{observable}.
 }
 
-@defproc[(maybe-obs/c [c contract?]) contract?]{
-  Returns a contract that accepts an @racket[obs?] whose values
-  conform to @racket[c] or a value that conforms to @racket[c].
-}
-
 @defproc[(obs [v any/c]) obs?]{
   Returns a new observable, whose intiial value is @racket[v].
 }
@@ -616,4 +611,14 @@ using @racket[obs-update!].
 @defthing[stretch/c (list/c boolean? boolean?)]{
   The contract for stretch values.  Represents whether or not a view
   can stretch horizontally and vertically, respectively.
+}
+
+@defproc[(obs/c [c contract?]) contract?]{
+  Returns a contract that accepts an @racket[obs?] whose values
+  conform to @racket[c].  Checks the initial value of the observable
+  as well as all subsequent updated values.
+}
+
+@defproc[(maybe-obs/c [c contract?]) contract?]{
+  A shorthand for @racket[(or/c c (obs/c c))].
 }
