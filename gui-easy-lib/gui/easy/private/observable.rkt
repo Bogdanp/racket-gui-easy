@@ -51,12 +51,12 @@
     [else (make-obs v)]))
 
 (define (make-obs v #:derived? [derived? #f])
-  (define id (gensym 'obs))
+  (define handle (gensym 'obs))
   (define value-box (box v))
   (define observers-box (box null))
   (define update-value-box! (make-box-update-proc value-box))
   (define update-observers-box! (make-box-update-proc observers-box))
-  (obs id
+  (obs handle
        value-box
        update-value-box!
        observers-box
