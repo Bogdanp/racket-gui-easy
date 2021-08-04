@@ -19,7 +19,7 @@
  obs-debounce)
 
 (struct obs
-  (id
+  (handle
    value-box
    [update-value-box! #:mutable]
    observers-box
@@ -30,14 +30,14 @@
   [(define (equal-proc o1 o2 _recursive-equal?)
      (and (obs? o1)
           (obs? o2)
-          (eq? (obs-id o1)
-               (obs-id o2))))
+          (eq? (obs-handle o1)
+               (obs-handle o2))))
 
    (define (hash-proc o recursive-equal-hash)
-     (recursive-equal-hash (obs-id o)))
+     (recursive-equal-hash (obs-handle o)))
 
    (define (hash2-proc o recursive-equal-hash)
-     (recursive-equal-hash (obs-id o)))]
+     (recursive-equal-hash (obs-handle o)))]
 
   #:methods gen:custom-write
   [(define write-proc
