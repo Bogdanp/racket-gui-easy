@@ -277,7 +277,7 @@
   @racket[action] whenever the current selection changes.
 }
 
-@defproc[(image [path (maybe-obs/c (or/c #f path-string?))]
+@defproc[(image [path (maybe-obs/c path-string?)]
                 [#:size size (maybe-obs/c size/c) '(#f #f)]
                 [#:mode mode (maybe-obs/c (or/c 'fit 'fill)) 'fit]) (is-a?/c view<%>)]{
 

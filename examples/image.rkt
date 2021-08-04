@@ -1,6 +1,7 @@
 #lang racket/base
 
-(require (prefix-in gui: racket/gui)
+(require racket/file
+         (prefix-in gui: racket/gui)
          racket/gui/easy
          racket/gui/easy/operator)
 
@@ -9,6 +10,13 @@
 (define @height (@ 200))
 (define @size (obs-combine list @width @height))
 (define @mode (@ 'fit))
+
+;; The contract on `image' requires the path to be a valid filesystem
+;; path so, when there is no current image, we need to be able to
+;; fall back to some path.
+(define fallback-path (make-temporary-file))
+(define (path-fallback p)
+  (or p fallback-path))
 
 (render
  (window
@@ -38,6 +46,6 @@
         #:min-value 1
         #:max-value 800
         @height (λ:= @height)))
-      (image @path #:size @size #:mode @mode))]
+      (image (@path . ~> . path-fallback) #:size @size #:mode @mode))]
     [else
      (text "Please choose an image to display.")]))))

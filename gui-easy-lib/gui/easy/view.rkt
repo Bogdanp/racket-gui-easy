@@ -116,7 +116,7 @@
                 #:min-size (maybe-obs/c size/c)
                 #:stretch (maybe-obs/c stretch/c))
                (is-a?/c view<%>))]
-  [image (->* ((maybe-obs/c (or/c #f path-string?)))
+  [image (->* ((maybe-obs/c path-string?))
               (#:size (maybe-obs/c size/c)
                #:mode (maybe-obs/c (or/c 'fit 'fill)))
               (is-a?/c view<%>))]
