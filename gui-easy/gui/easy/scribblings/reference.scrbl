@@ -470,6 +470,13 @@ time.  Their changes may be observed by arbitrary functions.
 depend on other observables.  Derived observables cannot be updated
 using @racket[obs-update!].
 
+@examples[
+  #:eval obs-sb
+  (define |@strs| (obs-map |@ints| number->string))
+  |@strs|
+  (eval:error (obs-update! |@strs| add1))
+]
+
 @defproc[(obs? [v any/c]) boolean?]{
   Returns @racket[#t] when @racket[v] is an @tech{observable}.
 }
