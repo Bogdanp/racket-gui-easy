@@ -19,7 +19,8 @@
  obs-debounce)
 
 (struct obs
-  (handle
+  (name
+   handle
    value-box
    [update-value-box! #:mutable]
    observers-box
@@ -42,21 +43,29 @@
   #:methods gen:custom-write
   [(define write-proc
      (make-constructor-style-printer
-      (λ (o) (if (obs-derived? o) 'obs/derived 'obs))
-      (λ (o) (list (unbox (obs-value-box o))))))])
+      (λ (_) 'obs)
+      (λ (o) (list
+              (unbox (obs-value-box o))
+              (unquoted-printing-string "#:name")
+              (obs-name o)
+              (unquoted-printing-string "#:derived?")
+              (obs-derived? o)))))])
 
 (define (->obs v)
   (cond
     [(obs? v) v]
     [else (make-obs v)]))
 
-(define (make-obs v #:derived? [derived? #f])
-  (define handle (gensym 'obs))
+(define (make-obs v
+                  #:name [name 'anon]
+                  #:derived? [derived? #f])
+  (define handle (gensym name))
   (define value-box (box v))
   (define observers-box (box null))
   (define update-value-box! (make-box-update-proc value-box))
   (define update-observers-box! (make-box-update-proc observers-box))
-  (obs handle
+  (obs name
+       handle
        value-box
        update-value-box!
        observers-box

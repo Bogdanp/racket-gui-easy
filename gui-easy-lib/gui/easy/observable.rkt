@@ -5,7 +5,10 @@
 
 (provide
  (contract-out
-  [obs (-> any/c obs?)]
+  [obs (->* (any/c)
+            (#:name symbol?
+             #:derived? boolean?)
+            obs?)]
   [obs? (-> any/c boolean?)]
   [obs-observe! (-> obs? (-> any/c any) void?)]
   [obs-unobserve! (-> obs? (-> any/c any) void?)]

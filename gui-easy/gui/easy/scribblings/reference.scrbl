@@ -377,11 +377,12 @@
 
   Returns a representation of a table that calls @racket[action] when
   the selection changes or when one of its columns is clicked (if the
-  @racket['clickable-headers] style is set).  The action is called
-  with the type of event that occurred, the set of entries at the time
-  of the event and the current selection, if any.  The current
-  selection can either be a single index in the set of entries or a
-  list of indices in the case of a @racket['multiple] selection table.
+  @racket['clickable-headers] style is set).  The action callback is
+  called with the type of event that occurred, the set of entries at
+  the time of the event and the current selection, if any.  The
+  current selection can either be a single index in the set of entries
+  or a list of indices in the case of a @racket['multiple] selection
+  table.
 
   The @racket[#:entry->row] argument converts each row in the input
   data for display in the table.
@@ -493,8 +494,23 @@ that equality (via @racket[equal?]) is preserved for
   Returns @racket[#t] when @racket[v] is an @tech{observable}.
 }
 
-@defproc[(obs [v any/c]) obs?]{
-  Returns a new observable, whose intiial value is @racket[v].
+@(define printed-link
+  (seclink
+   #:doc '(lib "scribblings/reference/reference.scrbl")
+   "printing"
+   "printed"))
+
+@defproc[(obs [v any/c]
+              [#:name name symbol? 'anon]
+              [#:derived? derived? boolean? #f]) obs?]{
+  Returns a new observable, whose initial value is @racket[v].
+
+  The @racket[#:name] of an observable is visible when the observable
+  is @printed-link so using a custom name can come in handy while
+  debugging code.
+
+  The @racket[#:derived?] argument controls whether or not the
+  observable may be updated.
 }
 
 @defproc[(obs-observe! [o obs?]
@@ -511,7 +527,9 @@ that equality (via @racket[equal?]) is preserved for
 @defproc[(obs-update! [o obs?]
                       [f (-> any/c any/c)]) any/c]{
   Updates the value within @racket[o] by applying @racket[f] to it and
-  storing the result.  Returns the new value.
+  storing the result.  Returns the new value.  If @racket[o] is a
+  @tech{derived observable}, raises an @racket[exn:fail:contract?]
+  error.
 }
 
 @defproc[(obs-peek [o obs?]) any/c]{
@@ -531,6 +549,10 @@ that equality (via @racket[equal?]) is preserved for
   time one of the @racket[o]s change.  The values held by the new
   observable are the values of the @racket[o]s combined via
   @racket[f].
+
+  This combinator retains a strong reference to each of the last
+  values of the respective observables that are being combined until
+  they change.
 }
 
 @defproc[(obs-debounce [o obs?]
@@ -611,8 +633,8 @@ that equality (via @racket[equal?]) is preserved for
 
 @defthing[position/c (or/c 'center (list/c gui:position-integer?
                                            gui:position-integer?))]{
-  The contract for positions.  Use the first form with @racket[window]s
-  and @racket[dialog]s to place them in the center of the screen.
+  The contract for positions.  The first places @racket[window]s and
+  @racket[dialog]s in the center of the screen.
 }
 
 @defthing[size/c (list/c (or/c #f gui:dimension-integer?)
