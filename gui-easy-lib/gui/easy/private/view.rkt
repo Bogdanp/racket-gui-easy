@@ -20,6 +20,7 @@
            "view/menu.rkt"
            "view/panel.rkt"
            "view/progress.rkt"
+           "view/radios.rkt"
            "view/slider.rkt"
            "view/snip.rkt"
            "view/spacer.rkt"

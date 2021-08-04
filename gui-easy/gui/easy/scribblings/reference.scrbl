@@ -264,9 +264,11 @@
   when toggled.
 }
 
-@defproc[(choice [choices (maybe-obs/c (listof gui:label-string?))]
-                 [action (-> maybe-label/c any)]
-                 [#:selection selection (maybe-obs/c maybe-label/c) #f]
+@defproc[(choice [choices (maybe-obs/c (listof any/c))]
+                 [action (-> (or/c #f any/c) any)]
+                 [#:choice->label choice->label (-> any/c gui:label-string?) values]
+                 [#:choice=? choice=? (-> any/c any/c boolean?) equal?]
+                 [#:selection selection (maybe-obs/c any/c) #f]
                  [#:label label (maybe-obs/c maybe-label/c) #f]
                  [#:style style (listof (or/c 'horizontal-label 'vertical-label 'deleted)) null]
                  [#:enabled? enabled? (maybe-obs/c boolean?) #t]
@@ -275,6 +277,11 @@
 
   Returns a representation of a choice widget that calls
   @racket[action] whenever the current selection changes.
+
+  The @racket[#:choice->label] argument controls how each choice is
+  displayed and the @racket[#:choice=?] argument controls how the
+  current @racket[#:selection] is compared against the list of choices
+  to determine the selection index.
 }
 
 @defproc[(image [path (maybe-obs/c path-string?)]
@@ -322,6 +329,28 @@
                               (list (memq 'horizontal style)
                                     (memq 'vertical   style))]) (is-a?/c view<%>)]{
   Returns a representation of a progress bar.
+}
+
+@defproc[(radios [choices (listof any/c)]
+                 [action (-> (or/c #f any/c) any)]
+                 [#:choice->label choice->label (-> any/c gui:label-string?) values]
+                 [#:choice=? choice=? (-> any/c any/c boolean?) equal?]
+                 [#:selection selection (maybe-obs/c any/c) #f]
+                 [#:label label (maybe-obs/c maybe-label/c) #f]
+                 [#:style style (listof (or/c 'horizontal-label 'vertical-label 'deleted)) null]
+                 [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                 [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
+                 [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]) (is-a?/c view<%>)]{
+
+  Returns a representation of a radio box widget that calls
+  @racket[action] whenever the current selection changes.
+
+  The @racket[#:choice->label] argument controls how each choice is
+  displayed and the @racket[#:choice=?] argument controls how the
+  current @racket[#:selection] is compared against the list of choices
+  to determine the selection index.
+
+  Unlike @racket[choice], the set of @racket[choices] cannot be changed.
 }
 
 @defproc[(slider [value (maybe-obs/c gui:position-integer?)]

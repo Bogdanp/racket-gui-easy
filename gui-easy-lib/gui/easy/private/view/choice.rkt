@@ -13,7 +13,7 @@
 
 (define choice%
   (class* object% (view<%>)
-    (init-field @label @enabled? @choices @selection @min-size @stretch style action)
+    (init-field @label @enabled? @choices @selection @min-size @stretch style choice->label choice=? action)
     (super-new)
 
     (define last-choices null)
@@ -21,8 +21,15 @@
     (define @choices&index
       (obs-combine
        (λ (choices selection)
-         (list choices (and selection (index-of choices selection))))
+         (list choices (and selection (index-of choices selection choice=?))))
        @choices @selection))
+
+    (define (choices=? cs1 cs2)
+      (and (= (length cs1)
+              (length cs2))
+           (for/and ([c1 (in-list cs1)]
+                     [c2 (in-list cs2)])
+             (choice=? c1 c2))))
 
     (define/public (dependencies)
       (filter obs? (list @label @enabled? @choices&index @min-size @stretch)))
@@ -36,10 +43,11 @@
              [parent parent]
              [label (peek @label)]
              [style style]
-             [choices choices]
+             [choices (map choice->label choices)]
              [enabled (peek @enabled?)]
              [callback (λ (self _event)
-                         (action (send self get-string-selection)))]
+                         (define idx (send self get-selection))
+                         (action (and idx (list-ref last-choices idx))))]
              [min-width min-w]
              [min-height min-h]
              [stretchable-width w-s?]
@@ -54,12 +62,13 @@
       (case/dep what
         [@choices&index
          (match-define (list choices index) val)
-         (unless (equal? choices last-choices)
+         (unless (choices=? choices last-choices)
            (send v clear)
            (for ([i (in-naturals)]
-                 [c (in-list (remove-duplicates choices))])
-             (send v append c)
-             (when (equal? c last-selection)
+                 [c (in-list (remove-duplicates choices choice=?))])
+             (define lbl (choice->label c))
+             (send v append lbl)
+             (when (equal? lbl last-selection)
                (send v set-selection i))))
          (cond
            [(null? choices)
@@ -73,9 +82,11 @@
               (send v set-selection index))]
            [else
             (define current-selection (send v get-string-selection))
+            (define current-selection-idx (send v get-selection))
             (unless (equal? current-selection last-selection)
               (set! last-selection current-selection)
-              (action current-selection))])
+              (when (< current-selection-idx (length choices))
+                (action (list-ref choices current-selection-idx))))])
          (set! last-choices choices)]
         [@label
          (send v set-label val)]
@@ -96,6 +107,8 @@
       (void))))
 
 (define (choice @choices action
+                #:choice->label [choice->label values]
+                #:choice=? [choice=? equal?]
                 #:selection [@selection #f]
                 #:label [@label #f]
                 #:style [style null]
@@ -110,4 +123,6 @@
        [@min-size @min-size]
        [@stretch @stretch]
        [style style]
+       [choice->label choice->label]
+       [choice=? choice=?]
        [action action]))

@@ -107,9 +107,11 @@
                   #:checked? (maybe-obs/c boolean?)
                   #:enabled? (maybe-obs/c boolean?))
                  (is-a?/c view<%>))]
-  [choice (->* ((maybe-obs/c (listof gui:label-string?))
-                (-> maybe-label/c any))
-               (#:selection (maybe-obs/c maybe-label/c)
+  [choice (->* ((maybe-obs/c (listof any/c))
+                (-> (or/c #f any/c) any))
+               (#:choice->label (-> any/c gui:label-string?)
+                #:choice=? (-> any/c any/c boolean?)
+                #:selection (maybe-obs/c any/c)
                 #:label (maybe-obs/c maybe-label/c)
                 #:style (listof (or/c 'horizontal-label 'vertical-label 'deleted))
                 #:enabled? (maybe-obs/c boolean?)
@@ -144,6 +146,19 @@
                   #:min-size (maybe-obs/c size/c)
                   #:stretch (maybe-obs/c stretch/c))
                  (is-a?/c view<%>))]
+  [radios (->* ((listof any/c)
+                (-> (or/c #f any/c) any))
+               (#:choice->label (-> any/c gui:label-string?)
+                #:choice=? (-> any/c any/c boolean?)
+                #:selection (maybe-obs/c (or/c #f any/c))
+                #:label (maybe-obs/c maybe-label/c)
+                #:style (listof (or/c 'horizontal 'vertical
+                                      'horizontal-label 'vertical-label
+                                      'deleted))
+                #:enabled? (maybe-obs/c boolean?)
+                #:min-size (maybe-obs/c size/c)
+                #:stretch (maybe-obs/c stretch/c))
+               (is-a?/c view<%>))]
   [slider (->* ((maybe-obs/c gui:position-integer?)
                 (-> gui:position-integer? any))
                (#:label (maybe-obs/c gui:label-string?)
