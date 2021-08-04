@@ -60,7 +60,7 @@
              (raise-blame-error
               #:missing-party neg-party
               blame o
-              '(expected: "~e" given: "~e") c o)]))))]))
+              '(expected: "~a" given: "~e") (contract-name c) o)]))))]))
 
 (define (maybe-obs/c c)
   (cond
