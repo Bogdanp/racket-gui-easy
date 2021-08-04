@@ -477,6 +477,18 @@ using @racket[obs-update!].
   (eval:error (obs-update! |@strs| add1))
 ]
 
+@(define impersonated-link
+  (tech
+   #:key "impersonators"
+   #:doc '(lib "scribblings/reference/reference.scrbl")
+   "impersonated"))
+
+Internally, every observable has a unique handle and two observables
+are @racket[equal?] when their handles are @racket[eq?].  This means
+that equality (via @racket[equal?]) is preserved for
+@impersonated-link observables, such as those guarded by
+@racket[obs/c].
+
 @defproc[(obs? [v any/c]) boolean?]{
   Returns @racket[#t] when @racket[v] is an @tech{observable}.
 }
@@ -536,8 +548,8 @@ using @racket[obs-update!].
                       [dep-expr  obs?])]{
 
   Executes the body of the first clause @racket[body] whose
-  @racket[dep-expr] is @racket[eq?] to @racket[what-expr].  Logs the
-  @racket[dep-expr] that matched to the @racket['gui-easy] topic.
+  @racket[dep-expr] is @racket[equal?] to @racket[what-expr].  Logs
+  the @racket[dep-expr] that matched to the @racket['gui-easy] topic.
 }
 
 
