@@ -94,7 +94,7 @@
   Returns a representation of a menu with @racket[item]s as children.
 }
 
-@defproc[(menu-item [label (maybe-obs/c maybe-lable/c)]
+@defproc[(menu-item [label (maybe-obs/c maybe-label/c)]
                     [action (-> any) void]) (is-a?/c view<%>)]{
 
   Returns a representation of a menu item that calls @racket[action]
