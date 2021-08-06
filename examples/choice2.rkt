@@ -21,12 +21,10 @@
    (hpanel
     (button
      "Next"
-     (λ ()
-       (@selection . <~ . (λ (sel)
-                            (define cs (obs-peek @choices))
-                            (define next-idx (modulo (add1 (index-of cs sel)) (length cs)))
-                            (list-ref cs next-idx)))))
+     (@selection . λ<~ . (λ (sel)
+                           (define cs (obs-peek @choices))
+                           (define next-idx (modulo (add1 (index-of cs sel)) (length cs)))
+                           (list-ref cs next-idx))))
     (button
      "Shuffle"
-     (λ ()
-       (@choices . <~ . shuffle)))))))
+     (@choices . λ<~ . shuffle))))))
