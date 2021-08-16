@@ -417,7 +417,8 @@
   data for display in the table.
 }
 
-@defproc[(text [s (maybe-obs/c gui:label-string?)]) (is-a?/c view<%>)]{
+@defproc[(text [s (maybe-obs/c gui:label-string?)]
+               [#:font font (is-a?/c gui:font%) gui:normal-control-font]) (is-a?/c view<%>)]{
   Returns a representation of a textual label.
 }
 

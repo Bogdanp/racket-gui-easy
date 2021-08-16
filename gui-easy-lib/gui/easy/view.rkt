@@ -196,7 +196,9 @@
                                  (or/c (list/c exact-nonnegative-integer? gui:dimension-integer?)
                                        (list/c exact-nonnegative-integer? gui:dimension-integer? gui:dimension-integer? gui:dimension-integer?)))))
               (is-a?/c view<%>))]
-  [text (-> (maybe-obs/c gui:label-string?) (is-a?/c view<%>))]))
+  [text (->* ((maybe-obs/c gui:label-string?))
+             (#:font (is-a?/c gui:font%))
+             (is-a?/c view<%>))]))
 
 (define (canvas/c draw/c)
   (->* ((maybe-obs/c any/c) draw/c)

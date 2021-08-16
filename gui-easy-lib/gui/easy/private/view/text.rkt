@@ -11,7 +11,7 @@
 
 (define text%
   (class* object% (view<%>)
-    (init-field @label)
+    (init-field @label font)
     (super-new)
 
     (define/public (dependencies)
@@ -21,6 +21,7 @@
       (new gui:message%
            [parent parent]
            [label (peek @label)]
+           [font font]
            [auto-resize #t]))
 
     (define/public (update v what val)
@@ -30,6 +31,8 @@
     (define/public (destroy _v)
       (void))))
 
-(define (text @label)
+(define (text @label
+              #:font [font gui:normal-control-font])
   (new text%
-       [@label @label]))
+       [@label @label]
+       [font font]))
