@@ -418,6 +418,7 @@
 }
 
 @defproc[(text [s (maybe-obs/c gui:label-string?)]
+               [#:color color (maybe-obs/c (or/c #f string? (is-a?/c gui:color%))) #f]
                [#:font font (is-a?/c gui:font%) gui:normal-control-font]) (is-a?/c view<%>)]{
   Returns a representation of a textual label.
 }
