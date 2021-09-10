@@ -10,6 +10,8 @@
  impersonate-obs
  ->obs
  obs?
+ obs-name
+ obs-derived?
  obs-observe!
  obs-unobserve!
  obs-update!
@@ -92,7 +94,9 @@
       (remq observer obss)))))
 
 (define (do-obs-update! o f)
+  (define old-v (unbox (obs-value-box o)))
   (define v ((obs-update-value-box! o) f))
+  (log-change o old-v v)
   (begin0 v
     (for ([obs (in-list (reverse (unbox (obs-observers-box o))))])
       (with-handlers ([exn:fail?
