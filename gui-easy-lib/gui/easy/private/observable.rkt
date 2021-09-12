@@ -11,6 +11,7 @@
  ->obs
  obs?
  obs-name
+ obs-rename!
  obs-derived?
  obs-observe!
  obs-unobserve!
@@ -21,7 +22,7 @@
  obs-debounce)
 
 (struct obs
-  (name
+  ([name #:mutable]
    handle
    value-box
    [update-value-box! #:mutable]
@@ -80,6 +81,9 @@
                       update-proc
                       set-obs-update-value-box!!
                       (λ (_ proc) proc)))
+
+(define (obs-rename! o name)
+  (set-obs-name! o name))
 
 (define (obs-observe! o observer)
   (void

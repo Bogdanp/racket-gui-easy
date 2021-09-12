@@ -1,8 +1,19 @@
 #lang racket/base
 
-(require "observable.rkt")
+(require (for-syntax racket/base)
+         syntax/parse/define
+         "observable.rkt")
 
-(provide @ := λ:= <~ λ<~ ~>)
+(provide define/obs @ := λ:= <~ λ<~ ~>)
+
+(define-syntax-parser define/obs
+  [(_ name:id v:expr)
+   #'(define name
+       (let ([e v])
+         (if (obs? e)
+             (begin0 e
+               (obs-rename! e 'name))
+             (obs e #:name 'name))))])
 
 (define (@ v)
   (if (obs? v) v (obs v)))

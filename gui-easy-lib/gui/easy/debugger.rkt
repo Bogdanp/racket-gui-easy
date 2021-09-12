@@ -67,10 +67,13 @@
                        (parameterize ([date-display-format 'iso-8601])
                          (date->string (seconds->date ts) #t))
                        (~a (obs-name obs))
-                       (~e after)))
+                       (~label after)))
        (lambda (event entries selection)
          (case event
            [(dclick)
             (match-define (list _ts obs _before after)
               (vector-ref entries selection) )
             (obs . := . after)])))))))
+
+(define (~label s)
+  (~e #:max-width 100 s))

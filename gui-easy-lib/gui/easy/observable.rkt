@@ -10,6 +10,7 @@
              #:derived? boolean?)
             obs?)]
   [obs? (-> any/c boolean?)]
+  [obs-rename! (-> obs? symbol? void?)]
   [obs-observe! (-> obs? (-> any/c any) void?)]
   [obs-unobserve! (-> obs? (-> any/c any) void?)]
   [obs-update! (-> obs? (-> any/c any/c) any/c)]

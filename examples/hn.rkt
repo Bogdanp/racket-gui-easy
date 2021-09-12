@@ -182,16 +182,16 @@
 
 ;; GUI ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define @mode (@ '(overview)))
-(define @story (@mode . ~> . (match-lambda
-                               [`(story ,s) s]
-                               [_ #f])))
+(define/obs @mode '(overview))
+(define/obs @story (@mode . ~> . (match-lambda
+                                   [`(story ,s) s]
+                                   [_ #f])))
 
-(define @sections (@ #(top new)))
-(define @section (@ 'top))
+(define/obs @sections (@ #(top new)))
+(define/obs @section (@ 'top))
 
-(define @top-stories (@ null))
-(define @new-stories (@ null))
+(define/obs @top-stories (@ null))
+(define/obs @new-stories (@ null))
 (async (@top-stories . := . (get-top-stories 50)))
 (async (@new-stories . := . (get-new-stories 50)))
 
