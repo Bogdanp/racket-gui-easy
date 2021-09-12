@@ -11,7 +11,7 @@
  ->obs
  obs?
  obs-name
- obs-rename!
+ obs-rename
  obs-derived?
  obs-observe!
  obs-unobserve!
@@ -75,15 +75,21 @@
        update-observers-box!
        derived?))
 
-(define (impersonate-obs o update-proc)
+(define (impersonate-obs o name-proc update-proc)
   (impersonate-struct o
+                      obs-name
+                      name-proc
+                      set-obs-name!
+                      (λ (_ proc) proc)
                       obs-update-value-box!
                       update-proc
                       set-obs-update-value-box!!
                       (λ (_ proc) proc)))
 
-(define (obs-rename! o name)
-  (set-obs-name! o name))
+(define (obs-rename o name)
+  (impersonate-obs o
+                   (λ (_ _name) name)
+                   (λ (_ update-proc) update-proc)))
 
 (define (obs-observe! o observer)
   (void

@@ -46,15 +46,17 @@
           (cond
             [(obs? o)
              (check-init-value (obs-peek o) neg-party)
-             (impersonate-obs o (λ (_ update-proc)
-                                  (chaperone-procedure
-                                   update-proc
-                                   (λ (proc)
-                                     (values
-                                      (λ (v)
-                                        (check-updated-value v neg-party)
-                                        v)
-                                      proc)))))]
+             (impersonate-obs o
+                              (λ (_ name) name)
+                              (λ (_ update-proc)
+                                (chaperone-procedure
+                                 update-proc
+                                 (λ (proc)
+                                   (values
+                                    (λ (v)
+                                      (check-updated-value v neg-party)
+                                      v)
+                                    proc)))))]
 
             [else
              (raise-blame-error

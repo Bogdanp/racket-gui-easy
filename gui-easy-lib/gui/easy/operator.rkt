@@ -7,12 +7,11 @@
 (provide define/obs @ := λ:= <~ λ<~ ~>)
 
 (define-syntax-parser define/obs
-  [(_ name:id v:expr)
+  [(_ name:id init-v:expr)
    #'(define name
-       (let ([e v])
+       (let ([e init-v])
          (if (obs? e)
-             (begin0 e
-               (obs-rename! e 'name))
+             (obs-rename e 'name)
              (obs e #:name 'name))))])
 
 (define (@ v)

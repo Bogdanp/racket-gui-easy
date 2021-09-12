@@ -544,6 +544,13 @@ that equality (via @racket[equal?]) is preserved for
   observable may be updated.
 }
 
+@defproc[(obs-rename [o obs?]
+                     [name symbol?]) obs?]{
+
+  Returns an impersonator of @racket[o] whose name is changed to
+  @racket[name].
+}
+
 @defproc[(obs-observe! [o obs?]
                        [f (-> any/c any/c)]) void?]{
   Registers @racket[f] as an observer of @racket[o], applying it to
@@ -608,6 +615,13 @@ that equality (via @racket[equal?]) is preserved for
 
 @section{Observable Operators}
 @defmodule[racket/gui/easy/operator]
+
+@defform[(define/obs name init-v)]{
+  Expands to @racket[(define name (obs init-v #:name 'name))].  If
+  @racket[init-v] is already an @racket[obs?], then the observable is
+  locally renamed to @racket[(quote name)] then bound to
+  @racket[name].
+}
 
 @defproc[(|@| [v any/c]) obs?]{
   Converts @racket[v] into an @tech{observable}.  If @racket[v] is

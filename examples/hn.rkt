@@ -187,11 +187,11 @@
                                    [`(story ,s) s]
                                    [_ #f])))
 
-(define/obs @sections (@ #(top new)))
-(define/obs @section (@ 'top))
+(define/obs @sections #(top new))
+(define/obs @section 'top)
 
-(define/obs @top-stories (@ null))
-(define/obs @new-stories (@ null))
+(define/obs @top-stories null)
+(define/obs @new-stories null)
 (async (@top-stories . := . (get-top-stories 50)))
 (async (@new-stories . := . (get-new-stories 50)))
 
