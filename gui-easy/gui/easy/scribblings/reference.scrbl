@@ -616,11 +616,11 @@ that equality (via @racket[equal?]) is preserved for
 @section{Observable Operators}
 @defmodule[racket/gui/easy/operator]
 
-@defform[(define/obs name init-v)]{
-  Expands to @racket[(define name (obs init-v #:name 'name))].  If
-  @racket[init-v] is already an @racket[obs?], then the observable is
-  locally renamed to @racket[(quote name)] then bound to
-  @racket[name].
+@defform[(define/obs name init-expr)]{
+  Binds @racket[name] to an observable whose initial value is
+  @racket[init-expr] and whose name is @racket['name].  If
+  @racket[init-expr] is already an @tech{observable}, then it is
+  locally renamed to @racket['name] then bound to @racket[name].
 }
 
 @defproc[(|@| [v any/c]) obs?]{
