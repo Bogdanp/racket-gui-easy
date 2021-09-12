@@ -80,7 +80,7 @@
                       obs-name
                       name-proc
                       set-obs-name!
-                      (λ (_ proc) proc)
+                      (λ (_ name) name)
                       obs-update-value-box!
                       update-proc
                       set-obs-update-value-box!!
