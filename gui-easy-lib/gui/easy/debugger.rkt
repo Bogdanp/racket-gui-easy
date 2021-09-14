@@ -17,6 +17,18 @@
 
 (struct state (paused? max-changes changes))
 
+(define (state-prepend-change s c)
+  (define max-changes (state-max-changes s))
+  (define changes (state-changes s))
+  (struct-copy state s [changes (keep (cons c changes) max-changes)]))
+
+(define (set-state-max-changes-str s num-str)
+  (struct-copy state s [max-changes (or (string->number num-str)
+                                        (state-max-changes s))]))
+
+(define (toggle-state-paused? s)
+  (struct-copy state s [paused? (not (state-paused? s))]))
+
 (define (start-debugger)
   (define @state (@ (state #f 20 null)))
   (define stop-collector-thd
@@ -25,12 +37,11 @@
        (unless (or (equal? obs @state)
                    (obs-derived? obs))
          (@state . <~ . (λ (s)
-                          (match-define (state paused? max-changes changes) s)
                           (cond
-                            [paused? s]
+                            [(state-paused? s) s]
                             [else
                              (define change (list (current-seconds) obs before after))
-                             (struct-copy state s [changes (keep (cons change changes) max-changes)])])))))))
+                             (state-prepend-change s change)])))))))
   (parameterize ([gui:current-eventspace (gui:make-eventspace)])
     (render
      (window
@@ -46,16 +57,14 @@
          (λ (event text)
            (case event
              [(return)
-              (@state . <~ . (λ (s)
-                               (struct-copy state s [max-changes (or (string->number text) (state-max-changes s))])))])))
+              (@state . <~ . (λ (s) (set-state-max-changes-str s text)))])))
         (button
          (@state . ~> . (λ (s)
                           (if (state-paused? s)
                               "&Unpause..."
                               "&Pause...")))
          (λ ()
-           (@state . <~ . (λ (s)
-                            (struct-copy state s [paused? (not (state-paused? s))]))))))
+           (@state . <~ . toggle-state-paused?))))
        (table
         '("Timestamp" "Observable" "State")
         #:column-widths '((0 140)
