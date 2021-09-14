@@ -15,22 +15,25 @@
 (provide
  start-debugger)
 
-(struct state (max-changes changes))
-
 (module+ main
   (start-debugger))
 
+(struct state (paused? max-changes changes))
+
 (define (start-debugger)
-  (define @state (@ (state 20 null)))
+  (define @state (@ (state #f 20 null)))
   (define stop-collector-thd
     (start-collector-thd
      (lambda (obs before after)
        (unless (or (equal? obs @state)
                    (obs-derived? obs))
          (@state . <~ . (λ (s)
-                          (match-define (state max-changes changes) s)
-                          (define change (list (current-seconds) obs before after))
-                          (struct-copy state s [changes (keep (cons change changes) max-changes)])))))))
+                          (match-define (state paused? max-changes changes) s)
+                          (cond
+                            [paused? s]
+                            [else
+                             (define change (list (current-seconds) obs before after))
+                             (struct-copy state s [changes (keep (cons change changes) max-changes)])])))))))
   (parameterize ([gui:current-eventspace (gui:make-eventspace)])
     (render
      (window
@@ -47,7 +50,15 @@
            (case event
              [(return)
               (@state . <~ . (λ (s)
-                               (struct-copy state s [max-changes (or (string->number text) (state-max-changes s))])))]))))
+                               (struct-copy state s [max-changes (or (string->number text) (state-max-changes s))])))])))
+        (button
+         (@state . ~> . (λ (s)
+                          (if (state-paused? s)
+                              "&Unpause..."
+                              "&Pause...")))
+         (λ ()
+           (@state . <~ . (λ (s)
+                            (struct-copy state s [paused? (not (state-paused? s))]))))))
        (table
         '("Timestamp" "Observable" "State")
         #:column-widths '((0 140)
