@@ -15,9 +15,6 @@
 (provide
  start-debugger)
 
-(module+ main
-  (start-debugger))
-
 (struct state (paused? max-changes changes))
 
 (define (start-debugger)
