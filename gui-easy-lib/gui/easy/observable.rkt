@@ -19,4 +19,7 @@
   [obs-combine (-> procedure? obs? obs? ... obs?)]
   [obs-debounce (->* (obs?)
                      (#:duration exact-nonnegative-integer?)
+                     obs?)]
+  [obs-throttle (->* (obs?)
+                     (#:duration exact-nonnegative-integer?)
                      obs?)]))

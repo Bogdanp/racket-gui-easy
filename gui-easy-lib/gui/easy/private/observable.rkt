@@ -19,7 +19,8 @@
  obs-peek
  obs-map
  obs-combine
- obs-debounce)
+ obs-debounce
+ obs-throttle)
 
 (struct obs
   ([name #:mutable]
@@ -192,6 +193,38 @@
     (obs-observe! a f)
     (will-register executor b (λ (_)
                                 (log-gui-easy-debug "obs-debounce: unobserve ~.s" f)
+                                (obs-unobserve! a f)
+                                (channel-put ch stop)))))
+
+(define (obs-throttle a #:duration [duration 200])
+  (define b (make-obs (obs-peek a) #:derived? #t))
+  (define b-box (make-weak-box b))
+  (define ch (make-channel))
+  (thread
+   (lambda ()
+     (let loop ([pending nothing]
+                [pending-alarm #f])
+       (sync
+        (handle-evt
+         ch
+         (lambda (v)
+           (unless (eq? v stop)
+             (loop v (or pending-alarm (alarm-evt (+ (current-inexact-milliseconds) duration)))))))
+        (if (eq? pending nothing)
+            never-evt
+            (handle-evt
+             pending-alarm
+             (lambda (_)
+               (define maybe-b (weak-box-value b-box))
+               (when maybe-b
+                 (do-obs-update! maybe-b (λ (_) pending)))
+               (loop nothing #f))))))))
+  (define (f v)
+    (channel-put ch v))
+  (begin0 b
+    (obs-observe! a f)
+    (will-register executor b (λ (_)
+                                (log-gui-easy-debug "obs-throttle: unobserve ~.s" f)
                                 (obs-unobserve! a f)
                                 (channel-put ch stop)))))
 

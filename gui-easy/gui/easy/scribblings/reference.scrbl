@@ -608,6 +608,13 @@ that equality (via @racket[equal?]) is preserved for
 @defproc[(obs-debounce [o obs?]
                        [#:duration duration-ms exact-nonnegative-integer? 200]) obs?]{
   Returns a new @tech{derived observable} based on @racket[o], whose
+  value changes when there is at least a @racket[duration-ms]
+  millisecond pause in changes to @racket[o].
+}
+
+@defproc[(obs-throttle [o obs?]
+                       [#:duration duration-ms exact-nonnegative-integer? 200]) obs?]{
+  Returns a new @tech{derived observable} based on @racket[o], whose
   values change at most once every @racket[duration-ms] milliseconds.
 }
 
