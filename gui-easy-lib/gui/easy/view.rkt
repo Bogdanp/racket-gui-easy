@@ -15,6 +15,7 @@
  popup-menu-view<%>
  case/dep
  cond-view
+ case-view
  (contract-out
   ;; Windows & Dialogs
   [window (window/c gui:frame% (listof (or/c 'no-resize-border 'no-caption

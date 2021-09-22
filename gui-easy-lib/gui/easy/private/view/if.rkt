@@ -12,7 +12,8 @@
 
 (provide
  if-view
- cond-view)
+ cond-view
+ case-view)
 
 (define if-view%
   (class* container% (view<%>)
@@ -97,3 +98,12 @@
               (cond-view
                [@cond-e view-e] ...
                [else else-e]))])
+
+(define-syntax-parser case-view
+  #:literals (else)
+  [(_ @e
+      [(lit ...+) view-e:expr] ...
+      [else else-e:expr])
+   #'(cond-view
+      [(obs-map @e (λ (e) (member e '(lit ...)))) view-e] ...
+      [else else-e])])

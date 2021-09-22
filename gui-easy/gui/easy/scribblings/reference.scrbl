@@ -162,6 +162,18 @@
   value is truthy.
 }
 
+@defform[#:literals (else)
+         (case-view e
+          [(case-lit ...+) view-e] ...+
+          [else view-e])
+         #:contracts ([e (obs/c any/c)]
+                      [view-e (is-a?/c view<%>)])]{
+
+  Returns a representation of a panel that renders the first
+  @racket[view-e] where one of the @racket[case-lit]s is
+  @racket[equal?] to @racket[e]'s current value.
+}
+
 @defproc[(list-view [entries (maybe-obs/c list?)]
                     [make-view (-> any/c any/c (is-a?/c view<%>))]
                     [#:key key (-> any/c any/c) values]
