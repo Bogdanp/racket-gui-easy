@@ -174,12 +174,9 @@
                (is-a?/c view<%>))]
   [spacer (-> (is-a?/c view<%>))]
   [table (->* ((listof gui:label-string?)
-               (maybe-obs/c vector?)
-               (-> (or/c 'select 'dclick 'column)
-                   vector?
-                   (or/c #f exact-nonnegative-integer? (listof exact-nonnegative-integer?))
-                   any))
-              (#:label (maybe-obs/c (or/c #f gui:label-string?))
+               (maybe-obs/c vector?))
+              (table-action/c
+               #:label (maybe-obs/c (or/c #f gui:label-string?))
                #:entry->row (-> any/c vector?)
                #:selection (maybe-obs/c (or/c #f exact-nonnegative-integer? (listof exact-nonnegative-integer?)))
                #:enabled? (maybe-obs/c boolean?)
@@ -242,3 +239,9 @@
         #:mixin (make-mixin-contract %))
        #:rest (listof (is-a?/c view<%>))
        (is-a?/c view<%>)))
+
+(define table-action/c
+  (-> (or/c 'select 'dclick 'column)
+      vector?
+      (or/c #f exact-nonnegative-integer? (listof exact-nonnegative-integer?))
+      any))

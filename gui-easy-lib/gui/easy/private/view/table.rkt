@@ -125,7 +125,8 @@
             [`(,idx ,width ,min-width ,max-width) (values idx width min-width max-width)]))
         (send v set-column-width idx w min-w max-w)))))
 
-(define (table columns @entries action
+(define (table columns @entries
+               [action void]
                #:entry->row [entry->row values]
                #:label [@label #f]
                #:selection [@selection #f]

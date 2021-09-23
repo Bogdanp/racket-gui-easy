@@ -394,7 +394,8 @@
                             (or/c #f
                                   exact-nonnegative-integer?
                                   (listof exact-nonnegative-integer?))
-                            any)]
+                            any)
+                        void]
                 [#:entry->row entry->row (-> any/c vector?) values]
                 [#:selection selection
                              (maybe-obs/c
