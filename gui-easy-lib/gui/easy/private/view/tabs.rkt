@@ -58,8 +58,10 @@
              [stretchable-width w-s?]
              [stretchable-height h-s?]))
       (begin0 the-panel
+        (send the-panel begin-container-sequence)
         (for ([c (in-list children)])
-          (add-child c (send c create the-panel)))))
+          (add-child c (send c create the-panel)))
+        (send the-panel end-container-sequence)))
 
     (define/public (update v what val)
       (case/dep what

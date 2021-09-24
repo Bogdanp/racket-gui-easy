@@ -46,6 +46,7 @@
     (define/public (update v what val)
       (case/dep what
         [@cond-e
+         (send v begin-container-sequence)
          (when (and val (has-child? else-view))
            (define w (get-child else-view))
            (send else-view destroy w)
@@ -65,7 +66,8 @@
            (unless (null? else-pending)
              (for ([pending (in-list else-pending)])
                (send/apply else-view update (get-child else-view) pending))
-             (set! else-pending null)))])
+             (set! else-pending null)))
+         (send v end-container-sequence)])
 
       (when (member what (send then-view dependencies))
         (if (has-child? then-view)
