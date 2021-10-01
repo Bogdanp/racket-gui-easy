@@ -104,7 +104,7 @@
                 #:stretch (maybe-obs/c stretch/c))
                (is-a?/c view<%>))]
   [checkbox (->* ((-> boolean? any))
-                 (#:label (maybe-obs/c maybe-label/c)
+                 (#:label (maybe-obs/c gui:label-string?)
                   #:checked? (maybe-obs/c boolean?)
                   #:enabled? (maybe-obs/c boolean?))
                  (is-a?/c view<%>))]

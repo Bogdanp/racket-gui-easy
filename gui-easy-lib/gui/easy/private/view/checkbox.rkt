@@ -36,7 +36,7 @@
       (void))))
 
 (define (checkbox action
-                  #:label [@label #f]
+                  #:label [@label ""]
                   #:checked? [@checked? #f]
                   #:enabled? [@enabled? #t])
   (new checkbox%
