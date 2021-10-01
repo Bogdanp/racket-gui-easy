@@ -24,4 +24,4 @@
               #:smoothing [smoothing 'default]
               #:hinting [hinting 'aligned]
               #:size-in-pixels? [pixels? #f])
-  (make-object gui:font% size face family style weight underline? smoothing pixels? hinting))
+  (send gui:the-font-list find-or-create-font size face family style weight underline? smoothing pixels? hinting))
