@@ -269,7 +269,7 @@
 }
 
 @defproc[(checkbox [action (-> boolean? any)]
-                   [#:label label (maybe-obs/c maybe-label/c) #f]
+                   [#:label label (maybe-obs/c gui:lable-string?) #f]
                    [#:checked? checked? (maybe-obs/c boolean?) #f]
                    [#:enabled? enabled? (maybe-obs/c boolean?) #f]) (is-a?/c view<%>)]{
   Returns a representation of a checkbox that calls @racket[action]
