@@ -142,7 +142,7 @@
 }
 
 @defproc[(group [label (maybe-obs/c gui:label-string?)]
-                [(vpanel [#:alignment alignment (maybe-obs/c alignment/c) '(center top)]
+                [#:alignment alignment (maybe-obs/c alignment/c) '(center top)]
                 [#:style style
                          (listof (or/c 'border 'deleted
                                        'hscroll 'auto-hscroll 'hide-hscroll
