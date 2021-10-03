@@ -10,7 +10,8 @@
 
 (provide
  canvas
- pict-canvas)
+ pict-canvas
+ snip-canvas)
 
 (define (make-canvas% %)
   (class* object% (view<%>)
@@ -96,3 +97,35 @@
         (p:draw-pict (make-pict v) dc 0 0))
       (keyword-apply canvas kws kw-args @data draw args)))
    'pict-canvas))
+
+(define snip-canvas
+  (procedure-rename
+   (make-keyword-procedure
+    (λ (kws kw-args @data make-snip . args)
+      (define draw
+        (let ([last-w   #f]
+              [last-h   #f]
+              [last-v   #f]
+              [last-bmp #f])
+          (λ (dc v)
+            (define-values (w h)
+              (send dc get-size))
+            (define bmp
+              (cond
+                [(and (equal? last-w w)
+                      (equal? last-h h)
+                      (equal? last-v v))
+                 last-bmp]
+                [else
+                 (define snip
+                   (make-snip v w h))
+                 (define bmp
+                   (send snip get-bitmap))
+                 (begin0 bmp
+                   (set! last-bmp bmp)
+                   (set! last-v v)
+                   (set! last-w w)
+                   (set! last-h h))]))
+            (send dc draw-bitmap bmp 0 0))))
+      (keyword-apply canvas kws kw-args @data draw args)))
+   'snip-canvas))

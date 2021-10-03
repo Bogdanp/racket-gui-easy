@@ -231,6 +231,26 @@
   result of @racket[make-pict] whenever @racket[data] changes.
 }
 
+@defproc[(snip-canvas [data (maybe-obs/c any/c)]
+                      [make-snip (-> any/c (is-a?/c gui:snip%))]
+                      [#:label label (maybe-obs/c maybe-label/c) #f]
+                      [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                      [#:style style (listof (or/c 'border 'control-border 'combo
+                                                   'vscroll 'hscroll 'resize-corner
+                                                   'gl 'no-autoclear 'transparent
+                                                   'no-focus 'deleted)) null]
+                      [#:margin margin (maybe-obs/c margin/c) '(0 0)]
+                      [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
+                      [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
+                      [#:mixin mix (make-mixin-contract gui:canvas%) values]) (is-a?/c view<%>)]{
+
+  Returns a representation of a canvas that is redrawn using the
+  result of @racket[make-snip] whenever @racket[data] changes.  The
+  snip is converted to a bitmap before being drawn to the canvas so it
+  is non-interactive.  Use this view when you want to efficiently
+  update plots.  For interactive snips, see @racket[snip].
+}
+
 @defproc[(snip [data (maybe-obs/c any/c)]
                [make-snip (-> any/c
                               gui:dimension-integer?

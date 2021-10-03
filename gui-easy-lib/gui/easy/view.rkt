@@ -79,6 +79,7 @@
   ;; Canvases & Snips
   [canvas (canvas/c (-> (is-a?/c gui:dc<%>) any/c any))]
   [pict-canvas (canvas/c (-> any/c p:pict?))]
+  [snip-canvas (canvas/c (-> any/c gui:dimension-integer? gui:dimension-integer? (is-a?/c gui:snip%)))]
   [snip (->* ((maybe-obs/c any/c)
               (-> any/c gui:dimension-integer? gui:dimension-integer? (is-a?/c gui:snip%)))
              ((-> (is-a?/c gui:snip%) any/c any)
