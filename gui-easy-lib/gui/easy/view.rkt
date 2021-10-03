@@ -38,8 +38,9 @@
   [menu-item-separator (-> (is-a?/c view<%>))]
 
   ;; Containers
-  [hpanel panel/c]
-  [vpanel panel/c]
+  [hpanel (panel/c)]
+  [vpanel (panel/c)]
+  [group (panel/c (maybe-obs/c gui:label-string?))]
   [tabs (->* ((maybe-obs/c (listof gui:label-string?))
               (-> (or/c 'close 'reorder 'select)
                   (listof any/c)
@@ -214,8 +215,8 @@
         #:mixin (make-mixin-contract gui:canvas%))
        (is-a?/c view<%>)))
 
-(define panel/c
-  (->* ()
+(define-syntax-rule (panel/c arg/c ...)
+  (->* (arg/c ...)
        (#:alignment (maybe-obs/c alignment/c)
         #:enabled? (maybe-obs/c boolean?)
         #:style (listof (or/c 'border 'deleted

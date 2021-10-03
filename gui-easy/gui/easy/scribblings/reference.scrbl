@@ -141,6 +141,23 @@
   vertically.
 }
 
+@defproc[(group [label (maybe-obs/c gui:label-string?)]
+                [(vpanel [#:alignment alignment (maybe-obs/c alignment/c) '(center top)]
+                [#:style style
+                         (listof (or/c 'border 'deleted
+                                       'hscroll 'auto-hscroll 'hide-hscroll
+                                       'vscroll 'auto-vscroll 'hide-vscroll))
+                         null]
+                [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                [#:spacing spacing (maybe-obs/c spacing/c) 0]
+                [#:margin margin (maybe-obs/c margin/c) '(0 0)]
+                [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
+                [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
+                [child (is-a?/c view<%>)] ...+) (is-a?/c view<%>)]{
+
+  Returns a representation of a labeled vertical panel.
+}
+
 @defproc[(if-view [cond-value (maybe-obs/c any/c)]
                   [then-view (is-a?/c view<%>)]
                   [else-view (is-a?/c view<%>)]) (is-a?/c view<%>)]{

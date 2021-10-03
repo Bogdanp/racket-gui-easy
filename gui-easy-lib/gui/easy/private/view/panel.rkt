@@ -11,7 +11,8 @@
 
 (provide
  hpanel
- vpanel)
+ vpanel
+ group)
 
 (define (panel% clazz)
   (class* container% (view<%>)
@@ -25,23 +26,25 @@
                     (append (list @alignment @enabled? @spacing @margin @min-size @stretch)
                             (child-dependencies)))))
 
-    (define/public (create parent)
+    (define/public (-make-panel parent)
       (match-define (list h-m v-m) (peek @margin))
       (match-define (list w h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
-      (define the-panel
-        (new clazz
-             [parent parent]
-             [alignment (peek @alignment)]
-             [enabled (peek @enabled?)]
-             [style style]
-             [spacing (peek @spacing)]
-             [vert-margin v-m]
-             [horiz-margin h-m]
-             [min-width w]
-             [min-height h]
-             [stretchable-width w-s?]
-             [stretchable-height h-s?]))
+      (new clazz
+           [parent parent]
+           [alignment (peek @alignment)]
+           [enabled (peek @enabled?)]
+           [style style]
+           [spacing (peek @spacing)]
+           [vert-margin v-m]
+           [horiz-margin h-m]
+           [min-width w]
+           [min-height h]
+           [stretchable-width w-s?]
+           [stretchable-height h-s?]))
+
+    (define/public (create parent)
+      (define the-panel (-make-panel parent))
       (begin0 the-panel
         (send the-panel begin-container-sequence)
         (for ([c (in-list children)])
@@ -106,6 +109,61 @@
                 #:stretch [@stretch '(#t #t)]
                 . children)
   (new vpanel%
+       [@alignment @alignment]
+       [@enabled? @enabled?]
+       [@spacing @spacing]
+       [@margin @margin]
+       [@min-size @min-size]
+       [@stretch @stretch]
+       [children children]
+       [style style]))
+
+(define group-box-panel%
+  (class* (panel% gui:group-box-panel%) (view<%>)
+    (init-field @label)
+    (inherit-field @alignment @enabled? @spacing @margin @min-size @stretch style)
+    (super-new)
+
+    (define/override (dependencies)
+      (define deps (super dependencies))
+      (if (obs? @label)
+          (cons @label deps)
+          deps))
+
+    (define/override (-make-panel parent)
+      (match-define (list h-m v-m) (peek @margin))
+      (match-define (list w h) (peek @min-size))
+      (match-define (list w-s? h-s?) (peek @stretch))
+      (new gui:group-box-panel%
+           [label (peek @label)]
+           [parent parent]
+           [alignment (peek @alignment)]
+           [enabled (peek @enabled?)]
+           [style style]
+           [spacing (peek @spacing)]
+           [vert-margin v-m]
+           [horiz-margin h-m]
+           [min-width w]
+           [min-height h]
+           [stretchable-width w-s?]
+           [stretchable-height h-s?]))
+
+    (define/override (update v what val)
+      (case/dep what
+        [@label (send v set-label val)])
+      (super update v what val))))
+
+(define (group @label
+               #:alignment [@alignment '(center top)]
+               #:enabled? [@enabled? #t]
+               #:style [style null]
+               #:spacing [@spacing 0]
+               #:margin [@margin '(0 0)]
+               #:min-size [@min-size '(#f #f)]
+               #:stretch [@stretch '(#t #t)]
+               . children)
+  (new group-box-panel%
+       [@label @label]
        [@alignment @alignment]
        [@enabled? @enabled?]
        [@spacing @spacing]
