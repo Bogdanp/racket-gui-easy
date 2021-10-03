@@ -65,7 +65,7 @@
          (unless (choices=? choices last-choices)
            (send v clear)
            (for ([i (in-naturals)]
-                 [c (in-list (remove-duplicates choices choice=?))])
+                 [c (in-list choices)])
              (define lbl (choice->label c))
              (send v append lbl)
              (when (equal? lbl last-selection)
