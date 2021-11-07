@@ -182,6 +182,9 @@
     (parse-cell-name id))
   (and row col))
 
+
+;; GUI ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 (define r
   (render
    (window
@@ -221,6 +224,7 @@
    (dialog
     #:title (~cell-name row col)
     (input
+     #:min-size '(200 #f)
      (~cell (state-ref (obs-peek @state) row col))
      (λ (event text)
        (case event
