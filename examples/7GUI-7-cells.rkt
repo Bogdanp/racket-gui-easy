@@ -79,7 +79,8 @@
       #:when (valid-cell-name? id)
       (list id)]
 
-     [`(+ ,e0 ,e1)
+     [`(,(? symbol? op) ,e0 ,e1)
+      #:when (hash-has-key? ops op)
       (append (formula-deps e0)
               (formula-deps e1))]
 
