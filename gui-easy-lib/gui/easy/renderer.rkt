@@ -9,6 +9,9 @@
 (provide
  renderer?
  (contract-out
+  [embed (-> (is-a?/c gui:area<%>)
+             (is-a?/c view<%>)
+             (is-a?/c renderer<%>))]
   [render (->* ((is-a?/c window-view<%>))
                ((or/c (is-a?/c renderer<%>) #f))
                (is-a?/c renderer<%>))]
@@ -16,7 +19,8 @@
                          (is-a?/c popup-menu-view<%>)
                          gui:position-integer?
                          gui:position-integer?
-                         void?)]))
+                         void?)]
+  [renderer-root (-> (is-a?/c renderer<%>) any/c)]))
 
 (define (renderer? v)
   (is-a? v renderer<%>))

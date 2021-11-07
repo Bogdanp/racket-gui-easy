@@ -4,25 +4,30 @@
          racket/class
          (prefix-in gui: racket/gui)
          "logger.rkt"
-         "observable.rkt"
-         "view/window.rkt")
+         "observable.rkt")
 
 (provide
+ embed
+
  render
  render-popup-menu
- renderer<%>)
+
+ renderer<%>
+ renderer-root)
 
 (define id-seq (box 0))
 (define update-id-seq! (make-box-update-proc id-seq))
 (define (next-id!)
   (update-id-seq! add1))
 
+(define renderers (make-hasheqv))
 (define renderer<%>
   (interface () get-root render destroy))
 
 (define renderer%
   (class* object% (renderer<%>)
-    (init-field id tree)
+    (init-field tree)
+    (field [id (next-id!)])
     (super-new)
 
     (define root #f)
@@ -51,10 +56,17 @@
       (send tree destroy root)
       (set! root #f))))
 
-(define renderers (make-hasheqv))
+(define (embed parent tree)
+  (define r (new renderer% [tree tree]))
+  (define id (get-field id r))
+  (send r render parent)
+  (log-gui-easy-debug "rendered tree ~a" id)
+  (begin0 r
+    (hash-set! renderers id r)))
+
 (define (render tree [parent #f])
-  (define id (next-id!))
-  (define r (new renderer% [id id] [tree tree]))
+  (define r (new renderer% [tree tree]))
+  (define id (get-field id r))
   (define root (send r render (and parent (renderer-root parent))))
   (log-gui-easy-debug "rendered window ~a" id)
   (begin0 r
