@@ -145,7 +145,7 @@
                   #:style (listof (or/c 'horizontal 'vertical 'plain
                                         'vertical-label 'horizontal-label
                                         'deleted))
-                  #:range gui:positive-dimension-integer?
+                  #:range (maybe-obs/c gui:positive-dimension-integer?)
                   #:min-size (maybe-obs/c size/c)
                   #:stretch (maybe-obs/c stretch/c))
                  (is-a?/c view<%>))]

@@ -385,8 +385,7 @@
                    [#:style style (listof (or/c 'horizontal 'vertical 'plain
                                                 'vertical-label 'horizontal-label
                                                 'deleted)) '(horizontal)]
-                   [#:min-value min-value gui:position-integer? 0]
-                   [#:max-value max-value gui:position-integer? 100]
+                   [#:range range (maybe-obs/c gui:dimension-integer?) 100]
                    [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
                    [#:stretch stretch
                               (maybe-obs/c stretch/c)
