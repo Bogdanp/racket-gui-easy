@@ -20,7 +20,7 @@
     [create (->m (or/c (is-a?/c gui:frame%)
                        (is-a?/c gui:dialog%)
                        #f)
-                 (is-a?/c gui:window<%>))]
+                 (is-a?/c gui:top-level-window<%>))]
     [is-dialog? (->m boolean?)]))
 
 (define (window-like% clazz)

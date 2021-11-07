@@ -512,8 +512,8 @@
 
   @defmethod[(create [parent (or/c (is-a?/c gui:frame%)
                                    (is-a?/c gui:dialog%)
-                                   #f)]) (is-a?/c gui:window<%>)]{
-    Returns a new @racket[gui:window<%>] belonging to @racket[parent].
+                                   #f)]) (is-a?/c gui:top-level-window<%>)]{
+    Returns a new @racket[gui:top-level-window<%>] belonging to @racket[parent].
   }
 
   @defmethod[(is-dialog?) boolean?]{
