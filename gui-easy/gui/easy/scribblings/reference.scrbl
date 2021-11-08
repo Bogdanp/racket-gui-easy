@@ -321,7 +321,7 @@
 }
 
 @defproc[(checkbox [action (-> boolean? any)]
-                   [#:label label (maybe-obs/c gui:lable-string?) #f]
+                   [#:label label (maybe-obs/c gui:label-string?) #f]
                    [#:checked? checked? (maybe-obs/c boolean?) #f]
                    [#:enabled? enabled? (maybe-obs/c boolean?) #f]) (is-a?/c view<%>)]{
   Returns a representation of a checkbox that calls @racket[action]
@@ -681,6 +681,7 @@ that equality (via @racket[equal?]) is preserved for
   Executes the body of the first clause @racket[body] whose
   @racket[dep-expr] is @racket[equal?] to @racket[what-expr].  Logs
   the @racket[dep-expr] that matched to the @racket['gui-easy] topic.
+  Use this form to implement @method[view<%> update] methods.
 }
 
 
