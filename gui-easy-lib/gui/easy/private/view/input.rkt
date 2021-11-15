@@ -11,24 +11,26 @@
 (provide
  input)
 
-(define input%
+(define (input% clazz)
   (class* object% (view<%>)
-    (init-field @label @content @enabled? @background-color @margin @min-size @stretch action style font keymap)
+    (init-field @label @content @enabled? @background-color @margin @min-size @stretch action style font keymap value=? value->text)
     (super-new)
 
     (define/public (dependencies)
       (filter obs? (list @label @content @enabled? @background-color @margin @min-size @stretch)))
 
+    (define last-val #f)
     (define/public (create parent)
+      (set! last-val (obs-peek @content))
       (match-define (list h-m v-m) (peek @margin))
       (match-define (list w h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
       (define background-color (peek @background-color))
       (define the-field
-        (new gui:text-field%
+        (new clazz
              [parent parent]
              [label (peek @label)]
-             [init-value (peek @content)]
+             [init-value (value->text last-val)]
              [enabled (peek @enabled?)]
              [callback (λ (self event)
                          (action
@@ -49,17 +51,31 @@
           (send the-field set-field-background background-color))
         (send+ the-field (get-editor) (set-keymap keymap))))
 
+    (define (call-preserving-position ed thunk)
+      (define text (send ed get-text))
+      (define-values (start end)
+        (let ([sb (box #f)]
+              [eb (box #f)])
+          (send ed get-position sb eb)
+          (values
+           (unbox sb)
+           (unbox eb))))
+      (begin0 (thunk)
+        (unless (string=? "" text)
+          (send ed set-position start end))))
+
     (define/public (update v what val)
       (case/dep what
         [@label
          (send v set-label val)]
         [@content
-         ;; Don't update the content if the value hasn't changed to avoid
-         ;; forcing a change to the cursor position in case the input has
-         ;; an action that somehow alters its own @content.
-         (unless (string=? val (send v get-value))
-           (send v set-value val)
-           (send v refresh))]
+         (unless (value=? val last-val)
+           (set! last-val val)
+           (call-preserving-position
+            (send v get-editor)
+            (lambda ()
+              (send v set-value (value->text val))
+              (send v refresh))))]
         [@enabled?
          (send v enable val)]
         [@background-color
@@ -92,8 +108,11 @@
                #:keymap [keymap the-default-keymap]
                #:margin [@margin '(2 2)]
                #:min-size [@min-size '(#f #f)]
-               #:stretch [@stretch '(#t #f)])
-  (new input%
+               #:stretch [@stretch '(#t #f)]
+               #:mixin [mix values]
+               #:value=? [value=? equal?]
+               #:value->text [value->text values])
+  (new (input% (mix gui:text-field%))
        [@label @label]
        [@content @content]
        [@enabled? @enabled?]
@@ -104,4 +123,6 @@
        [action action]
        [style style]
        [font font]
-       [keymap keymap]))
+       [keymap keymap]
+       [value=? value=?]
+       [value->text value->text]))

@@ -125,7 +125,7 @@
               (#:size (maybe-obs/c size/c)
                #:mode (maybe-obs/c (or/c 'fit 'fill)))
               (is-a?/c view<%>))]
-  [input (->* ((maybe-obs/c string?))
+  [input (->* ((maybe-obs/c any/c))
               ((-> (or/c 'input 'return) string? any)
                #:label (maybe-obs/c maybe-label/c)
                #:enabled? (maybe-obs/c boolean?)
@@ -137,7 +137,10 @@
                #:keymap (is-a?/c gui:keymap%)
                #:margin (maybe-obs/c margin/c)
                #:min-size (maybe-obs/c size/c)
-               #:stretch (maybe-obs/c stretch/c))
+               #:stretch (maybe-obs/c stretch/c)
+               #:mixin (make-mixin-contract gui:text-field%)
+               #:value=? (-> any/c any/c boolean?)
+               #:value->text (-> any/c string?))
               (is-a?/c view<%>))]
   [progress (->* ((maybe-obs/c gui:position-integer?))
                  (#:label (maybe-obs/c gui:label-string?)

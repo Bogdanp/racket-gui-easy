@@ -360,7 +360,7 @@
   the container.
 }
 
-@defproc[(input [value (maybe-obs/c string?)]
+@defproc[(input [value (maybe-obs/c any/c)]
                 [action (-> (or/c 'input 'return) string? any) void]
                 [#:label label (maybe-obs/c maybe-label/c) #f]
                 [#:enabled? enabled? (maybe-obs/c boolean?) #t]
@@ -372,11 +372,23 @@
                 [#:keymap keymap (is-a?/c gui:keymap%) (new gui:keymap%)]
                 [#:margin margin (maybe-obs/c margin/c) '(0 0)]
                 [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
-                [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]) (is-a?/c view<%>)]{
+                [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
+                [#:mixin mix (make-mixin-contract gui:text-field%) values]
+                [#:value=? value=? (-> any/c any/c boolean?) equal?]
+                [#:value->text value->text (-> any/c string?) values]) (is-a?/c view<%>)]{
   Returns a representation of a text field that calls @racket[action]
   on change.  The first argument to the @racket[action] is the type of
   event that caused the input to change and the second is the contents
   of the text field.
+
+  The @racket[#:value=?] argument controls when changes to the input
+  data are reflected in the contents of the field.  When a new value
+  of the input observable is @racket[value=?] to the one before it,
+  the contents of the text field remain unchanged.
+
+  The @racket[#:value->text] argument controls how the input values
+  are rendered to strings.  If not provided, @racket[value] must be
+  either a @racket[string?] or an observable of strings.
 }
 
 @defproc[(progress [value (maybe-obs/c gui:position-integer?)]
