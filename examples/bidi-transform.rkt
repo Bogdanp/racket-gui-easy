@@ -4,7 +4,7 @@
          racket/gui/easy/operator
          racket/string)
 
-(define/obs @n (@ 42))
+(define/obs @n 42)
 
 (define (text->num text)
   (and (not (string-suffix? text "."))

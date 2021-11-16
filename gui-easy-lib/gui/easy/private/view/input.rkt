@@ -52,7 +52,7 @@
         (send+ the-field (get-editor) (set-keymap keymap))))
 
     (define (call-preserving-position ed thunk)
-      (define text (send ed get-text))
+      (define old-text (send ed get-text))
       (define-values (start end)
         (let ([sb (box #f)]
               [eb (box #f)])
@@ -60,9 +60,20 @@
           (values
            (unbox sb)
            (unbox eb))))
+      ;; When the entire text is selected and the new text after the
+      ;; (thunk) is longer, expand the selection to cover the new
+      ;; text.
+      (define full-selection?
+        (and (= start 0)
+             (= end (string-length old-text))))
       (begin0 (thunk)
-        (unless (string=? "" text)
-          (send ed set-position start end))))
+        ;; When the contents of the editor are empty, avoid changing
+        ;; the position since doing so would place the cursor before
+        ;; any newly-inserted text.
+        (unless (string=? "" old-text)
+          (if full-selection?
+              (send ed set-position 0 (string-length (send ed get-text)))
+              (send ed set-position start end)))))
 
     (define/public (update v what val)
       (case/dep what
