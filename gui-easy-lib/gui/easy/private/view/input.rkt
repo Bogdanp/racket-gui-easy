@@ -21,7 +21,7 @@
 
     (define last-val #f)
     (define/public (create parent)
-      (set! last-val (obs-peek @content))
+      (set! last-val (peek @content))
       (match-define (list h-m v-m) (peek @margin))
       (match-define (list w h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
