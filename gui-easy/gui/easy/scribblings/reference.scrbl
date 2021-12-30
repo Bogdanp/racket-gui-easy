@@ -25,17 +25,20 @@
 @defproc[(embed [parent (is-a?/c gui:area<%>)]
                 [view (is-a?/c view<%>)]) renderer?]{
   Renders the view hierarchy represented by @racket[view] as a child
-  of @racket[parent].  Use this function when you need to embed one or
-  more @racket[view<%>]s within an existing @racketmodname[racket/gui]
-  application, otherwise use @racket[render].
+  of @racket[parent].
+
+  Use this function when you need to embed one or more
+  @racket[view<%>]s within an existing @racketmodname[racket/gui]
+  application.  Otherwise, use @racket[render].
 }
 
 @defproc[(render [view (is-a?/c window-view<%>)]
                  [parent (or/c #f renderer?) #f]) renderer?]{
-  Renders the view hierarchy represented by @racket[view].  If a
-  @racket[parent] renderer is provided, then the view is rendered as a
-  child of the root view of that parent.  This is useful, for example,
-  if you need to render a modal dialog on top of an existing window.
+  Renders the view hierarchy represented by @racket[view].
+
+  When a @racket[parent] renderer is provided, renders the view as a
+  child of the root view of @racket[parent].  This is useful when you
+  need to render a modal dialog on top of an existing window.
 }
 
 @defproc[(render-popup-menu [parent renderer?]
