@@ -176,6 +176,33 @@
   Returns a representation of a labeled vertical panel.
 }
 
+@defproc[(tabs [choices (maybe-obs/c (listof any/c))]
+               [action (-> (or/c 'close 'reorder 'select)
+                           (listof any/c)
+                           (or/c #f exact-nonnegative-integer?)
+                           any)]
+               [child (is-a?/c view<%>)] ...
+               [#:choice->label choice->label (-> any/c gui:label-string?) values]
+               [#:selection selection-index (maybe-obs/c (or/c #f exact-nonnegative-integer?)) #f]
+               [#:alignment alignment (maybe-obs/c alignment/c) '(left center)]
+               [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+               [#:style style (listof (or/c 'no-border
+                                            'can-reorder 'can-close 'new-button
+                                            'flat-portable 'deleted)) null]
+               [#:spacing spacing (maybe-obs/c spacing/c) 0]
+               [#:margin margin (maybe-obs/c margin/c) 0]
+               [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
+               [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]) (is-a?/c view<%>)]{
+
+  Returns a representation of a tab panel.  The @racket[choices] are
+  converted to tab names via @racket[choice->label].  On user action,
+  @racket[action] is called with a symbol representing the event, the
+  set of choices at the moment the action occurred and the relevant
+  selection index within the set of choices (if any).
+
+  See @filepath{examples/tabs.rkt} for an example.
+}
+
 @defproc[(if-view [cond-value (maybe-obs/c any/c)]
                   [then-view (is-a?/c view<%>)]
                   [else-view (is-a?/c view<%>)]) (is-a?/c view<%>)]{
@@ -229,6 +256,7 @@
   to @racket[make-view].  Each entry must have a unique
   @racket[#:key].
 }
+
 
 @subsection{Canvases & Snips}
 

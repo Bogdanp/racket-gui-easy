@@ -41,9 +41,9 @@
   [hpanel (panel/c)]
   [vpanel (panel/c)]
   [group (panel/c (maybe-obs/c gui:label-string?))]
-  [tabs (->* ((maybe-obs/c (listof gui:label-string?))
+  [tabs (->* ((maybe-obs/c list?)
               (-> (or/c 'close 'reorder 'select)
-                  (listof any/c)
+                  list?
                   (or/c #f exact-nonnegative-integer?)
                   any))
              (#:choice->label (-> any/c gui:label-string?)
