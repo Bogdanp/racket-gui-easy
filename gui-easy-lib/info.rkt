@@ -1,6 +1,6 @@
 #lang info
 
-(define version "0.2")
+(define version "0.2.1")
 (define collection "racket")
 (define deps '("base"
                "box-extra-lib"
