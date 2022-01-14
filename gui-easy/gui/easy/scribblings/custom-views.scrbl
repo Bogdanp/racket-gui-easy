@@ -47,7 +47,7 @@ implementation of @racketid[canvas-list-view%]:
 @racketblock[
   (define canvas-list-view%
     (class* object% (view<%>)
-      (init |@entries| draw action)
+      (init-field |@entries| draw action)
       (super-new)
 
       (define/public (dependencies)
