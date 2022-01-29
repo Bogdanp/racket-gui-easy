@@ -509,19 +509,33 @@
                 [#:font font (is-a?/c gui:font%) gui:view-control-font]
                 [#:margin margin (maybe-obs/c margin/c) '(0 0)]
                 [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
-                [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]) (is-a?/c view<%>)]{
+                [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
+                [#:column-widths column-widths (maybe-obs/c
+                                                (listof
+                                                 (or/c (list/c exact-nonnegative-integer?
+                                                               gui:dimension-integer?)
+                                                       (list/c exact-nonnegative-integer?
+                                                               gui:dimension-integer?
+                                                               gui:dimension-integer?
+                                                               gui:dimension-integer?)))) null]) (is-a?/c view<%>)]{
 
   Returns a representation of a table that calls @racket[action] when
   the selection changes or when one of its columns is clicked (if the
-  @racket['clickable-headers] style is set).  The action callback is
-  called with the type of event that occurred, the set of entries at
-  the time of the event and the current selection, if any.  The
-  current selection can either be a single index in the set of entries
-  or a list of indices in the case of a @racket['multiple] selection
-  table.
+  @racket['clickable-headers] style is set).  The @racket[action]
+  callback is called with the type of event that occurred, the set of
+  entries at the time of the event and the current selection, if any.
+  The current selection can either be a single index in the set of
+  entries or a list of indices in the case of a @racket['multiple]
+  selection table.
 
   The @racket[#:entry->row] argument converts each row in the input
   data for display in the table.
+
+  The @racket[#:column-widths] argument controls the widths of the
+  columns.  Column lengths can be specified either as a list of the
+  column index (starting from 0) and the default width or a list of
+  the column index, the column width, the minimum width and the
+  maximum width.
 }
 
 @defproc[(text [s (maybe-obs/c gui:label-string?)]
