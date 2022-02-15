@@ -78,7 +78,7 @@
 
 (define (render-popup-menu r tree x y)
   (define id (next-id!))
-  (define menu-r (new renderer% [id id] [tree tree]))
+  (define menu-r (new renderer% [tree tree]))
   (define menu (send menu-r render #f))
   (define window (send r get-root))
   (log-gui-easy-debug "rendered popup menu ~a" id)
