@@ -80,13 +80,23 @@
         [@label
          (send v set-label val)]
         [@content
-         (unless (value=? val last-val)
-           (set! last-val val)
-           (call-preserving-position
-            (send v get-editor)
-            (lambda ()
-              (send v set-value (value->text val))
-              (send v refresh))))]
+         (define text
+           (value->text val))
+         (cond
+           [(not (value=? val last-val))
+            (set! last-val val)
+            (call-preserving-position
+             (send v get-editor)
+             (lambda ()
+               (send v set-value text)
+               (send v refresh)))]
+
+           [(string=? text "")
+            (send v set-value "")
+            (send v refresh)]
+
+           [else
+            (void)])]
         [@enabled?
          (send v enable val)]
         [@background-color
