@@ -413,9 +413,13 @@
   of the text field.
 
   The @racket[#:value=?] argument controls when changes to the input
-  data are reflected in the contents of the field.  When a new value
-  of the input observable is @racket[value=?] to the one before it,
-  the contents of the text field remain unchanged.
+  data are reflected in the contents of the field.  The contents of
+  the input field only change when the new value of the underlying
+  observable is not @racket[value=?] to the previous one.  The only
+  exception to this is when the textual value (via
+  @racket[#:value->text]) of the observable is the empty string, in
+  which case the input is cleared regardless of the value of the
+  underlying observable.
 
   The @racket[#:value->text] argument controls how the input values
   are rendered to strings.  If not provided, @racket[value] must be
