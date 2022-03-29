@@ -295,7 +295,7 @@
 }
 
 @defproc[(snip-canvas [data (maybe-obs/c any/c)]
-                      [make-snip (-> any/c (is-a?/c gui:snip%))]
+                      [make-snip (-> any/c gui:dimension-integer? gui:dimension-integer? (is-a?/c gui:snip%))]
                       [#:label label (maybe-obs/c maybe-label/c) #f]
                       [#:enabled? enabled? (maybe-obs/c boolean?) #t]
                       [#:style style (listof (or/c 'border 'control-border 'combo
