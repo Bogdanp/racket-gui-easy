@@ -117,7 +117,7 @@
 
 (define (obs-update! o f)
   (when (obs-derived? o)
-    (raise-argument-error 'obs-update! "a non-derived observable" o))
+    (raise-argument-error 'obs-update! "(not/c obs-derived?)" o))
   (do-obs-update! o f))
 
 (define (obs-peek o)
@@ -239,7 +239,7 @@
   (define @b (obs-map @a number->string))
   (check-equal? (obs-peek @b) "2")
   (check-exn
-   #rx"a non-derived observable"
+   #rx"not/c obs-derived"
    (λ () (obs-update! @b "3")))
   (check-equal? (obs-peek @b) "2")
   (check-equal? (obs-update! @a add1) 3)
