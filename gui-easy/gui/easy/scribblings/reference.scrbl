@@ -767,7 +767,7 @@ that equality (via @racket[equal?]) is preserved for
 }
 
 @defproc[((λ:= [o obs?]
-               [f (-> any/c any/c)]) [v any/c]) any/c]{
+               [f (-> any/c any/c) values]) [v any/c]) any/c]{
   Changes the value of @racket[o] to the result of @racket[(f v)].
 }
 
