@@ -1,7 +1,5 @@
 #lang racket/base
 
-(require (for-syntax racket/base))
-
 (define-syntax-rule (reprovide mod ...)
   (begin
     (require mod ...)
