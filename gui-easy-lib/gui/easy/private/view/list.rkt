@@ -185,7 +185,7 @@
                    #:stretch [@stretch '(#t #t)]
                    #:key [key-proc values])
   (new list-view%
-       [@entries @entries]
+       [@entries (->obs @entries)]
        [@alignment @alignment]
        [@enabled? @enabled?]
        [@spacing @spacing]

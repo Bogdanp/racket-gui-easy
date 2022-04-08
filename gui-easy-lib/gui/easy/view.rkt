@@ -64,7 +64,8 @@
   [dyn-view (->* (obs? (-> any/c (is-a?/c view<%>)))
                  (#:equal? (-> any/c any/c any/c))
                  (is-a?/c view<%>))]
-  [list-view (->* (obs? (-> any/c any/c (is-a?/c view<%>)))
+  [list-view (->* ((maybe-obs/c any/c)
+                   (-> any/c any/c (is-a?/c view<%>)))
                   (#:alignment (maybe-obs/c alignment/c)
                    #:enabled? (maybe-obs/c boolean?)
                    #:style (listof (or/c 'horizontal 'vertical 'border 'deleted
