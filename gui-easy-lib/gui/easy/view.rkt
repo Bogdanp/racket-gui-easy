@@ -75,7 +75,8 @@
                    #:margin (maybe-obs/c margin/c)
                    #:min-size (maybe-obs/c size/c)
                    #:stretch (maybe-obs/c stretch/c)
-                   #:key (-> any/c any/c))
+                   #:key (-> any/c any/c)
+                   #:mixin (make-mixin-contract gui:panel%))
                   (is-a?/c view<%>))]
 
   ;; Canvases & Snips

@@ -249,7 +249,8 @@
                     [#:spacing spacing (maybe-obs/c spacing/c) 0]
                     [#:margin margin (maybe-obs/c margin/c) '(0 0)]
                     [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
-                    [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]) (is-a?/c view<%>)]{
+                    [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
+                    [#:mixin mix (make-mixin-contract gui:panel%) values]) (is-a?/c view<%>)]{
 
   Returns a representation of a panel that renders the
   @racket[entries] by passing each one as a @tech{derived observable}

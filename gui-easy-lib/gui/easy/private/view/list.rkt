@@ -12,7 +12,7 @@
 (provide
  list-view)
 
-(define list-view%
+(define (make-list-view% mix)
   (class* container% (view<%>)
     (init-field @entries @alignment @enabled? @spacing @margin @min-size @stretch
                 make-view style key-proc)
@@ -91,9 +91,9 @@
       (match-define (list w h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
       (define the-panel
-        (new (if (memq 'vertical style)
-                 gui:vertical-panel%
-                 gui:horizontal-panel%)
+        (new (mix (if (memq 'vertical style)
+                      gui:vertical-panel%
+                      gui:horizontal-panel%))
              [parent parent]
              [alignment (peek @alignment)]
              [enabled (peek @enabled?)]
@@ -183,8 +183,9 @@
                    #:margin [@margin '(0 0)]
                    #:min-size [@min-size '(#f #f)]
                    #:stretch [@stretch '(#t #t)]
-                   #:key [key-proc values])
-  (new list-view%
+                   #:key [key-proc values]
+                   #:mixin [mix values])
+  (new (make-list-view% mix)
        [@entries (->obs @entries)]
        [@alignment @alignment]
        [@enabled? @enabled?]
