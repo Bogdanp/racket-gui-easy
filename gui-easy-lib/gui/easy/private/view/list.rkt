@@ -76,7 +76,7 @@
            (sync deadline)
            (gui:queue-callback flush-updates!)))))
     (define (flush-updates!)
-      (for ([update (in-list pending-updates)])
+      (for ([update (in-list (reverse pending-updates))])
         (match-define (list v what val) update)
         (when (has-child? v)
           (send v update (get-child v) what val)))
