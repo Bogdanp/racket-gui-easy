@@ -39,7 +39,9 @@
       (for ([dep (in-list (send child-v dependencies))])
         (define (handle val)
           (gui:queue-callback
-           (λ () (handle-update! child-v dep val)) #f))
+           (lambda ()
+             (when (has-child? child-v)
+               (send child-v update (get-child child-v) dep val)))))
         (obs-observe! dep handle)
         (hash-update! deps-to-handlers
                       (cons child-v dep)
@@ -61,33 +63,6 @@
              [hdl (in-list hdls)])
         (obs-unobserve! dep hdl))
       (hash-clear! deps-to-handlers))
-
-    (define flush-frequency 16) ;; ms
-    (define flush-scheduled? #f)
-    (define pending-updates null)
-    (define (handle-update! v what val)
-      (set! pending-updates (cons (list v what val)
-                                  (filter
-                                   (lambda (update)
-                                     (match update
-                                       [`(,(== v eq?) ,(== what equal?) ,_) #f]
-                                       [_ #t]))
-                                   pending-updates)))
-      (unless flush-scheduled?
-        (set! flush-scheduled? #t)
-        (define deadline
-          (alarm-evt (+ (current-inexact-milliseconds) flush-frequency)))
-        (thread
-         (lambda ()
-           (sync deadline)
-           (gui:queue-callback flush-updates!)))))
-    (define (flush-updates!)
-      (for ([update (in-list (reverse pending-updates))])
-        (match-define (list v what val) update)
-        (when (has-child? v)
-          (send v update (get-child v) what val)))
-      (set! pending-updates null)
-      (set! flush-scheduled? #f))
 
     (define/public (dependencies)
       (filter obs? (list @entries @alignment @enabled? @spacing @margin @min-size @stretch)))
