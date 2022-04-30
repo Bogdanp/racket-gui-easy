@@ -66,7 +66,13 @@
     (define flush-scheduled? #f)
     (define pending-updates null)
     (define (handle-update! v what val)
-      (set! pending-updates (cons (list v what val) pending-updates))
+      (set! pending-updates (cons (list v what val)
+                                  (filter
+                                   (lambda (update)
+                                     (match update
+                                       [`(,(== v eq?) ,(== what equal?) ,_) #f]
+                                       [_ #t]))
+                                   pending-updates)))
       (unless flush-scheduled?
         (set! flush-scheduled? #t)
         (define deadline
