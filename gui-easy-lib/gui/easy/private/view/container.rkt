@@ -33,8 +33,8 @@
     (define/public (add-child c w)
       (hash-set! children-to-widgets c w))
 
-    (define/public (get-child c)
-      (hash-ref children-to-widgets c))
+    (define/public (get-child c [default (lambda () (error 'get-child "child not found: ~e" c))])
+      (hash-ref children-to-widgets c default))
 
     (define/public (has-child? c)
       (hash-has-key? children-to-widgets c))

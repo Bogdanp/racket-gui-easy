@@ -41,9 +41,8 @@
       (set! handlers (for/list ([dep (in-list deps)])
                        (define (f v)
                          (gui:queue-callback
-                          (λ ()
-                            (send tree update root dep v))
-                          #f))
+                          (lambda ()
+                            (send tree update root dep v))))
                        (begin0 f
                          (obs-observe! dep f))))
       root)
@@ -53,8 +52,10 @@
             [handler (in-list handlers)])
         (obs-unobserve! dep handler))
       (hash-remove! renderers id)
-      (send tree destroy root)
-      (set! root #f))))
+      (gui:queue-callback
+       (lambda ()
+         (send tree destroy root)
+         (set! root #f))))))
 
 (define (embed parent tree)
   (define r (new renderer% [tree tree]))
