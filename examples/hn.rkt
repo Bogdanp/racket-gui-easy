@@ -21,7 +21,7 @@
   (story
    (hash-ref h 'id)
    (hash-ref h 'by)
-   (hash-ref h 'title)
+   (hash-ref h 'title "<untitled>")
    (hash-ref h 'url #f)
    (hash-ref h 'score 0)
    (hash-ref h 'text #f)
