@@ -8,10 +8,10 @@
 
 (provide
  (contract-out
-  [font (font/c string?)]
-  [font* (font/c (or/c string? (listof string?)))]))
+  [font (font/c string? (is-a?/c gui:font%))]
+  [font* (font/c (or/c string? (listof string?)) (or/c #f (is-a?/c gui:font%)))]))
 
-(define (font/c name/c)
+(define (font/c name/c res/c)
   (->* (name/c (real-in 0 1024.0))
        (#:family gui:font-family/c
         #:style gui:font-style/c
@@ -20,7 +20,7 @@
         #:smoothing gui:font-smoothing/c
         #:hinting gui:font-hinting/c
         #:size-in-pixels? any/c)
-       (is-a?/c gui:font%)))
+       res/c))
 
 (define (font face size
               #:family [family 'default]
