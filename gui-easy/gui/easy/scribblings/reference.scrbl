@@ -177,7 +177,7 @@
 }
 
 @defproc[(tabs [choices (maybe-obs/c (listof any/c))]
-               [action (-> (or/c 'close 'reorder 'select)
+               [action (-> (or/c 'new 'close 'reorder 'select)
                            (listof any/c)
                            (or/c #f exact-nonnegative-integer?)
                            any)]

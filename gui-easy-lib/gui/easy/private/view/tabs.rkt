@@ -42,7 +42,9 @@
                  (set! choices reordered-choices)
                  (action 'reorder choices (get-selection)))
                (define/override (on-close-request index)
-                 (action 'close choices index)))
+                 (action 'close choices index))
+               (define/override (on-new-request)
+                 (action 'new choices (get-selection))))
              [parent parent]
              [choices (map choice->label choices)]
              [callback (λ (self _event)

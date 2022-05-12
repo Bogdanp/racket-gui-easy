@@ -42,7 +42,7 @@
   [vpanel (panel/c)]
   [group (panel/c (maybe-obs/c gui:label-string?))]
   [tabs (->* ((maybe-obs/c list?)
-              (-> (or/c 'close 'reorder 'select)
+              (-> (or/c 'new 'close 'reorder 'select)
                   list?
                   (or/c #f exact-nonnegative-integer?)
                   any))
