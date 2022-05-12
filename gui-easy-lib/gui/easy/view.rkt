@@ -50,7 +50,8 @@
               #:selection (maybe-obs/c (or/c #f exact-nonnegative-integer?))
               #:alignment (maybe-obs/c alignment/c)
               #:enabled? (maybe-obs/c boolean?)
-              #:style (listof (or/c 'no-border 'can-reorder 'can-close 'flat-portable 'deleted))
+              #:style (listof (or/c 'no-border 'can-reorder 'can-close
+                                    'new-button 'flat-portable 'deleted))
               #:spacing (maybe-obs/c gui:spacing-integer?)
               #:margin (maybe-obs/c margin/c)
               #:min-size (maybe-obs/c size/c)
