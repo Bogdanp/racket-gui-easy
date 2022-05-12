@@ -87,11 +87,12 @@
            ;; current selection if it's a part of the new set.
            [else
             (define selection (send v get-selection))
-            (define choice (and selection (list-ref choices selection)))
+            (define old-choice (and selection (list-ref choices selection)))
             (set! choices val)
             (send v set (map choice->label val))
-            (when selection
-              (send v set-selection (index-of choices choice)))])]
+            (define index (index-of choices old-choice))
+            (when (and selection index)
+              (send v set-selection index))])]
         [@selection-index
          (when val
            (unless (= (send v get-selection) val)
