@@ -59,6 +59,7 @@
              [min-height h]
              [stretchable-width w-s?]
              [stretchable-height h-s?]))
+      (send the-panel set-selection (peek @selection-index))
       (begin0 the-panel
         (send the-panel begin-container-sequence)
         (for ([c (in-list children)])
@@ -95,7 +96,7 @@
               (send v set-selection index))])]
         [@selection-index
          (when val
-           (unless (= (send v get-selection) val)
+           (unless (eqv? (send v get-selection) val)
              (send v set-selection val)))]
         [@alignment
          (send/apply v set-alignment val)]
