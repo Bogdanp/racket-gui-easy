@@ -27,6 +27,7 @@
                             (child-dependencies)))))
 
     (define/public (create parent)
+      (define selection (peek @selection-index))
       (match-define (list h-m v-m) (peek @margin))
       (match-define (list w h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
@@ -59,7 +60,8 @@
              [min-height h]
              [stretchable-width w-s?]
              [stretchable-height h-s?]))
-      (send the-panel set-selection (peek @selection-index))
+      (when selection
+        (send the-panel set-selection selection))
       (begin0 the-panel
         (send the-panel begin-container-sequence)
         (for ([c (in-list children)])
