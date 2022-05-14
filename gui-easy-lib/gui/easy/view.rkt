@@ -42,12 +42,10 @@
   [vpanel (panel/c)]
   [group (panel/c (maybe-obs/c gui:label-string?))]
   [tabs (->* ((maybe-obs/c list?)
-              (-> (or/c 'new 'close 'reorder 'select)
-                  list?
-                  (or/c #f exact-nonnegative-integer?)
-                  any))
+              (-> (or/c 'new 'close 'reorder 'select) list? (or/c #f any/c) any))
              (#:choice->label (-> any/c gui:label-string?)
-              #:selection (maybe-obs/c (or/c #f exact-nonnegative-integer?))
+              #:choice=? (-> any/c any/c boolean?)
+              #:selection (maybe-obs/c (or/c #f any/c))
               #:alignment (maybe-obs/c alignment/c)
               #:enabled? (maybe-obs/c boolean?)
               #:style (listof (or/c 'no-border 'can-reorder 'can-close
@@ -117,7 +115,7 @@
                 (-> (or/c #f any/c) any))
                (#:choice->label (-> any/c gui:label-string?)
                 #:choice=? (-> any/c any/c boolean?)
-                #:selection (maybe-obs/c any/c)
+                #:selection (maybe-obs/c (or/c #f any/c))
                 #:label (maybe-obs/c maybe-label/c)
                 #:style (listof (or/c 'horizontal-label 'vertical-label 'deleted))
                 #:enabled? (maybe-obs/c boolean?)

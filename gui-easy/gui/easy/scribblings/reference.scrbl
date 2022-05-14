@@ -179,11 +179,12 @@
 @defproc[(tabs [choices (maybe-obs/c (listof any/c))]
                [action (-> (or/c 'new 'close 'reorder 'select)
                            (listof any/c)
-                           (or/c #f exact-nonnegative-integer?)
+                           (or/c #f any/c)
                            any)]
                [child (is-a?/c view<%>)] ...
                [#:choice->label choice->label (-> any/c gui:label-string?) values]
-               [#:selection selection-index (maybe-obs/c (or/c #f exact-nonnegative-integer?)) #f]
+               [#:choice=? choice=? (-> any/c any/c boolean?) equal?]
+               [#:selection selection (maybe-obs/c (or/c #f any/c)) #f]
                [#:alignment alignment (maybe-obs/c alignment/c) '(left center)]
                [#:enabled? enabled? (maybe-obs/c boolean?) #t]
                [#:style style (listof (or/c 'no-border
@@ -194,13 +195,21 @@
                [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
                [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]) (is-a?/c view<%>)]{
 
-  Returns a representation of a tab panel.  The @racket[choices] are
-  converted to tab names via @racket[choice->label].  On user action,
-  @racket[action] is called with a symbol representing the event, the
-  set of choices at the moment the action occurred and the relevant
-  selection index within the set of choices (if any).
+  Returns a representation of a tab panel.
 
-  See @filepath{examples/tabs.rkt} for an example.
+  The @racket[#:choice->label] argument controls how each choice is
+  displayed and the @racket[#:choice=?] argument controls how the
+  current @racket[#:selection] is compared against the list of choices
+  to determine the selection index.
+
+  On user interaction, @racket[action] is called with a symbol
+  representing the event, the set of choices at the moment the action
+  occurred and the current selection.  The selection may be adjusted
+  depending on the event (eg. when the current tab is closed, the
+  selection changes to an adjacent tab).
+
+  See @filepath{examples/tabs.rkt} and @filepath{examples/tabs2.rkt}
+  for examples.
 }
 
 @defproc[(if-view [cond-value (maybe-obs/c any/c)]

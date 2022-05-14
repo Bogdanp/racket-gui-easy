@@ -15,41 +15,60 @@
 (define tabs%
   (class* container% (view<%>)
     (inherit-field children)
-    (init-field @choices @selection-index @alignment @enabled? @spacing @margin @min-size @stretch style action choice->label)
+    (init-field @choices @selection @alignment @enabled? @spacing @margin @min-size @stretch style action choice->label choice=?)
     (inherit child-dependencies add-child update-children destroy-children)
     (super-new)
 
-    (define choices (peek @choices))
+    (define last-choices null)
+    (define last-labels null)
+    (define last-selection #f)
+    (define last-index #f)
+    (define @choices&selection&index
+      (obs-combine
+       (λ (choices selection)
+         (list choices selection (and selection (index-of choices selection choice=?))))
+       @choices @selection))
 
     (define/public (dependencies)
       (filter obs? (remove-duplicates
-                    (append (list @choices @selection-index @alignment @enabled? @spacing @margin @min-size @stretch)
+                    (append (list @choices&selection&index @alignment @enabled? @spacing @margin @min-size @stretch)
                             (child-dependencies)))))
 
     (define/public (create parent)
-      (define selection (peek @selection-index))
       (match-define (list h-m v-m) (peek @margin))
       (match-define (list w h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
+      (match-define (list choices selection index) (peek @choices&selection&index))
       (define the-panel
         (new (class gui:tab-panel%
-               (inherit get-selection)
                (super-new)
                (define/augment (on-reorder former-indices)
-                 (define choices-vec (list->vector choices))
+                 (define choices-vec (list->vector last-choices))
                  (define reordered-choices
                    (for/list ([old-index (in-list former-indices)])
                      (vector-ref choices-vec old-index)))
-                 (set! choices reordered-choices)
-                 (action 'reorder choices (get-selection)))
+                 (action 'reorder reordered-choices last-selection))
                (define/override (on-close-request index)
-                 (action 'close choices index))
+                 (define removed-choices
+                   (for/list ([idx (in-naturals)]
+                              [c (in-list last-choices)]
+                              #:unless (= idx index))
+                     c))
+                 (define adjusted-selection
+                   (cond
+                     [(null? removed-choices) #f]
+                     [(not (eqv? index last-index)) last-selection]
+                     [(= (length removed-choices) 1) (car removed-choices)]
+                     [(zero? index) (car removed-choices)]
+                     [else (list-ref removed-choices (sub1 index))]))
+                 (action 'close removed-choices adjusted-selection))
                (define/override (on-new-request)
-                 (action 'new choices (get-selection))))
+                 (action 'new last-choices last-selection)))
              [parent parent]
              [choices (map choice->label choices)]
              [callback (λ (self _event)
-                         (action 'select choices (send self get-selection)))]
+                         (define index (send self get-selection))
+                         (action 'select last-choices (and index (list-ref last-choices index))))]
              [alignment (peek @alignment)]
              [enabled (peek @enabled?)]
              [style style]
@@ -60,9 +79,12 @@
              [min-height h]
              [stretchable-width w-s?]
              [stretchable-height h-s?]))
-      (when selection
-        (send the-panel set-selection selection))
       (begin0 the-panel
+        (set! last-choices choices)
+        (when index
+          (set! last-selection selection)
+          (set! last-index index)
+          (send the-panel set-selection index))
         (send the-panel begin-container-sequence)
         (for ([c (in-list children)])
           (add-child c (send c create the-panel)))
@@ -70,36 +92,17 @@
 
     (define/public (update v what val)
       (case/dep what
-        [@choices
-         (cond
-           ;; The choices are the same and in the same order, so do
-           ;; nothing to avoid triggering an unnecessary `select'
-           ;; action.
-           [(equal? choices val)
-            (void)]
-
-           ;; The choices are the same except for the very last one.
-           ;; Assume this means we need to append and select the new
-           ;; choice.
-           [(and (not (null? val)) (equal? choices (drop-right val 1)))
-            (set! choices val)
-            (send v append (choice->label (last val)))
-            (send v set-selection (sub1 (length val)))]
-
-           ;; Otherwise, update the choices and try to preserve the
-           ;; current selection if it's a part of the new set.
-           [else
-            (define selection (send v get-selection))
-            (define old-choice (and selection (list-ref choices selection)))
-            (set! choices val)
-            (send v set (map choice->label val))
-            (define index (index-of choices old-choice))
-            (when (and selection index)
-              (send v set-selection index))])]
-        [@selection-index
-         (when val
-           (unless (eqv? (send v get-selection) val)
-             (send v set-selection val)))]
+        [@choices&selection&index
+         (match-define (list choices selection index) val)
+         (define labels (map choice->label choices))
+         (unless (equal? last-labels labels)
+           (send v set labels))
+         (when index
+           (send v set-selection index))
+         (set! last-choices choices)
+         (set! last-labels labels)
+         (set! last-selection selection)
+         (set! last-index index)]
         [@alignment
          (send/apply v set-alignment val)]
         [@enabled?
@@ -128,7 +131,8 @@
 
 (define (tabs @choices action
               #:choice->label [choice->label values]
-              #:selection [@selection-index #f]
+              #:choice=? [choice=? equal?]
+              #:selection [@selection #f]
               #:alignment [@alignment '(left center)]
               #:enabled? [@enabled? #t]
               #:style [style null]
@@ -138,8 +142,8 @@
               #:stretch [@stretch '(#t #t)]
               . children)
   (new tabs%
-       [@choices @choices]
-       [@selection-index @selection-index]
+       [@choices (->obs @choices)]
+       [@selection (->obs @selection)]
        [@alignment @alignment]
        [@enabled? @enabled?]
        [@spacing @spacing]
@@ -149,4 +153,5 @@
        [children children]
        [style style]
        [action action]
-       [choice->label choice->label]))
+       [choice->label choice->label]
+       [choice=? choice=?]))

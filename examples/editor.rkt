@@ -13,23 +13,8 @@
     (split-path p))
   (path->string filename))
 
-(define @buffers (@ null))
-(define @buffer-index (@ #f))
-(define @current-buffer
-  (obs-debounce
-   #:duration 100
-   (obs-combine
-    (λ (buffers index)
-      (and index
-           (< index (length buffers))
-           (list-ref buffers index)))
-    @buffers @buffer-index)))
-
-(define (remove-at-index xs idx)
-  (for/list ([x (in-list xs)]
-             [i (in-naturals)]
-             #:unless (= i idx))
-    x))
+(define/obs @buffers null)
+(define/obs @buffer #f)
 
 (render
  (window
@@ -44,35 +29,33 @@
           (define contents
             (call-with-input-file filename port->string))
           (@buffers . <~ . (λ (buffers)
-                             (append buffers (list (buffer filename contents))))))))))
+                             (define buf (buffer filename contents))
+                             (begin0 (append buffers (list buf))
+                               (@buffer . := . buf)))))))))
   (tabs
    #:style '(no-border can-close can-reorder)
+   #:selection @buffer
    #:choice->label buffer-name
-   #:selection @buffer-index
+   #:choice=? eq?
    @buffers
-   (let ([ignore-select? #f])
-     (λ (event buffers index)
-       (case event
-         [(close)
-          (when (= (obs-peek @buffer-index) index)
-            (@buffer-index . := . (max 0 (sub1 index))))
-          (@buffers . := . (remove-at-index buffers index))]
+   (λ (event bs b)
+     (case event
+       [(close)
+        (@buffers . := . bs)
+        (@buffer . := . b)]
 
-         [(reorder)
-          (set! ignore-select? #t)
-          (@buffers . := . buffers)
-          (@buffer-index . := . index)]
+       [(reorder)
+        (@buffers . := . bs)]
 
-         [(select)
-          (unless ignore-select?
-            (@buffer-index . := . index))
-          (set! ignore-select? #f)])))
+       [(select)
+        (@buffers . := . bs)
+        (@buffer . := . b)]))
    (input
     #:font (font "Operator Mono" 12 #:weight 'light #:family 'modern)
     #:style '(multiple)
     #:margin '(0 0)
     #:stretch '(#t #t)
-    (@current-buffer . ~> . (λ (b)
-                              (cond
-                                [b (buffer-contents b)]
-                                [else ""])))))))
+    (@buffer . ~> . (λ (b)
+                      (cond
+                        [b (buffer-contents b)]
+                        [else ""])))))))
