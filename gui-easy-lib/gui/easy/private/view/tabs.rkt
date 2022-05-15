@@ -39,6 +39,7 @@
       (match-define (list w h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
       (match-define (list choices selection index) (peek @choices&selection&index))
+      (define labels (map choice->label choices))
       (define the-panel
         (new (class gui:tab-panel%
                (super-new)
@@ -54,18 +55,20 @@
                               [c (in-list last-choices)]
                               #:unless (= idx index))
                      c))
+                 (define num-choices (length removed-choices))
                  (define adjusted-selection
                    (cond
                      [(null? removed-choices) #f]
                      [(not (eqv? index last-index)) last-selection]
-                     [(= (length removed-choices) 1) (car removed-choices)]
+                     [(= index num-choices) (last removed-choices)]
+                     [(= num-choices 1) (car removed-choices)]
                      [(zero? index) (car removed-choices)]
-                     [else (list-ref removed-choices (sub1 index))]))
+                     [else (list-ref removed-choices index)]))
                  (action 'close removed-choices adjusted-selection))
                (define/override (on-new-request)
                  (action 'new last-choices last-selection)))
              [parent parent]
-             [choices (map choice->label choices)]
+             [choices labels]
              [callback (λ (self _event)
                          (define index (send self get-selection))
                          (action 'select last-choices (and index (list-ref last-choices index))))]
@@ -81,6 +84,7 @@
              [stretchable-height h-s?]))
       (begin0 the-panel
         (set! last-choices choices)
+        (set! last-labels labels)
         (when index
           (set! last-selection selection)
           (set! last-index index)

@@ -200,16 +200,16 @@
   The @racket[#:choice->label] argument controls how each choice is
   displayed and the @racket[#:choice=?] argument controls how the
   current @racket[#:selection] is compared against the list of choices
-  to determine the selection index.
+  to determine the currently selected tab.
 
   On user interaction, @racket[action] is called with a symbol
   representing the event, the set of choices at the moment the action
   occurred and the current selection.  The selection may be adjusted
   depending on the event (eg. when the current tab is closed, the
-  selection changes to an adjacent tab).
+  selection changes to an adjacent tab).  When tabs are reordered, the
+  choices provided to the action represent the new tab order.
 
-  See @filepath{examples/tabs.rkt} and @filepath{examples/tabs2.rkt}
-  for examples.
+  See @filepath{examples/tabs.rkt} for an example.
 }
 
 @defproc[(if-view [cond-value (maybe-obs/c any/c)]
