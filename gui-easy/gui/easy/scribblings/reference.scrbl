@@ -210,6 +210,11 @@
   choices provided to the action represent the new tab order.
 
   See @filepath{examples/tabs.rkt} for an example.
+
+  @history[
+    #:changed "0.3" @elem{Added the @racket[#:choice=?] argument.}
+    #:changed "0.3" @elem{The @racket[selection] is now a value in the set of choices instead of an index.}
+  ]
 }
 
 @defproc[(if-view [cond-value (maybe-obs/c any/c)]
