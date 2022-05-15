@@ -62,7 +62,6 @@
                      [(not (eqv? index last-index)) last-selection]
                      [(= index num-choices) (last removed-choices)]
                      [(= num-choices 1) (car removed-choices)]
-                     [(zero? index) (car removed-choices)]
                      [else (list-ref removed-choices index)]))
                  (action 'close removed-choices adjusted-selection))
                (define/override (on-new-request)
