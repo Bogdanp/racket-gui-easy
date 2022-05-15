@@ -1,11 +1,11 @@
 #lang racket/base
 
-(require (prefix-in gui: racket/gui)
+(require racket/class
+         (prefix-in gui: racket/gui)
          racket/gui/easy
-         racket/gui/easy/operator
-         racket/port)
+         racket/gui/easy/operator)
 
-(struct buffer (path contents) #:transparent)
+(struct buffer (path text) #:transparent)
 
 (define (buffer-name b)
   (define p (buffer-path b))
@@ -15,6 +15,39 @@
 
 (define/obs @buffers null)
 (define/obs @buffer #f)
+
+(define editor-canvas%
+  (class* object% (view<%>)
+    (init-field @editor)
+    (super-new)
+
+    (define/public (dependencies)
+      (list @editor))
+
+    (define/public (create parent)
+      (new gui:editor-canvas%
+           [parent parent]
+           [editor (obs-peek @editor)]))
+
+    (define/public (update v what val)
+      (case/dep what
+        [@editor
+         (send v set-editor val)]))
+
+    (define/public (destroy v)
+      (void))))
+
+(define (editor-canvas @editor)
+  (new editor-canvas% [@editor @editor]))
+
+(define editor-styles
+  (let ([sl (new gui:style-list%)])
+    (define dt (new gui:style-delta%))
+    (send dt set-delta-face "Dank Mono" 'modern)
+    (send dt set-delta 'change-weight 'normal)
+    (define style (send sl find-or-create-style (send sl basic-style) dt))
+    (define _std (send sl new-named-style "Standard" style))
+    sl))
 
 (render
  (window
@@ -26,10 +59,11 @@
      (when filename
        (thread
         (lambda ()
-          (define contents
-            (call-with-input-file filename port->string))
+          (define text (new gui:text%))
+          (send text load-file filename)
+          (send text set-style-list editor-styles)
           (@buffers . <~ . (λ (buffers)
-                             (define buf (buffer filename contents))
+                             (define buf (buffer filename text))
                              (begin0 (append buffers (list buf))
                                (@buffer . := . buf)))))))))
   (tabs
@@ -50,12 +84,4 @@
        [(select)
         (@buffers . := . bs)
         (@buffer . := . b)]))
-   (input
-    #:font (font "Operator Mono" 12 #:weight 'light #:family 'modern)
-    #:style '(multiple)
-    #:margin '(0 0)
-    #:stretch '(#t #t)
-    (@buffer . ~> . (λ (b)
-                      (cond
-                        [b (buffer-contents b)]
-                        [else ""])))))))
+   (editor-canvas (@buffer . ~> . (λ (maybe-b) (and maybe-b (buffer-text maybe-b))))))))
