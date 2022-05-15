@@ -22,6 +22,6 @@
               (case event
                 [(return)
                  (@num . := . (string->number text))])))))
-   (button "Clearn" (λ ()
-                      (@text . := . "")
-                      (@num  . := . #f))))))
+   (button "Clear" (λ ()
+                     (@text . := . "")
+                     (@num  . := . #f))))))
