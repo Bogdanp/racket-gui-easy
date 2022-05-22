@@ -3,9 +3,9 @@
 (require racket/class
          (prefix-in gui: racket/gui)
          racket/match
-         racket/runtime-path
          "../observable.rkt"
          "common.rkt"
+         "keymap.rkt"
          "view.rkt")
 
 (provide
@@ -120,19 +120,13 @@
     (define/public (destroy _v)
       (void))))
 
-;; Loading foundation takes a while, so do your best to defer that
-;; cost until it's actually necessary.
-(define no-keymap (gensym))
-(define-runtime-module-path-index keymap.rkt
-  "keymap.rkt")
-
 (define (input @content [action void]
                #:label [@label #f]
                #:enabled? [@enabled? #t]
                #:background-color [@background-color #f]
                #:style [style '(single)]
                #:font [font gui:normal-control-font]
-               #:keymap [keymap no-keymap]
+               #:keymap [keymap the-default-keymap]
                #:margin [@margin '(2 2)]
                #:min-size [@min-size '(#f #f)]
                #:stretch [@stretch '(#t #f)]
@@ -150,8 +144,6 @@
        [action action]
        [style style]
        [font font]
-       [keymap (if (eq? keymap no-keymap)
-                   (dynamic-require keymap.rkt 'the-default-keymap)
-                   keymap)]
+       [keymap keymap]
        [value=? value=?]
        [value->text value->text]))
