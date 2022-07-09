@@ -12,8 +12,14 @@
  render
  render-popup-menu
 
+ current-renderer
  renderer<%>
  renderer-root)
+
+(define current-renderer
+  (make-parameter #f))
+
+(struct dependency-set (deps procs))
 
 (define id-seq (box 0))
 (define update-id-seq! (make-box-update-proc id-seq))
@@ -30,32 +36,48 @@
     (field [id (next-id!)])
     (super-new)
 
+    (define depss null)
     (define root #f)
     (define/public (get-root) root)
 
-    (define deps (send tree dependencies))
-    (define handlers null)
-
     (define/public (render parent)
-      (set! root (send tree create parent))
-      (set! handlers (for/list ([dep (in-list deps)])
-                       (define (f v)
-                         (gui:queue-callback
-                          (lambda ()
-                            (send tree update root dep v))))
-                       (begin0 f
-                         (obs-observe! dep f))))
+      (parameterize ([current-renderer this])
+        (set! root (send tree create parent)))
+      (do-register-dependencies (send tree dependencies) tree root)
       root)
 
     (define/public (destroy)
-      (for ([dep (in-list deps)]
-            [handler (in-list handlers)])
-        (obs-unobserve! dep handler))
-      (hash-remove! renderers id)
       (gui:queue-callback
        (lambda ()
-         (send tree destroy root)
-         (set! root #f))))))
+         (hash-remove! renderers id)
+         (for-each do-unregister-dependencies depss)
+         (parameterize ([current-renderer this])
+           (send tree destroy root))
+         (set! root #f))))
+
+    (define/public (register-dependencies deps tree root)
+      (do-register-dependencies deps tree root))
+
+    (define/public (unregister-dependencies s)
+      (do-unregister-dependencies s))
+
+    (define (do-register-dependencies deps tree root)
+      (define s
+        (dependency-set deps (for/list ([dep (in-list deps)])
+                               (define (proc v)
+                                 (gui:queue-callback
+                                  (lambda ()
+                                    (parameterize ([current-renderer this])
+                                      (send tree update root dep v)))))
+                               (begin0 proc
+                                 (obs-observe! dep proc)))))
+      (begin0 s
+        (set! depss (cons s depss))))
+
+    (define (do-unregister-dependencies s)
+      (for ([dep (in-list (dependency-set-deps s))]
+            [proc (in-list (dependency-set-procs s))])
+        (obs-unobserve! dep proc)))))
 
 (define (embed parent tree)
   (define r (new renderer% [tree tree]))
