@@ -75,6 +75,7 @@
         (set! depss (cons s depss))))
 
     (define (do-unregister-dependencies s)
+      (set! depss (remq s depss))
       (for ([dep (in-list (dependency-set-deps s))]
             [proc (in-list (dependency-set-procs s))])
         (obs-unobserve! dep proc)))))

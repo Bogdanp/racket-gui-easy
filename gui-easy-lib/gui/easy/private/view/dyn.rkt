@@ -6,6 +6,7 @@
          "../renderer.rkt"
          "common.rkt"
          "container.rkt"
+         "proxy.rkt"
          "view.rkt")
 
 (provide
@@ -50,7 +51,7 @@
 
     (define (create&add-child pane data)
       (set! current-data data)
-      (set! current-view (make-view data))
+      (set! current-view (proxy (make-view data)))
       (define deps (send current-view dependencies))
       (define widget (send current-view create pane))
       (set! current-deps (send (current-renderer) register-dependencies deps current-view widget))
