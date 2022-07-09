@@ -14,6 +14,7 @@
  window-view<%>
  popup-menu-view<%>
  case/dep
+ if-view
  cond-view
  case-view
  (contract-out
@@ -56,10 +57,6 @@
               #:stretch (maybe-obs/c stretch/c))
              #:rest (listof (is-a?/c view<%>))
              (is-a?/c view<%>))]
-  [if-view (-> (maybe-obs/c any/c)
-               (is-a?/c view<%>)
-               (is-a?/c view<%>)
-               (is-a?/c view<%>))]
   [dyn-view (->* (obs? (-> any/c (is-a?/c view<%>)))
                  (#:equal? (-> any/c any/c any/c))
                  (is-a?/c view<%>))]

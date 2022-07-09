@@ -217,9 +217,10 @@
   ]
 }
 
-@defproc[(if-view [cond-value (maybe-obs/c any/c)]
-                  [then-view (is-a?/c view<%>)]
-                  [else-view (is-a?/c view<%>)]) (is-a?/c view<%>)]{
+@defform[(if-view cond-e then-e else-e)
+         #:contracts ([cond-e (maybe-obs/c any/c)]
+                      [then-e (is-a?/c view<%>)]
+                      [else-e (is-a?/c view<%>)])]{
 
   Returns a repersentation of a panel that renders @racket[then-view]
   when the current-value of @racket[cond-value] is truthy and

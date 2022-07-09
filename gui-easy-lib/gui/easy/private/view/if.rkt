@@ -91,30 +91,34 @@
         (send else-view destroy (get-child else-view))
         (remove-child else-view)))))
 
-(define (if-view @cond-e then-view else-view)
+(define (make-if-view @cond-e then-view else-view)
   (new if-view%
        [@cond-e @cond-e]
        [then-view then-view]
        [else-view else-view]
        [children null]))
 
+(define-syntax-parser if-view
+  [(_ @cond-e:expr then-e:expr else-e:expr)
+   #'(make-if-view @cond-e then-e else-e)])
+
 (define-syntax-parser cond-view
   #:literals (else)
-  [(_ [@cond-e:expr view-e:expr] [else else-e:expr])
-   #'(if-view @cond-e view-e else-e)]
+  [(_ [@cond-e:expr then-e:expr] [else else-e:expr])
+   #'(make-if-view @cond-e then-e else-e)]
 
-  [(_ [@cond-e-1:expr view-e-1:expr] [@cond-e:expr view-e:expr] ... [else else-e:expr])
-   #'(if-view @cond-e-1
-              view-e-1
-              (cond-view
-               [@cond-e view-e] ...
-               [else else-e]))])
+  [(_ [@cond-e-1:expr then-e-1:expr] [@cond-e:expr then-e:expr] ... [else else-e:expr])
+   #'(make-if-view @cond-e-1
+                   then-e-1
+                   (cond-view
+                    [@cond-e then-e] ...
+                    [else else-e]))])
 
 (define-syntax-parser case-view
   #:literals (else)
   [(_ @e
-      [(lit ...+) view-e:expr] ...
+      [(lit ...+) then-e:expr] ...
       [else else-e:expr])
    #'(cond-view
-      [(obs-map @e (λ (e) (member e '(lit ...)))) view-e] ...
+      [(obs-map @e (λ (e) (member e '(lit ...)))) then-e] ...
       [else else-e])])
