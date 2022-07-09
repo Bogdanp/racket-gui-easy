@@ -73,7 +73,7 @@
         (set! view-id (proxy (view-proc)))
         (define deps (send view-id dependencies))
         (define widget (send view-id create pane))
-        (set! deps-id (send (current-renderer) register-dependencies deps view-id widget))
+        (set! deps-id (send (current-renderer) add-dependencies deps view-id widget))
         (add-child view-id widget)))
 
     (define-adder create&add-then-view then-proc then-view then-deps)
@@ -81,7 +81,7 @@
 
     (define-syntax-rule (define-remover id view-id deps-id)
       (define (id pane)
-        (send (current-renderer) unregister-dependencies deps-id)
+        (send (current-renderer) remove-dependencies deps-id)
         (define widget (get-child view-id))
         (send pane delete-child widget)
         (send view-id destroy widget)

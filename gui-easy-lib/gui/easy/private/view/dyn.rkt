@@ -54,11 +54,11 @@
       (set! current-view (proxy (make-view data)))
       (define deps (send current-view dependencies))
       (define widget (send current-view create pane))
-      (set! current-deps (send (current-renderer) register-dependencies deps current-view widget))
+      (set! current-deps (send (current-renderer) add-dependencies deps current-view widget))
       (add-child current-view widget))
 
     (define (remove&destroy-child pane)
-      (send (current-renderer) unregister-dependencies current-deps)
+      (send (current-renderer) remove-dependencies current-deps)
       (define widget (get-child current-view))
       (send current-view destroy widget)
       (send pane delete-child widget)

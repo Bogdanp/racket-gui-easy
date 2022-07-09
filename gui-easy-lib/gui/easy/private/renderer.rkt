@@ -43,25 +43,25 @@
     (define/public (render parent)
       (parameterize ([current-renderer this])
         (set! root (send tree create parent)))
-      (do-register-dependencies (send tree dependencies) tree root)
+      (do-add-dependencies (send tree dependencies) tree root)
       root)
 
     (define/public (destroy)
       (gui:queue-callback
        (lambda ()
          (hash-remove! renderers id)
-         (for-each do-unregister-dependencies depss)
+         (for-each do-remove-dependencies depss)
          (parameterize ([current-renderer this])
            (send tree destroy root))
          (set! root #f))))
 
-    (define/public (register-dependencies deps tree root)
-      (do-register-dependencies deps tree root))
+    (define/public (add-dependencies deps tree root)
+      (do-add-dependencies deps tree root))
 
-    (define/public (unregister-dependencies s)
-      (do-unregister-dependencies s))
+    (define/public (remove-dependencies s)
+      (do-remove-dependencies s))
 
-    (define (do-register-dependencies deps tree root)
+    (define (do-add-dependencies deps tree root)
       (define s
         (dependency-set deps (for/list ([dep (in-list deps)])
                                (define (proc v)
@@ -74,7 +74,7 @@
       (begin0 s
         (set! depss (cons s depss))))
 
-    (define (do-unregister-dependencies s)
+    (define (do-remove-dependencies s)
       (set! depss (remq s depss))
       (for ([dep (in-list (dependency-set-deps s))]
             [proc (in-list (dependency-set-procs s))])
