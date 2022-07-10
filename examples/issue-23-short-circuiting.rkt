@@ -77,7 +77,7 @@
 ;; `@current-character' to a string name using `human-name'.  After
 ;; that view is replaced, that mapping lingers for some time until it
 ;; is garbage-collected, and if the "type" of character changes, it
-;; raises an error asynchronously.  That error can be safely avoided
+;; raises an error asynchronously.  That error can be safely ignored
 ;; since it's on a different thread, but that's not exactly pretty.
 ;; Instead, we use this procedure to ensure disjoint views always get
 ;; observables of the correct type by plugging in dummy values when
