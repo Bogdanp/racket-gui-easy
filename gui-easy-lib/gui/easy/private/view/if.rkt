@@ -84,7 +84,7 @@
         (define widget (get-child view-id))
         (send pane delete-child widget)
         (send view-id destroy widget)
-        (remove-child widget)
+        (remove-child view-id)
         (set! view-id #f)
         (set! deps-id #f)))
 
