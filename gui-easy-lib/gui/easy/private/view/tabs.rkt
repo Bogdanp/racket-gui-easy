@@ -16,7 +16,7 @@
   (class* container% (view<%>)
     (inherit-field children)
     (init-field @choices @selection @alignment @enabled? @spacing @margin @min-size @stretch style action choice->label choice=?)
-    (inherit child-dependencies add-child update-children destroy-children)
+    (inherit child-dependencies add-child get-child update-children destroy-children)
     (super-new)
 
     (define last-choices null)
@@ -129,7 +129,9 @@
            (stretchable-height h-s?))])
       (update-children what val))
 
-    (define/public (destroy _v)
+    (define/public (destroy v)
+      (for ([c (in-list children)])
+        (send v delete-child (get-child c)))
       (destroy-children))))
 
 (define (tabs @choices action

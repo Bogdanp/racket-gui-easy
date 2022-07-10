@@ -27,7 +27,7 @@
   (class* container% (window-view<%>)
     (inherit-field children)
     (init-field @title @size @alignment @position @min-size @stretch style)
-    (inherit child-dependencies add-child update-children destroy-children)
+    (inherit child-dependencies add-child get-child update-children destroy-children)
     (super-new)
 
     (define/public (dependencies)
@@ -89,6 +89,8 @@
       (update-children what val))
 
     (define/public (destroy v)
+      (for ([c (in-list children)])
+        (send v delete-child (get-child c)))
       (destroy-children)
       (send v show #f))
 

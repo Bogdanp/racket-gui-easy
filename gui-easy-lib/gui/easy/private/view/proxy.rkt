@@ -31,7 +31,8 @@
 
     (define/public (destroy v)
       (send target destroy v)
-      (set! destroyed? #t))))
+      (set! destroyed? #t)
+      (set! target #f))))
 
 (define (proxy target)
   (new proxy% [target target]))
