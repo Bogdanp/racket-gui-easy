@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require racket/class
+         "../logger.rkt"
          "view.rkt")
 
 (provide
@@ -30,9 +31,13 @@
         (send target update v what val)))
 
     (define/public (destroy v)
-      (send target destroy v)
-      (set! destroyed? #t)
-      (set! target #f))))
+      (cond
+        [destroyed?
+         (log-gui-easy-warning "view ~e destroyed a second time" v)]
+        [else
+         (send target destroy v)
+         (set! destroyed? #t)
+         (set! target #f)]))))
 
 (define (proxy target)
   (new proxy% [target target]))
