@@ -36,12 +36,11 @@
              [stretchable-width #t]
              [stretchable-height #t]))
       (begin0 the-pane
-        (set! last-bool (->bool (peek @cond-e)))
         (if last-bool
             (create&add-then-view the-pane)
             (create&add-else-view the-pane))))
 
-    (define last-bool #f)
+    (define last-bool (->bool (peek @cond-e)))
     (define then-view #f)
     (define else-view #f)
     (define then-deps #f)
@@ -123,5 +122,5 @@
       [(lit ...+) then-e:expr] ...
       [else else-e:expr])
    #'(cond-view
-      [(obs-map @e (λ (e) (member e '(lit ...)))) then-e] ...
+      [(obs-map @e (λ (e) (memv e '(lit ...)))) then-e] ...
       [else else-e])])

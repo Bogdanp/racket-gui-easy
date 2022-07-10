@@ -26,5 +26,6 @@
                (text (@timer . ~> . ~a))))
             (text "Off"))
    (hpanel
+    #:alignment '(center center)
     (button "Update" (λ () (@seq . <~ . add1)))
     (button "Toggle" (λ () (@on? . <~ . not)))))))

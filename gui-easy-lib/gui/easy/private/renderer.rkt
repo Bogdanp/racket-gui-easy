@@ -28,7 +28,12 @@
 
 (define renderers (make-hasheqv))
 (define renderer<%>
-  (interface () get-root render destroy))
+  (interface ()
+    get-root
+    render
+    add-dependencies
+    remove-dependencies
+    destroy))
 
 (define renderer%
   (class* object% (renderer<%>)
@@ -43,8 +48,14 @@
     (define/public (render parent)
       (parameterize ([current-renderer this])
         (set! root (send tree create parent)))
-      (do-add-dependencies (send tree dependencies) tree root)
-      root)
+      (begin0 root
+        (do-add-dependencies (send tree dependencies) tree root)))
+
+    (define/public (add-dependencies deps tree root)
+      (do-add-dependencies deps tree root))
+
+    (define/public (remove-dependencies s)
+      (do-remove-dependencies s))
 
     (define/public (destroy)
       (gui:queue-callback
@@ -54,12 +65,6 @@
          (parameterize ([current-renderer this])
            (send tree destroy root))
          (set! root #f))))
-
-    (define/public (add-dependencies deps tree root)
-      (do-add-dependencies deps tree root))
-
-    (define/public (remove-dependencies s)
-      (do-remove-dependencies s))
 
     (define (do-add-dependencies deps tree root)
       (define s
@@ -75,10 +80,10 @@
         (set! depss (cons s depss))))
 
     (define (do-remove-dependencies s)
-      (set! depss (remq s depss))
       (for ([dep (in-list (dependency-set-deps s))]
             [proc (in-list (dependency-set-procs s))])
-        (obs-unobserve! dep proc)))))
+        (obs-unobserve! dep proc))
+      (set! depss (remq s depss)))))
 
 (define (embed parent tree)
   (define r (new renderer% [tree tree]))
