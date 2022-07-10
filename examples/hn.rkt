@@ -195,7 +195,7 @@
 (async (@top-stories . := . (get-top-stories 50)))
 (async (@new-stories . := . (get-new-stories 50)))
 
-(define section-list
+(define (section-list)
   (hpanel
    #:min-size '(150 #f)
    #:stretch '(#f #t)
@@ -280,7 +280,7 @@
             (story-view @mode @story)
             (hpanel
              #:alignment '(left top)
-             section-list
+             (section-list)
              (story-list
               @mode
               (obs-combine
