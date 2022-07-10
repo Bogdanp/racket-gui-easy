@@ -1,10 +1,12 @@
 #lang racket/base
 
 (require racket/class
+         (prefix-in gui: racket/gui)
          racket/gui/easy
          racket/gui/easy/operator)
 
 (define/obs @visible? #t)
+
 (render
  (window
   #:mixin (λ (%)
@@ -18,7 +20,8 @@
    "Hide temporarily..."
    (λ ()
      (@visible? . := . #f)
-     (thread
-      (λ ()
-        (sleep 5)
-        (@visible? . := . #t)))))))
+     (new gui:timer%
+          [interval 5000]
+          [just-once? #t]
+          [notify-callback (lambda ()
+                             (@visible? . := . #t))])))))
