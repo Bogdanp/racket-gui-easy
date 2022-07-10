@@ -10,11 +10,10 @@
     (init-field children)
     (super-new)
 
-    (define deps-to-children
-      (for*/fold ([h (hash)])
-                 ([c (in-list children)]
-                  [d (in-list (send c dependencies))])
-        (hash-update h d (λ (cs) (cons c cs)) null)))
+    (define deps-to-children (make-hash))
+    (for* ([c (in-list children)]
+           [d (in-list (send c dependencies))])
+      (hash-update! deps-to-children d (λ (cs) (cons c cs)) null))
 
     (define/public (child-dependencies)
       (hash-keys deps-to-children))
@@ -26,7 +25,10 @@
     (define/public (destroy-children)
       (for ([(c w) (in-hash children-to-widgets)])
         (send c destroy w)
-        (remove-child c)))
+        (remove-child c))
+      (hash-clear! deps-to-children)
+      (hash-clear! children-to-widgets)
+      (set! children null))
 
     (define children-to-widgets (make-hasheq))
 
