@@ -18,30 +18,36 @@
     (define/public (dependencies)
       (filter obs? (list @data @label @enabled? @margin @min-size @stretch)))
 
-    (define snip #f)
     (define/public (create parent)
       (match-define (list h-m v-m) (peek @margin))
       (match-define (list min-w min-h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
-      (new %
-           [parent parent]
-           [make-snip (let ([data (peek @data)])
-                        (λ (w h)
-                          (set! snip (make-snip data w h))
-                          snip))]
-           [label (peek @label)]
-           [style style]
-           [enabled (peek @enabled?)]
-           [horiz-margin h-m]
-           [vert-margin v-m]
-           [min-width min-w]
-           [min-height min-h]
-           [stretchable-width w-s?]
-           [stretchable-height h-s?]))
+      (define the-snip-canvas
+        (new (context-mixin %)
+             [parent parent]
+             [make-snip (let ([data (peek @data)])
+                          (λ (w h)
+                            (define the-snip (make-snip data w h))
+                            (begin0 the-snip
+                              (send the-snip-canvas set-context 'snip the-snip))))]
+             [label (peek @label)]
+             [style style]
+             [enabled (peek @enabled?)]
+             [horiz-margin h-m]
+             [vert-margin v-m]
+             [min-width min-w]
+             [min-height min-h]
+             [stretchable-width w-s?]
+             [stretchable-height h-s?]))
+      the-snip-canvas)
 
     (define/public (update v what val)
       (case/dep what
-        [@data (when snip (update-snip snip val))]
+        [@data
+         (define the-snip
+           (send v get-context 'snip #f))
+         (when the-snip
+           (update-snip the-snip val))]
         [@label (send v set-label val)]
         [@enabled? (send v enable val)]
         [@margin
@@ -60,8 +66,8 @@
            (stretchable-width w-s?)
            (stretchable-height h-s?))]))
 
-    (define/public (destroy _v)
-      (void))))
+    (define/public (destroy v)
+      (send v clear-context))))
 
 (define (snip @data make-snip
               [update-snip void]
