@@ -21,8 +21,6 @@
     (init-field @input @label @enabled? @margin @min-size @stretch draw style)
     (super-new)
 
-    (define input #f)
-
     (define/public (dependencies)
       (filter obs? (list @input @label @enabled? @margin @min-size @stretch)))
 
@@ -30,25 +28,27 @@
       (match-define (list h-m v-m) (peek @margin))
       (match-define (list min-w min-h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
-      (set! input (peek @input))
-      (new %
-           [parent parent]
-           [paint-callback (λ (_self dc)
-                             (draw dc input))]
-           [label (peek @label)]
-           [enabled (peek @enabled?)]
-           [style style]
-           [horiz-margin h-m]
-           [vert-margin v-m]
-           [min-width min-w]
-           [min-height min-h]
-           [stretchable-width w-s?]
-           [stretchable-height h-s?]))
+      (define the-canvas
+        (new (context-mixin %)
+             [parent parent]
+             [paint-callback (λ (self dc)
+                               (draw dc (send self get-context 'input #f)))]
+             [label (peek @label)]
+             [enabled (peek @enabled?)]
+             [style style]
+             [horiz-margin h-m]
+             [vert-margin v-m]
+             [min-width min-w]
+             [min-height min-h]
+             [stretchable-width w-s?]
+             [stretchable-height h-s?]))
+      (begin0 the-canvas
+        (send the-canvas set-context 'input (peek @input))))
 
     (define/public (update v what val)
       (case/dep what
         [@input
-         (set! input val)
+         (send v set-context 'input val)
          (send v refresh)]
         [@label
          (send v set-label val)]

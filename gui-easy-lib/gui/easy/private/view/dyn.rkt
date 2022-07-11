@@ -4,7 +4,6 @@
          (prefix-in gui: racket/gui)
          "../renderer.rkt"
          "common.rkt"
-         "container.rkt"
          "proxy.rkt"
          "view.rkt")
 
@@ -12,20 +11,16 @@
  dyn-view)
 
 (define dyn-view%
-  (class* container% (view<%>)
+  (class* object% (view<%>)
     (init-field @data make-view equal?-proc)
-    (inherit add-child get-child has-child? remove-child)
-    (super-new [children null])
+    (super-new)
 
     (define/public (dependencies)
       (list @data))
 
-    (define current-data #f)
-    (define current-view #f)
-    (define current-deps #f)
     (define/public (create parent)
       (define the-pane
-        (new gui:panel%
+        (new (context-mixin gui:panel%)
              [parent parent]
              [min-width #f]
              [min-height #f]
@@ -37,34 +32,32 @@
     (define/public (update v what val)
       (case/dep what
         [@data
-         (unless (equal?-proc val current-data)
+         (unless (equal?-proc val (send v get-context 'data gensym))
            (send v begin-container-sequence)
-           (when (has-child? current-view)
-             (remove&destroy-child v))
+           (remove&destroy-child v)
            (create&add-child v val)
            (send v end-container-sequence))]))
 
     (define/public (destroy v)
-      (when (has-child? current-view)
-        (remove&destroy-child v)))
+      (remove&destroy-child v))
 
     (define (create&add-child pane data)
-      (set! current-data data)
-      (set! current-view (proxy (make-view data)))
-      (define deps (send current-view dependencies))
-      (define widget (send current-view create pane))
-      (set! current-deps (send (current-renderer) add-dependencies deps current-view widget))
-      (add-child current-view widget))
+      (define view (proxy (make-view data)))
+      (define deps (send view dependencies))
+      (define widget (send view create pane))
+      (define depset (send (current-renderer) add-dependencies deps view widget))
+      (send pane set-context* 'data data 'view view 'widget widget 'deps depset))
 
     (define (remove&destroy-child pane)
-      (send (current-renderer) remove-dependencies current-deps)
-      (define widget (get-child current-view))
-      (send current-view destroy widget)
-      (send pane delete-child widget)
-      (remove-child current-view)
-      (set! current-data #f)
-      (set! current-view #f)
-      (set! current-deps #f))))
+      (define view
+        (send pane get-context 'view #f))
+      (when view
+        (define deps (send pane get-context 'deps))
+        (define widget (send pane get-context 'widget))
+        (send (current-renderer) remove-dependencies deps)
+        (send view destroy (send pane get-context 'view))
+        (send pane delete-child widget)
+        (send pane clear-context)))))
 
 (define (dyn-view @data make-view #:equal? [equal?-proc equal?])
   (new dyn-view%
