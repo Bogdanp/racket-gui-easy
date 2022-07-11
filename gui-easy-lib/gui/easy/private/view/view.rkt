@@ -13,7 +13,7 @@
   (class %
     (super-new)
 
-    (define ctx (make-ephemeron-hasheq))
+    (define ctx (make-hasheq))
     (define/public (set-context k v)
       (hash-set! ctx k v))
     (define/public (set-context* . k&vs)

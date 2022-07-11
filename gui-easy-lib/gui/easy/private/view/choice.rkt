@@ -104,8 +104,8 @@
            (stretchable-width w-s?)
            (stretchable-height h-s?))]))
 
-    (define/public (destroy _v)
-      (void))))
+    (define/public (destroy v)
+      (send v clear-context))))
 
 (define (choice @choices action
                 #:choice->label [choice->label values]

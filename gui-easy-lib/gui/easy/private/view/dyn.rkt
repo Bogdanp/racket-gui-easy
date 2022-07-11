@@ -39,7 +39,8 @@
            (send v end-container-sequence))]))
 
     (define/public (destroy v)
-      (remove&destroy-child v))
+      (remove&destroy-child v)
+      (send v clear-context))
 
     (define (create&add-child pane data)
       (define view (proxy (make-view data)))
