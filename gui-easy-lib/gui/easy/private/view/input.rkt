@@ -19,18 +19,17 @@
     (define/public (dependencies)
       (filter obs? (list @label @content @enabled? @background-color @margin @min-size @stretch)))
 
-    (define last-val #f)
     (define/public (create parent)
-      (set! last-val (peek @content))
+      (define content (peek @content))
       (match-define (list h-m v-m) (peek @margin))
       (match-define (list w h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
       (define background-color (peek @background-color))
       (define the-field
-        (new clazz
+        (new (context-mixin clazz)
              [parent parent]
              [label (peek @label)]
-             [init-value (value->text last-val)]
+             [init-value (value->text content)]
              [enabled (peek @enabled?)]
              [callback (λ (self event)
                          (action
@@ -49,7 +48,8 @@
       (begin0 the-field
         (when background-color
           (send the-field set-field-background background-color))
-        (send+ the-field (get-editor) (set-keymap keymap))))
+        (send+ the-field (get-editor) (set-keymap keymap))
+        (send the-field set-context 'last-val content)))
 
     (define (call-preserving-position ed thunk)
       (define old-text (send ed get-text))
@@ -80,11 +80,12 @@
         [@label
          (send v set-label val)]
         [@content
+         (define last-val (send v get-context 'last-val))
          (define text
            (value->text val))
          (cond
            [(not (value=? val last-val))
-            (set! last-val val)
+            (send v set-context 'last-val val)
             (call-preserving-position
              (send v get-editor)
              (lambda ()
@@ -117,8 +118,8 @@
            (stretchable-width w-s?)
            (stretchable-height h-s?))]))
 
-    (define/public (destroy _v)
-      (void))))
+    (define/public (destroy v)
+      (send v clear-context))))
 
 (define (input @content [action void]
                #:label [@label #f]
