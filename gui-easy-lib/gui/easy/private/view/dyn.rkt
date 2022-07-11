@@ -2,7 +2,6 @@
 
 (require racket/class
          (prefix-in gui: racket/gui)
-         "../observable.rkt"
          "../renderer.rkt"
          "common.rkt"
          "container.rkt"

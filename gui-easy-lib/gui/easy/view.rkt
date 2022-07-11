@@ -1,13 +1,16 @@
 #lang racket/base
 
 (require (prefix-in gui: mrlib/snip-canvas)
-         (prefix-in p: pict)
          racket/class
          racket/contract
          (prefix-in gui: racket/gui)
+         racket/lazy-require
          "contract.rkt"
          "observable.rkt"
          "private/view.rkt")
+
+(lazy-require
+ [pict (pict?)])
 
 (provide
  view<%>
@@ -77,7 +80,7 @@
 
   ;; Canvases & Snips
   [canvas (canvas/c (-> (is-a?/c gui:dc<%>) any/c any))]
-  [pict-canvas (canvas/c (-> any/c p:pict?))]
+  [pict-canvas (canvas/c (-> any/c pict?))]
   [snip-canvas (canvas/c (-> any/c gui:dimension-integer? gui:dimension-integer? (is-a?/c gui:snip%)))]
   [snip (->* ((maybe-obs/c any/c)
               (-> any/c gui:dimension-integer? gui:dimension-integer? (is-a?/c gui:snip%)))

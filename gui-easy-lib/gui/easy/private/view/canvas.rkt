@@ -1,12 +1,15 @@
 #lang racket/base
 
-(require (prefix-in p: pict)
-         racket/class
+(require racket/class
          (prefix-in gui: racket/gui)
+         racket/lazy-require
          racket/match
          "../observable.rkt"
          "common.rkt"
          "view.rkt")
+
+(lazy-require
+ [pict (draw-pict)])
 
 (provide
  canvas
@@ -94,7 +97,7 @@
     (λ (kws kw-args @data make-pict . args)
       (define (draw dc v)
         (send dc set-smoothing 'smoothed)
-        (p:draw-pict (make-pict v) dc 0 0))
+        (draw-pict (make-pict v) dc 0 0))
       (keyword-apply canvas kws kw-args @data draw args)))
    'pict-canvas))
 
