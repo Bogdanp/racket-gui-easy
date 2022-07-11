@@ -16,8 +16,8 @@
                 entry->row columns style font action)
     (super-new)
 
-    (define single? (memq 'single style))
-    (define entries (peek @entries))
+    (define single?
+      (memq 'single style))
 
     (define/public (dependencies)
       (filter obs? (list @label @enabled? @entries @selection @margin @min-size @stretch @column-widths)))
@@ -29,7 +29,7 @@
       (define selection (peek @selection))
       (define column-widths (peek @column-widths))
       (define the-list-box
-        (new gui:list-box%
+        (new (context-mixin gui:list-box%)
              [parent parent]
              [label (peek @label)]
              [choices null]
@@ -38,6 +38,8 @@
              [columns columns]
              [enabled (peek @enabled?)]
              [callback (λ (self event)
+                         (define entries
+                           (send self get-context 'entries))
                          (case (send event get-event-type)
                            [(list-box)
                             (action 'select entries (if single?
@@ -56,7 +58,7 @@
              [stretchable-width w-s?]
              [stretchable-height h-s?]))
       (begin0 the-list-box
-        (set the-list-box entries)
+        (set the-list-box (peek @entries))
         (when selection
           (select the-list-box selection))
         (resize-columns the-list-box column-widths)))
@@ -64,9 +66,7 @@
     (define/public (update v what val)
       (case/dep what
         [@label (send v set-label v)]
-        [@entries
-         (set! entries val)
-         (set v val)]
+        [@entries (set v val)]
         [@enabled? (send v enable val)]
         [@selection (select v val)]
         [@margin
@@ -87,8 +87,8 @@
         [@column-widths
          (resize-columns v val)]))
 
-    (define/public (destroy _v)
-      (void))
+    (define/public (destroy v)
+      (send v clear-context))
 
     (define/private (set target entries)
       (define entries-by-column
@@ -99,6 +99,7 @@
             (if (> (vector-length row) idx)
                 (vector-ref row idx)
                 ""))))
+      (send target set-context 'entries entries)
       (send/apply target set entries-by-column))
 
     (define/private (select target selection)
