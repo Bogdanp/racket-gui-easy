@@ -16,8 +16,6 @@
     (init-field @label @enabled? @choices @selection @min-size @stretch style choice->label choice=? action)
     (super-new)
 
-    (define last-choices null)
-    (define last-selection #f)
     (define @choices&index
       (obs-combine
        (λ (choices selection)
@@ -39,7 +37,7 @@
       (match-define (list w-s? h-s?) (peek @stretch))
       (match-define (list choices selection) (peek @choices&index))
       (define the-choice
-        (new gui:choice%
+        (new (context-mixin gui:choice%)
              [parent parent]
              [label (peek @label)]
              [style style]
@@ -47,21 +45,24 @@
              [enabled (peek @enabled?)]
              [callback (λ (self _event)
                          (define idx (send self get-selection))
+                         (define last-choices (send self get-context 'last-choices))
                          (action (and idx (list-ref last-choices idx))))]
              [min-width min-w]
              [min-height min-h]
              [stretchable-width w-s?]
              [stretchable-height h-s?]))
       (begin0 the-choice
-        (set! last-choices choices)
+        (send the-choice set-context 'last-choices choices)
         (when selection
-          (set! last-selection (send the-choice get-string-selection))
+          (send the-choice set-context 'last-selection (send the-choice get-string-selection))
           (send the-choice set-selection selection))))
 
     (define/public (update v what val)
       (case/dep what
         [@choices&index
          (match-define (list choices index) val)
+         (define last-choices (send v get-context 'last-choices))
+         (define last-selection (send v get-context 'last-selection #f))
          (unless (choices=? choices last-choices)
            (send v clear)
            (for ([i (in-naturals)]
@@ -73,21 +74,21 @@
          (cond
            [(null? choices)
             (unless (null? last-choices)
-              (set! last-selection #f)
+              (send v set-context 'last-selection #f)
               (action #f))]
            [(and index (< index (send v get-number)))
             (define current-selection (send v get-string index))
             (unless (equal? current-selection last-selection)
-              (set! last-selection current-selection)
+              (send v set-context 'last-selection current-selection)
               (send v set-selection index))]
            [else
             (define current-selection (send v get-string-selection))
             (define current-selection-idx (send v get-selection))
             (unless (equal? current-selection last-selection)
-              (set! last-selection current-selection)
+              (send v set-context 'last-selection current-selection)
               (when (< current-selection-idx (length choices))
                 (action (list-ref choices current-selection-idx))))])
-         (set! last-choices choices)]
+         (send v set-context 'last-choices choices)]
         [@label
          (send v set-label val)]
         [@enabled?
