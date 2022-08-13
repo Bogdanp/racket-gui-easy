@@ -35,13 +35,13 @@
                                (set! last-e new-e))]
                             [else last-e]))))
 
-    (define (add-child-handlers! child-v)
+    (define (add-child-handlers! v child-v)
       (for ([dep (in-list (send child-v dependencies))])
         (define (handle val)
           (gui:queue-callback
            (lambda ()
-             (when (has-child? child-v)
-               (send child-v update (get-child child-v) dep val)))))
+             (when (has-child? v child-v)
+               (send child-v update (get-child v child-v) dep val)))))
         (obs-observe! dep handle)
         (hash-update! deps-to-handlers
                       (cons child-v dep)
@@ -72,9 +72,11 @@
       (match-define (list w h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
       (define the-panel
-        (new (mix (if (memq 'vertical style)
-                      gui:vertical-panel%
-                      gui:horizontal-panel%))
+        (new (context-mixin
+              (mix
+               (if (memq 'vertical style)
+                   gui:vertical-panel%
+                   gui:horizontal-panel%)))
              [parent parent]
              [alignment (peek @alignment)]
              [enabled (peek @enabled?)]
@@ -92,8 +94,8 @@
           (define k (key-proc e))
           (define v (make-view k (make-keyed-obs k e)))
           (define w (send v create the-panel))
-          (add-child-handlers! v)
-          (add-child v w)
+          (add-child-handlers! the-panel v)
+          (add-child the-panel v w)
           (hash-set! keys-to-children k v))
         (send the-panel end-container-sequence)))
 
@@ -109,16 +111,16 @@
                  (define child-v (make-view k (make-keyed-obs k e)))
                  (define child-w (send child-v create v))
                  (add-child-handlers! child-v)
-                 (add-child child-v child-w)
+                 (add-child v child-v child-w)
                  (hash-set! keys-to-children k child-v)))))
          (for ([(old-k old-v) (in-hash keys-to-children)])
            (unless (member old-k new-keys)
-             (define old-w (get-child old-v))
+             (define old-w (get-child v old-v))
              (define focused? (send old-w has-focus?))
              (send old-v destroy old-w)
              (send v delete-child old-w)
              (remove-child-handlers! old-v)
-             (remove-child old-v)
+             (remove-child v old-v)
              (hash-remove! keys-to-children old-k)
              (when focused?
                (define children (send v get-children))
@@ -128,7 +130,7 @@
          (send v change-children
                (λ (_)
                  (for/list ([k (in-list new-keys)])
-                   (get-child (hash-ref keys-to-children k)))))
+                   (get-child v (hash-ref keys-to-children k)))))
          (send v end-container-sequence)]
         [@alignment
          (send/apply v set-alignment val)]
@@ -152,9 +154,9 @@
            (stretchable-width w-s?)
            (stretchable-height h-s?))]))
 
-    (define/public (destroy _v)
+    (define/public (destroy v)
       (remove-all-child-handlers!)
-      (destroy-children))))
+      (destroy-children v))))
 
 (define (list-view @entries make-view
                    #:alignment [@alignment '(left top)]

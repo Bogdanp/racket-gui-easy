@@ -30,7 +30,7 @@
       (match-define (list h-m v-m) (peek @margin))
       (match-define (list w h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
-      (new clazz
+      (new (context-mixin clazz)
            [parent parent]
            [alignment (peek @alignment)]
            [enabled (peek @enabled?)]
@@ -48,7 +48,7 @@
       (begin0 the-panel
         (send the-panel begin-container-sequence)
         (for ([c (in-list children)])
-          (add-child c (send c create the-panel)))
+          (add-child the-panel c (send c create the-panel)))
         (send the-panel end-container-sequence)))
 
     (define/public (update v what val)
@@ -74,12 +74,12 @@
          (send* v
            (stretchable-width w-s?)
            (stretchable-height h-s?))])
-      (update-children what val))
+      (update-children v what val))
 
     (define/public (destroy v)
       (for ([c (in-list children)])
-        (send v delete-child (get-child c)))
-      (destroy-children))))
+        (send v delete-child (get-child v c)))
+      (destroy-children v))))
 
 (define hpanel% (panel% gui:horizontal-panel%))
 (define vpanel% (panel% gui:vertical-panel%))
@@ -136,7 +136,7 @@
       (match-define (list h-m v-m) (peek @margin))
       (match-define (list w h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
-      (new gui:group-box-panel%
+      (new (context-mixin gui:group-box-panel%)
            [label (peek @label)]
            [parent parent]
            [alignment (peek @alignment)]

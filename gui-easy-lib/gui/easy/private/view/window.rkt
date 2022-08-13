@@ -45,7 +45,7 @@
           ['center (values #f #f)]
           [(list x y) (values x y)]))
       (define the-window
-        (new clazz
+        (new (context-mixin clazz)
              [parent parent]
              [label (peek @title)]
              [alignment (peek @alignment)]
@@ -62,7 +62,7 @@
         (send the-window center 'both))
       (begin0 the-window
         (for ([c (in-list children)])
-          (add-child c (send c create the-window)))))
+          (add-child the-window c (send c create the-window)))))
 
     (define/public (update v what val)
       (case/dep what
@@ -86,12 +86,12 @@
          (send* v
            (stretchable-width w-s?)
            (stretchable-height h-s?))])
-      (update-children what val))
+      (update-children v what val))
 
     (define/public (destroy v)
       (for ([c (in-list children)])
-        (send v delete-child (get-child c)))
-      (destroy-children)
+        (send v delete-child (get-child v c)))
+      (destroy-children v)
       (send v show #f))
 
     (define/public (is-dialog?)

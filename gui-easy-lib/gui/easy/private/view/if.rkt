@@ -48,9 +48,9 @@
          (define this-bool (->bool val))
          (unless (eq? (get-last-bool v) this-bool)
            (send v begin-container-sequence)
-           (when (has-child? (get-then-view v))
+           (when (has-then-view? v)
              (remove&destroy-then-view v))
-           (when (has-child? (get-else-view v))
+           (when (has-else-view? v)
              (remove&destroy-else-view v))
            (if this-bool
                (create&add-then-view v)
@@ -59,9 +59,9 @@
            (send v end-container-sequence))]))
 
     (define/public (destroy v)
-      (when (has-child? (get-then-view v))
+      (when (has-then-view? v)
         (remove&destroy-then-view v))
-      (when (has-child? (get-else-view v))
+      (when (has-else-view? v)
         (remove&destroy-else-view v))
       (send v clear-context))
 
@@ -71,6 +71,10 @@
       (send v get-context 'then-view #f))
     (define/private (get-else-view v)
       (send v get-context 'else-view #f))
+    (define/private (has-then-view? v)
+      (has-child? v (get-then-view v)))
+    (define/private (has-else-view? v)
+      (has-child? v (get-else-view v)))
 
     (define-syntax-rule (define-adder id view-proc view-id deps-id)
       (define (id pane)
@@ -79,7 +83,7 @@
         (define deps (send view-id dependencies))
         (define widget (send view-id create pane))
         (send pane set-context 'deps-id (send (current-renderer) add-dependencies deps view-id widget))
-        (add-child view-id widget)))
+        (add-child pane view-id widget)))
 
     (define-adder create&add-then-view then-proc then-view then-deps)
     (define-adder create&add-else-view else-proc else-view else-deps)
@@ -89,10 +93,10 @@
         (define view-id (send pane get-context 'view-id))
         (define deps-id (send pane get-context 'deps-id))
         (send (current-renderer) remove-dependencies deps-id)
-        (define widget (get-child view-id))
+        (define widget (get-child pane view-id))
         (send pane delete-child widget)
         (send view-id destroy widget)
-        (remove-child view-id)
+        (remove-child pane view-id)
         (send pane remove-context 'view-id)
         (send pane remove-context 'deps-id)))
 

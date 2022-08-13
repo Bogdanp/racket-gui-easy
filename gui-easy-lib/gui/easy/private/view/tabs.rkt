@@ -97,7 +97,7 @@
           (send the-panel set-selection index))
         (send the-panel begin-container-sequence)
         (for ([c (in-list children)])
-          (add-child c (send c create the-panel)))
+          (add-child the-panel c (send c create the-panel)))
         (send the-panel end-container-sequence)))
 
     (define/public (update v what val)
@@ -134,12 +134,12 @@
          (send* v
            (stretchable-width w-s?)
            (stretchable-height h-s?))])
-      (update-children what val))
+      (update-children v what val))
 
     (define/public (destroy v)
       (for ([c (in-list children)])
-        (send v delete-child (get-child c)))
-      (destroy-children))
+        (send v delete-child (get-child v c)))
+      (destroy-children v))
 
     (define/private (get-last-labels v)
       (send v get-context 'last-labels null))))

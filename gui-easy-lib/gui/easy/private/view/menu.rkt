@@ -33,16 +33,16 @@
       (child-dependencies))
 
     (define/public (create _parent)
-      (define the-menu (new gui:popup-menu%))
+      (define the-menu (new (context-mixin gui:popup-menu%)))
       (begin0 the-menu
         (for ([c (in-list children)])
-          (add-child c (send c create the-menu)))))
+          (add-child the-menu c (send c create the-menu)))))
 
-    (define/public (update _v what val)
-      (update-children what val))
+    (define/public (update v what val)
+      (update-children v what val))
 
-    (define/public (destroy _v)
-      (destroy-children))))
+    (define/public (destroy v)
+      (destroy-children v))))
 
 (define menu-bar-view<%>
   (interface (view<%>)
@@ -60,17 +60,17 @@
 
     (define/public (create parent)
       (define the-menu-bar
-        (new gui:menu-bar%
+        (new (context-mixin gui:menu-bar%)
              [parent parent]))
       (begin0 the-menu-bar
         (for ([c (in-list children)])
-          (add-child c (send c create the-menu-bar)))))
+          (add-child the-menu-bar c (send c create the-menu-bar)))))
 
-    (define/public (update _v what val)
-      (update-children what val))
+    (define/public (update v what val)
+      (update-children v what val))
 
-    (define/public (destroy _v)
-      (destroy-children))))
+    (define/public (destroy v)
+      (destroy-children v))))
 
 (define menu-view<%>
   (interface (view<%>)
@@ -93,20 +93,20 @@
 
     (define/public (create parent)
       (define the-menu
-        (new gui:menu%
+        (new (context-mixin gui:menu%)
              [parent parent]
              [label (peek @label)]))
       (begin0 the-menu
         (for ([c (in-list children)])
-          (add-child c (send c create the-menu)))))
+          (add-child the-menu c (send c create the-menu)))))
 
     (define/public (update v what val)
       (case/dep what
         [@label (send v set-label val)])
-      (update-children what val))
+      (update-children v what val))
 
-    (define/public (destroy _v)
-      (destroy-children))))
+    (define/public (destroy v)
+      (destroy-children v))))
 
 (define menu-item%
   (class* object% (view<%>)
