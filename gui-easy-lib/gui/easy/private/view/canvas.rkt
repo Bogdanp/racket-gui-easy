@@ -16,6 +16,8 @@
  pict-canvas
  snip-canvas)
 
+(define missing (gensym 'missing))
+
 (define (make-canvas% %)
   (class* object% (view<%>)
     (init-field @input @label @enabled? @margin @min-size @stretch draw style)
@@ -32,7 +34,9 @@
         (new (context-mixin %)
              [parent parent]
              [paint-callback (λ (self dc)
-                               (draw dc (send self get-context 'input #f)))]
+                               (define input (send self get-context 'input missing))
+                               (unless (eq? input missing)
+                                 (draw dc input)))]
              [label (peek @label)]
              [enabled (peek @enabled?)]
              [style style]

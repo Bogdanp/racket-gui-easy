@@ -18,7 +18,7 @@
       (hash-set! ctx k v))
     (define/public (set-context* . k&vs)
       (apply hash-set*! ctx k&vs))
-    (define/public (get-context k [default (λ () (error '(method get-context) "no entry for ~a" k))])
+    (define/public (get-context k [default (λ () (error 'get-context "no entry for ~a" k))])
       (hash-ref ctx k default))
     (define/public (clear-context)
       (hash-clear! ctx))))
