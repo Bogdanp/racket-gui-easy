@@ -19,10 +19,6 @@
     (inherit child-dependencies add-child get-child update-children destroy-children)
     (super-new)
 
-    (define last-choices null)
-    (define last-labels null)
-    (define last-selection #f)
-    (define last-index #f)
     (define @choices&selection&index
       (obs-combine
        (λ (choices selection)
@@ -41,35 +37,46 @@
       (match-define (list choices selection index) (peek @choices&selection&index))
       (define labels (map choice->label choices))
       (define the-panel
-        (new (class gui:tab-panel%
-               (super-new)
-               (define/augment (on-reorder former-indices)
-                 (define choices-vec (list->vector last-choices))
-                 (define reordered-choices
-                   (for/list ([old-index (in-list former-indices)])
-                     (vector-ref choices-vec old-index)))
-                 (action 'reorder reordered-choices last-selection))
-               (define/override (on-close-request index)
-                 (define removed-choices
-                   (for/list ([idx (in-naturals)]
-                              [c (in-list last-choices)]
-                              #:unless (= idx index))
-                     c))
-                 (define num-choices (length removed-choices))
-                 (define adjusted-selection
-                   (cond
-                     [(null? removed-choices) #f]
-                     [(not (eqv? index last-index)) last-selection]
-                     [(= index num-choices) (last removed-choices)]
-                     [(= num-choices 1) (car removed-choices)]
-                     [else (list-ref removed-choices index)]))
-                 (action 'close removed-choices adjusted-selection))
-               (define/override (on-new-request)
-                 (action 'new last-choices last-selection)))
+        (new (context-mixin
+              (class gui:tab-panel%
+                (super-new)
+                (define/private (get-last-choices)
+                  (send this get-context 'last-choices null))
+                (define/private (get-last-selection)
+                  (send this get-context 'last-selection #f))
+                (define/private (get-last-index)
+                  (send this get-context 'last-index #f))
+
+                (define/augment (on-reorder former-indices)
+                  (define choices-vec (list->vector (get-last-choices)))
+                  (define reordered-choices
+                    (for/list ([old-index (in-list former-indices)])
+                      (vector-ref choices-vec old-index)))
+                  (action 'reorder reordered-choices (get-last-selection)))
+
+                (define/override (on-close-request index)
+                  (define removed-choices
+                    (for/list ([idx (in-naturals)]
+                               [c (in-list (get-last-choices))]
+                               #:unless (= idx index))
+                      c))
+                  (define num-choices (length removed-choices))
+                  (define adjusted-selection
+                    (cond
+                      [(null? removed-choices) #f]
+                      [(not (eqv? index (get-last-index))) (get-last-selection)]
+                      [(= index num-choices) (last removed-choices)]
+                      [(= num-choices 1) (car removed-choices)]
+                      [else (list-ref removed-choices index)]))
+                  (action 'close removed-choices adjusted-selection))
+
+                (define/override (on-new-request)
+                  (action 'new (get-last-choices) (get-last-selection)))))
              [parent parent]
              [choices labels]
              [callback (λ (self _event)
                          (define index (send self get-selection))
+                         (define last-choices (send self get-context 'last-choices null))
                          (action 'select last-choices (and index (list-ref last-choices index))))]
              [alignment (peek @alignment)]
              [enabled (peek @enabled?)]
@@ -82,11 +89,11 @@
              [stretchable-width w-s?]
              [stretchable-height h-s?]))
       (begin0 the-panel
-        (set! last-choices choices)
-        (set! last-labels labels)
+        (send the-panel set-context 'last-choices choices)
+        (send the-panel set-context 'last-labels labels)
         (when index
-          (set! last-selection selection)
-          (set! last-index index)
+          (send the-panel set-context 'last-selection selection)
+          (send the-panel set-context 'last-index index)
           (send the-panel set-selection index))
         (send the-panel begin-container-sequence)
         (for ([c (in-list children)])
@@ -98,14 +105,14 @@
         [@choices&selection&index
          (match-define (list choices selection index) val)
          (define labels (map choice->label choices))
-         (unless (equal? last-labels labels)
+         (unless (equal? (get-last-labels v) labels)
            (send v set labels))
          (when index
            (send v set-selection index))
-         (set! last-choices choices)
-         (set! last-labels labels)
-         (set! last-selection selection)
-         (set! last-index index)]
+         (send v set-context 'last-choices choices)
+         (send v set-context 'last-labels labels)
+         (send v set-context 'last-selection selection)
+         (send v set-context 'last-index index)]
         [@alignment
          (send/apply v set-alignment val)]
         [@enabled?
@@ -132,7 +139,10 @@
     (define/public (destroy v)
       (for ([c (in-list children)])
         (send v delete-child (get-child c)))
-      (destroy-children))))
+      (destroy-children))
+
+    (define/private (get-last-labels v)
+      (send v get-context 'last-labels null))))
 
 (define (tabs @choices action
               #:choice->label [choice->label values]

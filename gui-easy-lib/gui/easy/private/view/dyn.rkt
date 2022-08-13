@@ -56,7 +56,7 @@
         (define deps (send pane get-context 'deps))
         (define widget (send pane get-context 'widget))
         (send (current-renderer) remove-dependencies deps)
-        (send view destroy (send pane get-context 'view))
+        (send view destroy widget)
         (send pane delete-child widget)
         (send pane clear-context)))))
 
