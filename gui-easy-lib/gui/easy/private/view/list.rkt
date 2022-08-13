@@ -110,7 +110,7 @@
                (unless (hash-has-key? keys-to-children k)
                  (define child-v (make-view k (make-keyed-obs k e)))
                  (define child-w (send child-v create v))
-                 (add-child-handlers! child-v)
+                 (add-child-handlers! v child-v)
                  (add-child v child-v child-w)
                  (hash-set! keys-to-children k child-v)))))
          (for ([(old-k old-v) (in-hash keys-to-children)])
