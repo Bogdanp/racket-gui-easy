@@ -19,9 +19,6 @@
     (inherit add-child get-child has-child? remove-child destroy-children)
     (super-new [children null])
 
-    (define keys-to-children (make-hash))
-    (define deps-to-handlers (make-hash))
-
     (define (make-keyed-obs k last-e)
       (obs-map @entries (λ (entries)
                           (define new-e
@@ -36,6 +33,8 @@
                             [else last-e]))))
 
     (define (add-child-handlers! v child-v)
+      (define deps-to-handlers
+        (get-deps-to-handlers v))
       (for ([dep (in-list (send child-v dependencies))])
         (define (handle val)
           (gui:queue-callback
@@ -49,7 +48,9 @@
                         (cons handle handlers))
                       null)))
 
-    (define (remove-child-handlers! child-v)
+    (define (remove-child-handlers! v child-v)
+      (define deps-to-handlers
+        (get-deps-to-handlers v))
       (for* ([(c&dep hdls) (in-hash deps-to-handlers)]
              [c (in-value (car c&dep))] #:when (eq? child-v c)
              [dep (in-value (cdr c&dep))])
@@ -57,7 +58,9 @@
           (obs-unobserve! dep hdl))
         (hash-remove! deps-to-handlers c&dep)))
 
-    (define (remove-all-child-handlers!)
+    (define (remove-all-child-handlers! v)
+      (define deps-to-handlers
+        (get-deps-to-handlers v))
       (for* ([(c&dep hdls) (in-hash deps-to-handlers)]
              [dep (in-value (cdr c&dep))]
              [hdl (in-list hdls)])
@@ -72,8 +75,8 @@
       (match-define (list w h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
       (define the-panel
-        (new (context-mixin
-              (mix
+        (new (mix
+              (context-mixin
                (if (memq 'vertical style)
                    gui:vertical-panel%
                    gui:horizontal-panel%)))
@@ -88,6 +91,8 @@
              [min-height h]
              [stretchable-width w-s?]
              [stretchable-height h-s?]))
+      (define keys-to-children
+        (get-keys-to-children the-panel))
       (begin0 the-panel
         (send the-panel begin-container-sequence)
         (for ([e (in-list (peek @entries))])
@@ -103,6 +108,8 @@
       (case/dep what
         [@entries
          (send v begin-container-sequence)
+         (define keys-to-children
+           (get-keys-to-children v))
          (define new-keys
            (for/list ([e (in-list val)])
              (define k (key-proc e))
@@ -119,7 +126,7 @@
              (define focused? (send old-w has-focus?))
              (send old-v destroy old-w)
              (send v delete-child old-w)
-             (remove-child-handlers! old-v)
+             (remove-child-handlers! v old-v)
              (remove-child v old-v)
              (hash-remove! keys-to-children old-k)
              (when focused?
@@ -155,8 +162,13 @@
            (stretchable-height h-s?))]))
 
     (define/public (destroy v)
-      (remove-all-child-handlers!)
-      (destroy-children v))))
+      (remove-all-child-handlers! v)
+      (destroy-children v))
+
+    (define/private (get-keys-to-children v)
+      (send v get-context! 'keys-to-children make-hash))
+    (define/private (get-deps-to-handlers v)
+      (send v get-context! 'deps-to-handlers make-hash))))
 
 (define (list-view @entries make-view
                    #:alignment [@alignment '(left top)]
