@@ -32,7 +32,7 @@
     (define/public (update v what val)
       (case/dep what
         [@data
-         (unless (equal?-proc val (send v get-context 'data gensym))
+         (unless (equal?-proc val (get-data v))
            (send v begin-container-sequence)
            (remove&destroy-child v)
            (create&add-child v val)
@@ -41,6 +41,9 @@
     (define/public (destroy v)
       (remove&destroy-child v)
       (send v clear-context))
+
+    (define/private (get-data v)
+      (send v get-context 'data gensym))
 
     (define (create&add-child pane data)
       (define view (proxy (make-view data)))
