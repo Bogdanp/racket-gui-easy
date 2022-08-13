@@ -29,50 +29,56 @@
 
     (define/public (create parent)
       (define the-pane
-        (new gui:panel%
+        (new (context-mixin gui:panel%)
              [parent parent]
              [min-width #f]
              [min-height #f]
              [stretchable-width #t]
              [stretchable-height #t]))
+      (define true? (->bool (peek @cond-e)))
       (begin0 the-pane
-        (if last-bool
+        (send the-pane set-context 'last-bool true?)
+        (if true?
             (create&add-then-view the-pane)
             (create&add-else-view the-pane))))
 
-    (define last-bool (->bool (peek @cond-e)))
-    (define then-view #f)
-    (define else-view #f)
-    (define then-deps #f)
-    (define else-deps #f)
     (define/public (update v what val)
       (case/dep what
         [@cond-e
          (define this-bool (->bool val))
-         (unless (eq? last-bool this-bool)
+         (unless (eq? (get-last-bool v) this-bool)
            (send v begin-container-sequence)
-           (when (has-child? then-view)
+           (when (has-child? (get-then-view v))
              (remove&destroy-then-view v))
-           (when (has-child? else-view)
+           (when (has-child? (get-else-view v))
              (remove&destroy-else-view v))
            (if this-bool
                (create&add-then-view v)
                (create&add-else-view v))
-           (set! last-bool this-bool)
+           (send v set-context 'last-bool this-bool)
            (send v end-container-sequence))]))
 
     (define/public (destroy v)
-      (when (has-child? then-view)
+      (when (has-child? (get-then-view v))
         (remove&destroy-then-view v))
-      (when (has-child? else-view)
-        (remove&destroy-else-view v)))
+      (when (has-child? (get-else-view v))
+        (remove&destroy-else-view v))
+      (send v clear-context))
+
+    (define/private (get-last-bool v)
+      (send v get-context 'last-bool v))
+    (define/private (get-then-view v)
+      (send v get-context 'then-view #f))
+    (define/private (get-else-view v)
+      (send v get-context 'else-view #f))
 
     (define-syntax-rule (define-adder id view-proc view-id deps-id)
       (define (id pane)
-        (set! view-id (proxy (view-proc)))
+        (define view-id (proxy (view-proc)))
+        (send pane set-context 'view-id view-id)
         (define deps (send view-id dependencies))
         (define widget (send view-id create pane))
-        (set! deps-id (send (current-renderer) add-dependencies deps view-id widget))
+        (send pane set-context 'deps-id (send (current-renderer) add-dependencies deps view-id widget))
         (add-child view-id widget)))
 
     (define-adder create&add-then-view then-proc then-view then-deps)
@@ -80,13 +86,15 @@
 
     (define-syntax-rule (define-remover id view-id deps-id)
       (define (id pane)
+        (define view-id (send pane get-context 'view-id))
+        (define deps-id (send pane get-context 'deps-id))
         (send (current-renderer) remove-dependencies deps-id)
         (define widget (get-child view-id))
         (send pane delete-child widget)
         (send view-id destroy widget)
         (remove-child view-id)
-        (set! view-id #f)
-        (set! deps-id #f)))
+        (send pane remove-context 'view-id)
+        (send pane remove-context 'deps-id)))
 
     (define-remover remove&destroy-then-view then-view then-deps)
     (define-remover remove&destroy-else-view else-view else-deps)))
