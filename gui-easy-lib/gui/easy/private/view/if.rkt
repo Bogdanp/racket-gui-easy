@@ -16,7 +16,7 @@
  cond-view
  case-view)
 
-(define ->bool (compose1 not not))
+(define ->bool (λ (v) (and v #t)))
 
 (define if-view%
   (class* container% (view<%>)
@@ -35,10 +35,10 @@
              [min-height #f]
              [stretchable-width #t]
              [stretchable-height #t]))
-      (define true? (->bool (peek @cond-e)))
+      (define this-bool (->bool (peek @cond-e)))
       (begin0 the-pane
-        (send the-pane set-context 'last-bool true?)
-        (if true?
+        (send the-pane set-context 'last-bool this-bool)
+        (if this-bool
             (create&add-then-view the-pane)
             (create&add-else-view the-pane))))
 
@@ -79,9 +79,9 @@
     (define-syntax-rule (define-adder id view-proc view-id deps-id)
       (define (id pane)
         (define view-id (proxy (view-proc)))
-        (send pane set-context 'view-id view-id)
         (define deps (send view-id dependencies))
         (define widget (send view-id create pane))
+        (send pane set-context 'view-id view-id)
         (send pane set-context 'deps-id (send (current-renderer) add-dependencies deps view-id widget))
         (add-child pane view-id widget)))
 
