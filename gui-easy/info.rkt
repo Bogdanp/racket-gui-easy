@@ -1,5 +1,6 @@
 #lang info
 
+(define license 'BSD-3-Clause)
 (define collection "racket")
 (define deps '("base"
                "gui-easy-lib"))
