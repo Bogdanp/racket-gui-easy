@@ -39,9 +39,7 @@
              [stretchable-width #f]
              [stretchable-height #f]
              [paint-callback (λ (self dc)
-                               (define bmp
-                                 (send self get-context 'bmp/scaled #f))
-                               (when bmp
+                               (let ([bmp (send self get-context 'bmp/scaled bmp/scaled)])
                                  (send dc draw-bitmap bmp 0 0)))]))
       (begin0 the-canvas
         (send the-canvas set-context* 'path path 'bmp bmp 'bmp/scaled bmp/scaled)))
