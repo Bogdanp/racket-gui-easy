@@ -575,6 +575,12 @@
   knows what its data dependecies are and how to respond to their
   changes.
 
+  A single @racket[view<%>] object may be used to manage multiple GUI
+  widgets.  Consequently, when implementing custom views, it's best
+  not to store any state within the view object itself.  Instead,
+  associate any internal state with the GUI widgets returned by
+  @racket[create], possibly via @racket[context-mixin].
+
   @defmethod[(dependencies) (listof obs?)]{
     Returns the set of observers that this view depends on.
   }
@@ -623,6 +629,69 @@
 
   @defmethod[(create [parent #f]) (is-a?/c gui:popup-menu%)]{
     Returns a new @racket[gui:popup-menu%].
+  }
+}
+
+@subsubsection{@tt{context<%>}}
+
+@; Require the private module to avoid requiring racket/gui/base.
+@(define ctxt-ev (make-base-eval '(require racket/class racket/gui/easy/private/view/view)))
+
+@defmixin[context-mixin (class?) (context<%>)]{
+  Specializes a class to implement the @racket[context<%>] interface.
+  Compares keys using @racket[eq?].
+
+  @examples[
+    #:eval ctxt-ev
+    (define ob (new (context-mixin object%)))
+    (send ob set-context 'a 42)
+    (send ob get-context 'a)
+  ]
+}
+
+@definterface[context<%> ()]{
+  A @racket[context<%>] object allows the user of an object to
+  associate arbitrary values with it.  Many of the @racket[view<%>]s
+  implemented by this library wrap their underlying GUI widgets using
+  @racket[context-mixin] in order to associate internal state with
+  them.
+
+  @defmethod[(set-context [k any/c] [v any/c]) void?]{
+    Stores @racket[v] under @racket[k] within the context, overriding
+    any existing values.
+  }
+
+  @defmethod[(set-context* [k any/c] [v any/c] ... ...) void?]{
+    Stores each @racket[v] under each @racket[k] within the context.
+  }
+
+  @defmethod[(get-context [k any/c]
+                          [default any/c (λ () (error 'get-context "no entry for ~a" k))]) any/c]{
+
+    Returns the value stored under @racket[k] from the context.  If
+    there is no value, the result is determined by @racket[default]:
+
+    @itemlist[
+      @item{If @racket[default] is a @racket[procedure?], it is called
+      with no arguments to produce a result.}
+      @item{Otherwise, @racket[default] is returned unchanged.}
+    ]
+  }
+
+  @defmethod[(get-context! [k any/c]
+                           [default any/c]) any/c]{
+    Like @racket[get-context], but if there is no value stored under
+    @racket[k], the @racket[default] value is computed as in
+    @racket[get-context], stored in the context under @racket[k] and
+    then returned.
+  }
+
+  @defmethod[(remove-context [k any/c]) void?]{
+    Removes the value stored under @racket[k] from the context.
+  }
+
+  @defmethod[(clear-context) void?]{
+    Removes all stored values from the context.
   }
 }
 

@@ -13,6 +13,9 @@
  [pict (pict?)])
 
 (provide
+ context<%>
+ context-mixin
+
  view<%>
  window-view<%>
  popup-menu-view<%>

@@ -136,8 +136,8 @@ let garbage collection take care of destroying the
 When the view becomes visible again, its @method[view<%> create]
 method will be called again and the whole cycle will repeat itself.
 
-That's all there is to it whe it comes to custom controls.  See the
-``hn.rkt'' example for a program that uses a custom view.
+That's all there is to it whes it comes to custom controls.  See the
+@filepath{hn.rkt} example for a program that uses a custom view.
 
 
 @section{Custom Containers}
@@ -148,4 +148,5 @@ them in their @method[view<%> dependencies] method.  Additionally,
 their @method[view<%> update] method is in charge of dispatching
 updates to their children.
 
-See ``gui-easy-lib/gui/easy/private/view/panel.rkt'' for an example.
+See @filepath{gui-easy-lib/gui/easy/private/view/panel.rkt} for an
+example.
