@@ -45,10 +45,12 @@
              [min-height h]
              [stretchable-width w-s?]
              [stretchable-height h-s?]))
+      (define editor
+        (send the-field get-editor))
+      (send editor set-keymap keymap)
+      (when background-color
+        (send the-field set-field-background background-color))
       (begin0 the-field
-        (when background-color
-          (send the-field set-field-background background-color))
-        (send+ the-field (get-editor) (set-keymap keymap))
         (send the-field set-context 'last-val content)))
 
     (define (call-preserving-position ed thunk)
