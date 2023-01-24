@@ -71,6 +71,7 @@
     ["c:a"         goto-start]
     ["c:e"         goto-end]
     ["d:Z"         redo]
+    ["d:a"         select-all]
     ["d:c"         copy]
     ["d:v"         paste]
     ["d:x"         cut]
