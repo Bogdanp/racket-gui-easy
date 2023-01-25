@@ -161,11 +161,7 @@
 
 @defproc[(group [label (maybe-obs/c gui:label-string?)]
                 [#:alignment alignment (maybe-obs/c alignment/c) '(center top)]
-                [#:style style
-                         (listof (or/c 'border 'deleted
-                                       'hscroll 'auto-hscroll 'hide-hscroll
-                                       'vscroll 'auto-vscroll 'hide-vscroll))
-                         null]
+                [#:style style (listof (or/c 'deleted)) null]
                 [#:enabled? enabled? (maybe-obs/c boolean?) #t]
                 [#:spacing spacing (maybe-obs/c spacing/c) 0]
                 [#:margin margin (maybe-obs/c margin/c) '(0 0)]
