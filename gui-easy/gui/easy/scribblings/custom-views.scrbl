@@ -129,8 +129,8 @@ let garbage collection take care of destroying the
     (class* object% (view<%>)
       ...
 
-    (define/public (destroy v)
-      (void))))
+      (define/public (destroy v)
+        (void))))
 ]
 
 When the view becomes visible again, its @method[view<%> create]
