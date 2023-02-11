@@ -12,14 +12,14 @@ jobs:
         path: |
           ~/.cache/racket
           ~/.local/share/racket
-        key: ${{ runner.os }}-racket-cs-8.1
+        key: ${{ runner.os }}-racket-cs-8.8
     - name: Install Racket
-      uses: Bogdanp/setup-racket@v1.5
+      uses: Bogdanp/setup-racket@v1.9.1
       with:
         architecture: 'x64'
         distribution: 'full'
         variant: 'CS'
-        version: '8.1'
+        version: '8.8'
     - name: Install Package & Deps
       run: raco pkg install --auto --skip-installed gui-easy-lib/ gui-easy/
     - name: Update Package
