@@ -633,7 +633,7 @@
 @; Require the private module to avoid requiring racket/gui/base.
 @(define ctxt-ev (make-base-eval '(require racket/class racket/gui/easy/private/view/view)))
 
-@defmixin[context-mixin (object%) (context<%>)]{
+@defmixin[context-mixin (view<%>) (context<%>)]{
   Specializes a class to implement the @racket[context<%>] interface.
   Compares keys using @racket[eq?].
 
