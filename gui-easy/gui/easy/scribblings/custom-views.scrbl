@@ -118,10 +118,16 @@ The view is then in charge of modifying its GUI object appropriately.
       ...))
 ]
 
+@margin-note{
+  Windows are a special case: the resources they manage only get
+  disposed of when @racket[renderer-destroy] is called, or when the
+  program exits.
+}
+
 Finally, when a view is no longer visible, its @method[view<%>
-destroy] method is called to dispose of the GUI object and perform any
-teardown actions.  In our case, there's nothing to tear down so we can
-let garbage collection take care of destroying the
+destroy] method is typically called to dispose of the GUI object and
+perform any teardown actions.  In our case, there's nothing to tear
+down so we can let garbage collection take care of destroying the
 @racketid[canvas-list%] object:
 
 @racketblock[

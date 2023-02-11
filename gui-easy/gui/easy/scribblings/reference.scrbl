@@ -57,6 +57,10 @@
   need to get it and send it a @tt{show} message.
 }
 
+@defproc[(renderer-destroy [r renderer?]) void?]{
+  Destroys the render tree managed by @racket[r].
+}
+
 
 @section{Views}
 

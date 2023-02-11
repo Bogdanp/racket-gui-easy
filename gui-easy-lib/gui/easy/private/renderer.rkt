@@ -14,7 +14,8 @@
 
  current-renderer
  renderer<%>
- renderer-root)
+ renderer-root
+ renderer-destroy)
 
 (define current-renderer
   (make-parameter #f))
@@ -61,10 +62,11 @@
       (gui:queue-callback
        (lambda ()
          (hash-remove! renderers id)
-         (for-each do-remove-dependencies depss)
-         (parameterize ([current-renderer this])
-           (send tree destroy root))
-         (set! root #f))))
+         (when root
+           (for-each do-remove-dependencies depss)
+           (parameterize ([current-renderer this])
+             (send tree destroy root))
+           (set! root #f)))))
 
     (define (do-add-dependencies deps tree root)
       (define s
@@ -117,3 +119,6 @@
 
 (define (renderer-root r)
   (send r get-root))
+
+(define (renderer-destroy r)
+  (send r destroy))
