@@ -357,7 +357,12 @@
 
 @subsection{Controls}
 
-@defproc[(button [label (maybe-obs/c gui:label-string?)]
+@defproc[(button [label (maybe-obs/c
+                         (or/c gui:label-string?
+                               (is-a?/c gui:bitmap%)
+                               (list/c (is-a?/c gui:bitmap%)
+                                       gui:label-string?
+                                       (or/c 'left 'top 'right 'bottom))))]
                  [action (-> any)]
                  [#:enabled? enabled? (maybe-obs/c boolean?) #t]
                  [#:style style (listof (or/c 'border 'multi-line 'deleted)) null]

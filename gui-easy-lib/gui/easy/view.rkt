@@ -100,7 +100,12 @@
              (is-a?/c view<%>))]
 
   ;; Widgets
-  [button (->* ((maybe-obs/c gui:label-string?)
+  [button (->* ((maybe-obs/c
+                 (or/c gui:label-string?
+                       (is-a?/c gui:bitmap%)
+                       (list/c (is-a?/c gui:bitmap%)
+                               gui:label-string?
+                               (or/c 'left 'top 'right 'bottom))))
                 (-> any))
                (#:enabled? (maybe-obs/c boolean?)
                 #:style (listof (or/c 'border 'multi-line 'deleted))
