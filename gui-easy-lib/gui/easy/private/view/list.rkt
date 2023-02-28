@@ -5,6 +5,7 @@
          racket/list
          racket/match
          "../observable.rkt"
+         "../renderer.rkt"
          "common.rkt"
          "container.rkt"
          "view.rkt")
@@ -33,6 +34,7 @@
                             [else last-e]))))
 
     (define (add-child-handlers! v child-v)
+      (define renderer (current-renderer))
       (define deps-to-handlers
         (get-deps-to-handlers v))
       (for ([dep (in-list (send child-v dependencies))])
@@ -40,7 +42,8 @@
           (gui:queue-callback
            (lambda ()
              (when (has-child? v child-v)
-               (send child-v update (get-child v child-v) dep val)))))
+               (parameterize ([current-renderer renderer])
+                 (send child-v update (get-child v child-v) dep val))))))
         (obs-observe! dep handle)
         (hash-update! deps-to-handlers
                       (cons child-v dep)
