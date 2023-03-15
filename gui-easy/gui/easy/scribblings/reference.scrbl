@@ -264,7 +264,7 @@
                              (listof (or/c 'horizontal 'vertical 'border 'deleted
                                            'hscroll 'auto-hscroll 'hide-hscroll
                                            'vscroll 'auto-vscroll 'hide-vscroll))
-                             null]
+                             '(vertical auto-vscroll)]
                     [#:spacing spacing (maybe-obs/c spacing/c) 0]
                     [#:margin margin (maybe-obs/c margin/c) '(0 0)]
                     [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
