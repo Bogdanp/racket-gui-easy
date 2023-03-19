@@ -181,7 +181,7 @@
                (is-a?/c view<%>))]
   [slider (->* ((maybe-obs/c gui:position-integer?)
                 (-> gui:position-integer? any))
-               (#:label (maybe-obs/c gui:label-string?)
+               (#:label (maybe-obs/c (or/c #f gui:label-string?))
                 #:enabled? (maybe-obs/c boolean?)
                 #:style (listof (or/c 'horizontal 'vertical 'plain
                                       'vertical-label 'horizontal-label
@@ -220,7 +220,7 @@
 
 (define (canvas/c draw/c)
   (->* ((maybe-obs/c any/c) draw/c)
-       (#:label (maybe-obs/c gui:label-string?)
+       (#:label (maybe-obs/c (or/c #f gui:label-string?))
         #:enabled? (maybe-obs/c boolean?)
         #:style (listof (or/c 'border 'control-border 'combo
                               'vscroll 'hscroll 'resize-corner

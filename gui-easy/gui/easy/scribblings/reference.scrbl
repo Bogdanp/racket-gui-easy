@@ -222,9 +222,9 @@
                       [then-e (is-a?/c view<%>)]
                       [else-e (is-a?/c view<%>)])]{
 
-  Returns a representation of a panel that renders @racket[then-view]
-  when the current-value of @racket[cond-value] is truthy and
-  @racket[else-view] otherwise.
+  Returns a representation of a panel that renders @racket[then-e]
+  when the current-value of @racket[cond-e] is truthy and
+  @racket[else-e] otherwise.
 
   @history[
     #:changed "0.4" @elem{The @racket[if-view] form was converted from a procedure into a syntactic form.}
