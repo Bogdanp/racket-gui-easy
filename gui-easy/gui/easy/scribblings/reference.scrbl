@@ -287,6 +287,8 @@
   current value is not equal (according to @racket[equal?-proc]) to
   the previous value.  The pane automatically adjusts its area
   properties when its child's area properties change to match.
+
+  @history[#:added "0.9"]
 }
 
 @subsection{Canvases & Snips}
