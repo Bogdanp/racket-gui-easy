@@ -63,9 +63,14 @@
               #:stretch (maybe-obs/c stretch/c))
              #:rest (listof (is-a?/c view<%>))
              (is-a?/c view<%>))]
-  [dyn-view (->* (obs? (-> any/c (is-a?/c view<%>)))
-                 (#:equal? (-> any/c any/c any/c))
-                 (is-a?/c view<%>))]
+  [observable-view (->* (obs?)
+                        ((-> any/c (is-a?/c view<%>))
+                         #:equal? (-> any/c any/c any/c))
+                        (is-a?/c view<%>))]
+  [rename observable-view dyn-view
+          (->* (obs? (-> any/c (is-a?/c view<%>)))
+               (#:equal? (-> any/c any/c any/c))
+               (is-a?/c view<%>))]
   [list-view (->* ((maybe-obs/c any/c)
                    (-> any/c any/c (is-a?/c view<%>)))
                   (#:alignment (maybe-obs/c alignment/c)

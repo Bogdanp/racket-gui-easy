@@ -277,6 +277,17 @@
   @racket[#:key].
 }
 
+@defproc[(observable-view [data (maybe-obs/c any/c)]
+                          [make-view (-> any/c (is-a?/c view<%>)) values]
+                          [#:equal? equal?-proc (-> any/c any/c boolean?) equal?]) (is-a?/c view<%>)]{
+
+  Returns a representation of a pane whose content is the result of
+  applying @racket[make-view] to the value of @racket[data].  The
+  content of the pane changes every time @racket[data] changes and its
+  current value is not equal (according to @racket[equal?-proc]) to
+  the previous value.  The pane automatically adjusts its area
+  properties when its child's area properties change to match.
+}
 
 @subsection{Canvases & Snips}
 

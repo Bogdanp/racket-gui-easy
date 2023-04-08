@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require racket/class
+         racket/contract
          (prefix-in gui: racket/gui)
          "../renderer.rkt"
          "common.rkt"
@@ -8,9 +9,9 @@
          "view.rkt")
 
 (provide
- dyn-view)
+ observable-view)
 
-(define dyn-view%
+(define observable-view%
   (class* object% (view<%>)
     (init-field @data make-view equal?-proc)
     (super-new)
@@ -20,12 +21,8 @@
 
     (define/public (create parent)
       (define the-pane
-        (new (context-mixin gui:panel%)
-             [parent parent]
-             [min-width #f]
-             [min-height #f]
-             [stretchable-width #t]
-             [stretchable-height #t]))
+        (new (context-mixin gui:pane%)
+             [parent parent]))
       (begin0 the-pane
         (create&add-child the-pane (peek @data))))
 
@@ -36,21 +33,28 @@
            (send v begin-container-sequence)
            (remove&destroy-child v)
            (create&add-child v val)
-           (send v end-container-sequence))]))
+           (send v end-container-sequence))])
+      (define child
+        (send v get-context 'view #f))
+      (when child
+        (define child-v (send v get-context 'widget))
+        (send child update child-v what val)
+        (copy-area<%>-properties child-v v)))
 
     (define/public (destroy v)
       (remove&destroy-child v)
       (send v clear-context))
 
-    (define/private (get-data v)
-      (send v get-context 'data gensym))
+    (define/private (get-data pane)
+      (send pane get-context 'data gensym))
 
     (define (create&add-child pane data)
       (define view (proxy (make-view data)))
       (define deps (send view dependencies))
       (define widget (send view create pane))
-      (define depset (send (current-renderer) add-dependencies deps view widget))
-      (send pane set-context* 'data data 'view view 'widget widget 'deps depset))
+      (define depset (send (current-renderer) add-dependencies deps this pane))
+      (send pane set-context* 'data data 'view view 'widget widget 'deps depset)
+      (copy-area<%>-properties widget pane))
 
     (define (remove&destroy-child pane)
       (define view
@@ -61,10 +65,18 @@
         (send (current-renderer) remove-dependencies deps)
         (send view destroy widget)
         (send pane delete-child widget)
-        (send pane clear-context)))))
+        (send pane clear-context)))
 
-(define (dyn-view @data make-view #:equal? [equal?-proc equal?])
-  (new dyn-view%
+    (define (copy-area<%>-properties src dst)
+      (send dst min-width (send src min-width))
+      (send dst min-width (send src min-height))
+      (send dst stretchable-width (send src stretchable-width))
+      (send dst stretchable-height (send src stretchable-height)))))
+
+(define (observable-view @data
+                         [make-view values]
+                         #:equal? [equal?-proc equal?])
+  (new observable-view%
        [@data @data]
        [make-view make-view]
        [equal?-proc equal?-proc]))
