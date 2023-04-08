@@ -77,8 +77,7 @@
       (update-children v what val))
 
     (define/public (destroy v)
-      (for ([c (in-list children)])
-        (send v delete-child (get-child v c)))
+      (send v change-children (λ (_) null))
       (destroy-children v))))
 
 (define hpanel% (panel% gui:horizontal-panel%))
