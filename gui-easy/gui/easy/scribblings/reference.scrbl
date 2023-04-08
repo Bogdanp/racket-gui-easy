@@ -277,7 +277,7 @@
   @racket[#:key].
 }
 
-@defproc[(observable-view [data (maybe-obs/c any/c)]
+@defproc[(observable-view [data (obs/c any/c)]
                           [make-view (-> any/c (is-a?/c view<%>)) values]
                           [#:equal? equal?-proc (-> any/c any/c boolean?) equal?]) (is-a?/c view<%>)]{
 
