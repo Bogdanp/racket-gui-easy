@@ -26,7 +26,6 @@
       (for ([(c w) (in-hash (get-children-to-widgets v))])
         (send c destroy w)
         (remove-child v c))
-      (hash-clear! deps-to-children)
       (hash-clear! (get-children-to-widgets v)))
 
     (define/public (add-child v c w)
