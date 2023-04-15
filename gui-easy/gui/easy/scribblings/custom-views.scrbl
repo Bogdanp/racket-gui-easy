@@ -142,7 +142,7 @@ down so we can let garbage collection take care of destroying the
 When the view becomes visible again, its @method[view<%> create]
 method will be called again and the whole cycle will repeat itself.
 
-That's all there is to it whes it comes to custom controls.  See the
+That's all there is to it when it comes to custom controls.  See the
 @filepath{hn.rkt} example for a program that uses a custom view.
 
 
