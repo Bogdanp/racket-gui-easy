@@ -21,7 +21,7 @@
 
     (define/public (create parent)
       (define the-pane
-        (new (context-mixin gui:pane%)
+        (new (context-mixin gui:panel%)
              [parent parent]))
       (begin0 the-pane
         (create&add-child the-pane (peek @data))))
