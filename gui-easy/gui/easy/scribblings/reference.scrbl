@@ -129,7 +129,7 @@
 
 @subsection[#:tag "containers"]{Containers}
 
-@defproc[(hpanel [#:alignment alignment (maybe-obs/c alignment/c) '(center top)]
+@defproc[(hpanel [#:alignment alignment (maybe-obs/c alignment/c) '(left center)]
                  [#:style style
                           (listof (or/c 'border 'deleted
                                         'hscroll 'auto-hscroll 'hide-hscroll
