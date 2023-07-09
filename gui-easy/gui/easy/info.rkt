@@ -1,3 +1,3 @@
 #lang info
 
-(define scribblings '(("scribblings/gui-easy.scrbl")))
+(define scribblings '(("scribblings/gui-easy.scrbl" () (gui-library))))
