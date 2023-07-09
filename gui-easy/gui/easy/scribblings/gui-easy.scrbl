@@ -2,6 +2,8 @@
 
 @(require scribble/core
           scribble/html-properties
+          scribble/latex-properties
+          racket/runtime-path
           (for-label racket/base
                      racket/gui/easy
                      racket/gui/easy/operator))
@@ -13,10 +15,12 @@ This library provides a declarative API on top of
 @racketmodname[racket/gui].  This library is still a work in progress,
 so expect some breaking changes.
 
+@(define-runtime-path youtubestub.tex "youtubestub.tex")
 @(define embed-style
   (make-style
-   "youtube-embed"
+   "youtubeembed"
    (list
+    (make-tex-addition youtubestub.tex)
     (make-alt-tag "iframe")
     (make-attributes '((width           . "700")
                        (height          . "394")
