@@ -18,6 +18,8 @@
  obs-update!
  obs-peek
  obs-map
+ obs-filter
+ obs-filter-map
  obs-combine
  obs-debounce
  obs-throttle)
@@ -137,6 +139,28 @@
                                 (log-gui-easy-debug "obs-map: unobserve ~.s" f)
                                 (obs-unobserve! a g)))))
 
+(define (obs-filter a f [d #f])
+  (obs-filter-map a (λ (v) (and (f v) v)) d))
+
+(define (obs-filter-map a f [d #f])
+  (define b
+    (make-obs
+     #:derived? #t
+     (or (f (obs-peek a)) d)))
+  (define b-box (make-weak-box b))
+  (define (g v)
+    (define w (f v))
+    (when w
+      (define maybe-b
+        (weak-box-value b-box))
+      (when maybe-b
+        (do-obs-update! maybe-b (λ (_) w)))))
+  (begin0 b
+    (obs-observe! a g)
+    (will-register executor b (λ (_)
+                                (log-gui-easy-debug "obs-filter: unobserved ~.s" f)
+                                (obs-unobserve! a g)))))
+
 (define (obs-combine f . os)
   (define vals
     (for/vector #:length (length os)
@@ -251,4 +275,16 @@
   (obs-update! @a add1)
   (check-equal? (obs-peek @d) (list 4 "4" 10))
   (obs-update! @c add1)
-  (check-equal? (obs-peek @d) (list 4 "4" 11)))
+  (check-equal? (obs-peek @d) (list 4 "4" 11))
+
+  (define @evens (obs-filter @a even?))
+  (define @odds (obs-filter @a odd?))
+  (check-equal? (obs-peek @evens) 4)
+  (check-equal? (obs-peek @odds) #f)
+  (obs-update! @a add1)
+  (check-equal? (obs-peek @evens) 4)
+  (check-equal? (obs-peek @odds) 5)
+  (obs-update! @a add1)
+  (check-equal? (obs-peek @evens) 6)
+  (check-equal? (obs-peek @odds) 5)
+  (obs-update! @a add1))

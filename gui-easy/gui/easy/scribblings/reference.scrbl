@@ -813,6 +813,26 @@ that equality (via @racket[equal?]) is preserved for
   are mapped via @racket[f].
 }
 
+@defproc[(obs-filter-map [o obs?]
+                         [p (-> any/c any/c)]
+                         [d any/c #f]) obs?]{
+  Returns a new @tech{derived observable} that applies @racket[p] to
+  every new value of @racket[o]. The derived observable updates when
+  the result of applying @racket[p] to the new value of @racket[o]
+  is not @racket[#f]. The initial value of the derived observable is
+  @racket[(or (p (obs-peek o)) d)].
+
+  @history[#:added "0.11"]
+}
+
+@defproc[(obs-filter [o obs?]
+                     [p (-> any/c any/c)]
+                     [d any/c #f]) obs?]{
+  Equivalent to @racket[(obs-filter-map o (λ (v) (and (p v) v)) d)].
+
+  @history[#:added "0.11"]
+}
+
 @defproc[(obs-combine [f (-> any/c ...+ any/c)]
                       [o obs?] ...+) obs?]{
   Returns a new @tech{derived observable} whose value changes every
@@ -886,6 +906,14 @@ that equality (via @racket[equal?]) is preserved for
 @defproc[(~> [o obs?]
              [f (-> any/c any/c)]) obs?]{
   An alias for @racket[obs-map].
+}
+
+@defproc[(~#> [o obs?]
+              [p (-> any/c any/c)]
+              [d any/c #f]) obs?]{
+  An alias for @racket[obs-filter].
+
+  @history[#:added "0.11"]
 }
 
 @defproc[(λ<~ [o obs?]

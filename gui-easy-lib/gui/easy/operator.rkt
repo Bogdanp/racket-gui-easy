@@ -4,7 +4,7 @@
          syntax/parse/define
          "observable.rkt")
 
-(provide define/obs @ := λ:= <~ λ<~ ~>)
+(provide define/obs @ := λ:= <~ λ<~ ~> ~#>)
 
 (define-syntax-parser define/obs
   [(_ name:id init-expr:expr)
@@ -28,6 +28,9 @@
 
 (define (~> o f)
   (obs-map o f))
+
+(define (~#> o f)
+  (obs-filter o f))
 
 (define (λ<~ o f)
   (λ () (<~ o f)))
