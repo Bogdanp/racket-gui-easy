@@ -29,11 +29,12 @@
     (define/public (create parent)
       (match-define (list path size mode)
         (peek @path+size+mode))
-      (define bmp (gui:read-bitmap path))
+      (define bmp (read-bitmap path))
       (define bmp/scaled (scale bmp size mode))
       (define the-canvas
         (new (context-mixin gui:canvas%)
              [parent parent]
+             [style '(transparent)]
              [min-width (send bmp/scaled get-width)]
              [min-height (send bmp/scaled get-height)]
              [stretchable-width #f]
@@ -53,7 +54,7 @@
          (define bmp
            (if (equal? path last-path)
                (send v get-context 'bmp)
-               (gui:read-bitmap path)))
+               (read-bitmap path)))
          (define bmp/scaled
            (scale bmp size mode))
          (send v set-context* 'path path 'bmp bmp 'bmp/scaled bmp/scaled)
@@ -63,6 +64,11 @@
 
     (define/public (destroy v)
       (send v clear-context))
+
+    (define (read-bitmap path)
+      (gui:read-bitmap
+       #:try-@2x? #t
+       path))
 
     (define (scale bmp size mode)
       (match size
