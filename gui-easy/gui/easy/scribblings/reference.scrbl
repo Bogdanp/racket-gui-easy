@@ -427,6 +427,10 @@
   fill its container.  If the mode is @racket['fit], then the image
   will preserve its aspect ratio, otherwise it will stretch to fill
   the container.
+
+  @history[#:changed "0.11.1" @elem{The canvas background is now
+    @racket['transparent]. Now passes @racket[#t] to the
+    @racket[#:try-@2x?] argument of @racket[gui:read-bitmap].}]
 }
 
 @defproc[(input [value (maybe-obs/c any/c)]
