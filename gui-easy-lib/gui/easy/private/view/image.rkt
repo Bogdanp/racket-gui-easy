@@ -15,20 +15,22 @@
 (define backing-scale
   (gui:get-display-backing-scale))
 
+(struct props (path size mode))
+
 (define image%
   (class* object% (view<%>)
     (init-field @path @size @mode)
     (super-new)
 
-    (define @path+size+mode
-      (obs-combine list @path @size @mode))
+    (define @props
+      (obs-combine props @path @size @mode))
 
     (define/public (dependencies)
-      (filter obs? (list @path+size+mode)))
+      (filter obs? (list @props)))
 
     (define/public (create parent)
-      (match-define (list path size mode)
-        (peek @path+size+mode))
+      (match-define (props path size mode)
+        (peek @props))
       (define bmp (read-bitmap path))
       (define bmp/scaled (scale bmp size mode))
       (define the-canvas
@@ -47,10 +49,10 @@
 
     (define/public (update v what val)
       (case/dep what
-        [@path+size+mode
+        [@props
          (define last-path
            (send v get-context 'path))
-         (match-define (list path size mode) val)
+         (match-define (props path size mode) val)
          (define bmp
            (if (equal? path last-path)
                (send v get-context 'bmp)
