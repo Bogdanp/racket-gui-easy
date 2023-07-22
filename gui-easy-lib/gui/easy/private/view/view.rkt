@@ -21,9 +21,9 @@
 
 (define (context-mixin %)
   (class* % (context<%>)
+    (field [ctx (make-hasheq)])
     (super-new)
 
-    (define ctx (make-hasheq))
     (define/public (set-context k v)
       (hash-set! ctx k v))
     (define/public (set-context* . k&vs)

@@ -1,7 +1,7 @@
 #lang info
 
 (define license 'BSD-3-Clause)
-(define version "0.11.1")
+(define version "0.11.2")
 (define collection "racket")
 (define deps '("base"
                "box-extra-lib"
