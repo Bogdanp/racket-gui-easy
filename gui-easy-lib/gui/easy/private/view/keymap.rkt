@@ -8,9 +8,11 @@
  the-default-keymap
 
  backward-char
+ backward-delete-word
+ backward-select-word
  backward-word
- delete-word-backward
  forward-char
+ forward-select-word
  forward-word
  goto-end
  goto-start
@@ -58,7 +60,7 @@
   (send editor find-wordbreak start-pos #f 'caret)
   (send editor set-position (unbox start-pos) end-pos))
 
-(define (delete-word-backward editor _event)
+(define (backward-delete-word editor _event)
   (define start-pos (send editor get-start-position))
   (define end-pos
     (let ([b (box start-pos)])
@@ -114,7 +116,7 @@
   [backward-word]
   [copy (make-editor-operation 'copy)]
   [cut (make-editor-operation 'cut)]
-  [delete-word-backward]
+  [backward-delete-word]
   [forward-char]
   [forward-select-word]
   [forward-word]
@@ -131,7 +133,7 @@
 (case (system-type 'os)
   [(macosx)
    (bind
-    ["a:backspace" delete-word-backward]
+    ["a:backspace" backward-delete-word]
     ["a:b"         backward-word]
     ["a:f"         forward-word]
     ["a:left"      backward-word]
@@ -145,7 +147,7 @@
     ["c:k"         kill-line]
     ["c:n"         next-line]
     ["c:p"         previous-line]
-    ["c:w"         delete-word-backward]
+    ["c:w"         backward-delete-word]
     ["c:y"         paste]
     ["d:Z"         redo]
     ["d:a"         select-all]
@@ -157,7 +159,7 @@
    (bind
     ["c:Z"         redo]
     ["c:a"         select-all]
-    ["c:backspace" delete-word-backward]
+    ["c:backspace" backward-delete-word]
     ["c:c"         copy]
     ["c:left"      backward-word]
     ["c:n"         next-line]
