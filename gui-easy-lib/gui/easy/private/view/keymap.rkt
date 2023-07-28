@@ -41,10 +41,22 @@
   (send editor find-wordbreak #f pos 'caret)
   (send editor set-position (unbox pos)))
 
+(define (forward-select-word editor _event)
+  (define start-pos (send editor get-start-position))
+  (define end-pos (box (send editor get-end-position)))
+  (send editor find-wordbreak #f end-pos 'caret)
+  (send editor set-position start-pos (unbox end-pos)))
+
 (define (backward-word editor _event)
   (define pos (box (send editor get-start-position)))
   (send editor find-wordbreak pos #f 'caret)
   (send editor set-position (unbox pos)))
+
+(define (backward-select-word editor _event)
+  (define start-pos (box (send editor get-start-position)))
+  (define end-pos (send editor get-end-position))
+  (send editor find-wordbreak start-pos #f 'caret)
+  (send editor set-position (unbox start-pos) end-pos))
 
 (define (delete-word-backward editor _event)
   (define start-pos (send editor get-start-position))
@@ -98,11 +110,13 @@
 
 (define-procs
   [backward-char]
+  [backward-select-word]
   [backward-word]
   [copy (make-editor-operation 'copy)]
   [cut (make-editor-operation 'cut)]
   [delete-word-backward]
   [forward-char]
+  [forward-select-word]
   [forward-word]
   [goto-end]
   [goto-start]
@@ -122,6 +136,8 @@
     ["a:f"         forward-word]
     ["a:left"      backward-word]
     ["a:right"     forward-word]
+    ["a:s:left"    backward-select-word]
+    ["a:s:right"   forward-select-word]
     ["c:a"         goto-start]
     ["c:b"         backward-char]
     ["c:e"         goto-end]
