@@ -14,10 +14,17 @@
   (apply dynamic-send editor id args))
 
 (define (goto-start editor _event)
-  (send editor set-position 0))
+  (define pos (send editor get-start-position))
+  (send editor set-position (or (send editor find-newline 'backward pos 0) 0)))
 
 (define (goto-end editor _event)
-  (send editor set-position (send editor last-position)))
+  (define pos (send editor get-end-position))
+  (define target-pos (send editor find-newline 'forward pos))
+  (define last-pos (send editor last-position))
+  (send editor set-position (if (or (not target-pos)
+                                    (= target-pos last-pos))
+                                last-pos
+                                (sub1 target-pos))))
 
 (define (forward-word editor _event)
   (define pos (box (send editor get-end-position)))
@@ -37,6 +44,21 @@
       (unbox b)))
   (unless (= start-pos end-pos)
     (send editor delete end-pos start-pos)))
+
+(define ((make-line-proc proc) editor _event)
+  (define pos (send editor get-start-position))
+  (define line (send editor position-line pos))
+  (define line-start-pos (send editor line-start-position line))
+  (define line-offset (- pos line-start-pos))
+  (define last-line (send editor last-line))
+  (define target-line (min (max 0 (proc line)) last-line))
+  (define target-line-start-pos (send editor line-start-position target-line))
+  (define target-line-end-pos (send editor line-end-position target-line))
+  (define target-position (min target-line-end-pos (+ target-line-start-pos line-offset)))
+  (send editor set-position target-position))
+
+(define previous-line (make-line-proc sub1))
+(define next-line (make-line-proc add1))
 
 (define-syntax (define-proc stx)
   (syntax-case stx ()
@@ -58,6 +80,8 @@
   [goto-end]
   [goto-start]
   [paste (make-editor-operation 'paste)]
+  [next-line]
+  [previous-line]
   [redo (make-editor-operation 'redo)]
   [select-all (make-editor-operation 'select-all)]
   [undo (make-editor-operation 'undo)])
@@ -66,10 +90,12 @@
   [(macosx)
    (bind
     ["a:backspace" delete-word-backward]
-    ["a:left"      backward-word]
-    ["a:right"     forward-word]
+    ["a:b"         backward-word]
+    ["a:f"         forward-word]
     ["c:a"         goto-start]
     ["c:e"         goto-end]
+    ["c:n"         next-line]
+    ["c:p"         previous-line]
     ["d:Z"         redo]
     ["d:a"         select-all]
     ["d:c"         copy]
@@ -83,6 +109,8 @@
     ["c:backspace" delete-word-backward]
     ["c:c"         copy]
     ["c:left"      backward-word]
+    ["c:n"         next-line]
+    ["c:p"         previous-line]
     ["c:right"     forward-word]
     ["c:v"         paste]
     ["c:x"         cut]
