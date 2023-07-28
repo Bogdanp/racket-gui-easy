@@ -45,6 +45,15 @@
   (unless (= start-pos end-pos)
     (send editor delete end-pos start-pos)))
 
+(define ((make-char-proc proc) editor _event)
+  (define pos (send editor get-start-position))
+  (define last-pos (send editor last-position))
+  (define target-pos (max 0 (min (proc pos) last-pos)))
+  (send editor set-position target-pos))
+
+(define backward-char (make-char-proc sub1))
+(define forward-char (make-char-proc add1))
+
 (define ((make-line-proc proc) editor _event)
   (define pos (send editor get-start-position))
   (define line (send editor position-line pos))
@@ -72,10 +81,12 @@
   (begin (send the-default-keymap map-function binding (symbol->string 'id)) ...))
 
 (define-procs
+  [backward-char]
   [backward-word]
   [copy (make-editor-operation 'copy)]
   [cut (make-editor-operation 'cut)]
   [delete-word-backward]
+  [forward-char]
   [forward-word]
   [goto-end]
   [goto-start]
@@ -93,7 +104,9 @@
     ["a:b"         backward-word]
     ["a:f"         forward-word]
     ["c:a"         goto-start]
+    ["c:b"         backward-char]
     ["c:e"         goto-end]
+    ["c:f"         forward-char]
     ["c:n"         next-line]
     ["c:p"         previous-line]
     ["d:Z"         redo]
