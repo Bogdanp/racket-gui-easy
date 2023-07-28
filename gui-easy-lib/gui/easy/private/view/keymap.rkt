@@ -5,7 +5,17 @@
          (prefix-in gui: racket/gui))
 
 (provide
- the-default-keymap)
+ the-default-keymap
+
+ backward-char
+ backward-word
+ delete-word-backward
+ forward-char
+ forward-word
+ goto-end
+ goto-start
+ next-line
+ previous-line)
 
 (define the-default-keymap
   (new gui:keymap%))
@@ -69,6 +79,12 @@
 (define previous-line (make-line-proc sub1))
 (define next-line (make-line-proc add1))
 
+(define (kill-line editor _event)
+  (send editor kill (current-seconds)))
+
+(define (paste editor _event)
+  (send editor paste))
+
 (define-syntax (define-proc stx)
   (syntax-case stx ()
     [(_ id) #'(define-proc id id)]
@@ -90,6 +106,7 @@
   [forward-word]
   [goto-end]
   [goto-start]
+  [kill-line]
   [paste (make-editor-operation 'paste)]
   [next-line]
   [previous-line]
@@ -103,12 +120,17 @@
     ["a:backspace" delete-word-backward]
     ["a:b"         backward-word]
     ["a:f"         forward-word]
+    ["a:left"      backward-word]
+    ["a:right"     forward-word]
     ["c:a"         goto-start]
     ["c:b"         backward-char]
     ["c:e"         goto-end]
     ["c:f"         forward-char]
+    ["c:k"         kill-line]
     ["c:n"         next-line]
     ["c:p"         previous-line]
+    ["c:w"         delete-word-backward]
+    ["c:y"         paste]
     ["d:Z"         redo]
     ["d:a"         select-all]
     ["d:c"         copy]
