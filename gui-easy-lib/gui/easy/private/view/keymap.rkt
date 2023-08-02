@@ -8,9 +8,11 @@
  the-default-keymap
 
  backward-char
+ backward-delete-char
  backward-delete-word
  backward-select-word
  backward-word
+ delete-char
  forward-char
  forward-select-word
  forward-word
@@ -83,6 +85,13 @@
 (define backward-char (make-char-proc sub1))
 (define forward-char (make-char-proc add1))
 
+(define (backward-delete-char editor _event)
+  (send editor delete 'start))
+
+(define (delete-char editor _event)
+  (define position (send editor get-start-position))
+  (send editor delete position (add1 position)))
+
 (define ((make-line-proc proc) editor _event)
   (define pos (send editor get-start-position))
   (define line (send editor position-line pos))
@@ -117,19 +126,21 @@
 
 (define-procs
   [backward-char]
+  [backward-delete-char]
+  [backward-delete-word]
   [backward-select-word]
   [backward-word]
   [copy (make-editor-operation 'copy)]
   [cut (make-editor-operation 'cut)]
-  [backward-delete-word]
+  [delete-char]
   [forward-char]
   [forward-select-word]
   [forward-word]
   [goto-end]
   [goto-start]
   [kill-line]
-  [paste (make-editor-operation 'paste)]
   [next-line]
+  [paste (make-editor-operation 'paste)]
   [previous-line]
   [redo (make-editor-operation 'redo)]
   [select-all (make-editor-operation 'select-all)]
@@ -138,8 +149,8 @@
 (case (system-type 'os)
   [(macosx)
    (bind
-    ["a:backspace" backward-delete-word]
     ["a:b"         backward-word]
+    ["a:backspace" backward-delete-word]
     ["a:f"         forward-word]
     ["a:left"      backward-word]
     ["a:right"     forward-word]
@@ -147,11 +158,13 @@
     ["a:s:right"   forward-select-word]
     ["c:a"         goto-start]
     ["c:b"         backward-char]
+    ["c:d"         delete-char]
     ["c:e"         goto-end]
     ["c:f"         forward-char]
     ["c:k"         kill-line]
     ["c:n"         next-line]
     ["c:p"         previous-line]
+    ["c:s:d"       backward-delete-char]
     ["c:w"         backward-delete-word]
     ["c:y"         paste]
     ["d:Z"         redo]
