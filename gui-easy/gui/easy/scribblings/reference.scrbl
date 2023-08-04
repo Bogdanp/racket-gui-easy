@@ -101,13 +101,36 @@
 
 @subsection{Menus & Menu Items}
 
-@defproc[(popup-menu [menu (is-a?/c view<%>)]) (is-a?/c popup-menu-view<%>)]{
+@defproc[(popup-menu [menu-or-item (is-a?/c view<%>)] ...) (is-a?/c popup-menu-view<%>)]{
   Returns a representation of a popup menu.  Popup menus are rendered
   using @racket[render-popup-menu].
+
+  @racketblock[
+    (popup-menu
+     (menu
+      "File"
+      (menu-item "Open...")
+      (menu-item "Save"))
+     (menu-item-separator)
+     (menu-item "Quit"))
+  ]
 }
 
-@defproc[(menu-bar [menu (is-a?/c view<%>)]) (is-a?/c view<%>)]{
+@defproc[(menu-bar [menu-or-item (is-a?/c view<%>)] ...) (is-a?/c view<%>)]{
   Returns a representation of a menu-bar menu.
+
+  @racketblock[
+    (menu-bar
+     (menu
+      "File"
+      (menu-item "Open...")
+      (menu-item "Save")
+      (menu-item-separator)
+      (menu-item "Quit"))
+     (menu
+      "Help"
+      (menu-item "Getting Started")))
+  ]
 }
 
 @defproc[(menu [label (maybe-obs/c maybe-label/c)]
