@@ -14,11 +14,11 @@
  vpanel
  group)
 
-(define (panel% clazz)
+(define (make-panel% %)
   (class* container% (view<%>)
     (inherit-field children)
     (init-field @alignment @enabled? @spacing @margin @min-size @stretch style)
-    (inherit child-dependencies add-child get-child update-children destroy-children)
+    (inherit child-dependencies add-child update-children destroy-children)
     (super-new)
 
     (define/public (dependencies)
@@ -30,7 +30,7 @@
       (match-define (list h-m v-m) (peek @margin))
       (match-define (list w h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
-      (new (context-mixin clazz)
+      (new (context-mixin %)
            [parent parent]
            [alignment (peek @alignment)]
            [enabled (peek @enabled?)]
@@ -80,9 +80,6 @@
       (send v change-children (λ (_) null))
       (destroy-children v))))
 
-(define hpanel% (panel% gui:horizontal-panel%))
-(define vpanel% (panel% gui:vertical-panel%))
-
 (define (hpanel #:alignment [@alignment '(left center)]
                 #:enabled? [@enabled? #t]
                 #:style [style null]
@@ -90,8 +87,9 @@
                 #:margin [@margin '(0 0)]
                 #:min-size [@min-size '(#f #f)]
                 #:stretch [@stretch '(#t #t)]
+                #:mixin [mix values]
                 . children)
-  (new hpanel%
+  (new (make-panel% (mix gui:horizontal-panel%))
        [@alignment @alignment]
        [@enabled? @enabled?]
        [@spacing @spacing]
@@ -108,8 +106,9 @@
                 #:margin [@margin '(0 0)]
                 #:min-size [@min-size '(#f #f)]
                 #:stretch [@stretch '(#t #t)]
+                #:mixin [mix values]
                 . children)
-  (new vpanel%
+  (new (make-panel% (mix gui:vertical-panel%))
        [@alignment @alignment]
        [@enabled? @enabled?]
        [@spacing @spacing]
@@ -119,8 +118,8 @@
        [children children]
        [style style]))
 
-(define group-box-panel%
-  (class* (panel% gui:group-box-panel%) (view<%>)
+(define (make-group-box-panel% %)
+  (class* (make-panel% %) (view<%>)
     (init-field @label)
     (inherit-field @alignment @enabled? @spacing @margin @min-size @stretch style)
     (super-new)
@@ -162,8 +161,10 @@
                #:margin [@margin '(0 0)]
                #:min-size [@min-size '(#f #f)]
                #:stretch [@stretch '(#t #t)]
+               #:mixin [mix values]
                . children)
-  (new group-box-panel%
+  (new (make-group-box-panel%
+        (mix gui:group-box-panel%))
        [@label @label]
        [@alignment @alignment]
        [@enabled? @enabled?]

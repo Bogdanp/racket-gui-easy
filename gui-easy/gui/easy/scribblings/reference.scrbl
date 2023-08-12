@@ -163,10 +163,13 @@
                  [#:margin margin (maybe-obs/c margin/c) '(0 0)]
                  [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
                  [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
+                 [#:mixin mix (make-mixin-contract gui:panel%) values]
                  [child (is-a?/c view<%>)] ...+) (is-a?/c view<%>)]{
 
   Returns a representation of a panel that lays out its children
   horizontally.
+
+  @history[#:changed "0.13" @elem{Added the @racket[#:mixin] argument.}]
 }
 
 @defproc[(vpanel [#:alignment alignment (maybe-obs/c alignment/c) '(center top)]
@@ -180,10 +183,13 @@
                  [#:margin margin (maybe-obs/c margin/c) '(0 0)]
                  [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
                  [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
+                 [#:mixin mix (make-mixin-contract gui:panel%) values]
                  [child (is-a?/c view<%>)] ...+) (is-a?/c view<%>)]{
 
   Returns a representation of a panel that lays out its children
   vertically.
+
+  @history[#:changed "0.13" @elem{Added the @racket[#:mixin] argument.}]
 }
 
 @defproc[(group [label (maybe-obs/c gui:label-string?)]
@@ -194,9 +200,12 @@
                 [#:margin margin (maybe-obs/c margin/c) '(0 0)]
                 [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
                 [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
+                [#:mixin mix (make-mixin-contract gui:panel%) values]
                 [child (is-a?/c view<%>)] ...+) (is-a?/c view<%>)]{
 
   Returns a representation of a labeled vertical panel.
+
+  @history[#:changed "0.13" @elem{Added the @racket[#:mixin] argument.}]
 }
 
 @defproc[(tabs [choices (maybe-obs/c (listof any/c))]

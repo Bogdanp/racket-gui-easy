@@ -242,7 +242,8 @@
         #:spacing (maybe-obs/c gui:spacing-integer?)
         #:margin (maybe-obs/c margin/c)
         #:min-size (maybe-obs/c size/c)
-        #:stretch (maybe-obs/c stretch/c))
+        #:stretch (maybe-obs/c stretch/c)
+        #:mixin (make-mixin-contract gui:panel%))
        #:rest (listof (is-a?/c view<%>))
        (is-a?/c view<%>)))
 
