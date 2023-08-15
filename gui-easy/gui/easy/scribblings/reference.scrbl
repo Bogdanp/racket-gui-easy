@@ -595,7 +595,8 @@
                                                        (list/c exact-nonnegative-integer?
                                                                gui:dimension-integer?
                                                                gui:dimension-integer?
-                                                               gui:dimension-integer?)))) null]) (is-a?/c view<%>)]{
+                                                               gui:dimension-integer?)))) null]
+                [#:mixin mix (make-mixin-contract gui:list-box%) values]) (is-a?/c view<%>)]{
 
   Returns a representation of a table that calls @racket[action] when
   the selection changes or when one of its columns is clicked (if the
@@ -614,6 +615,8 @@
   column index (starting from 0) and the default width or a list of
   the column index, the column width, the minimum width and the
   maximum width.
+
+  @history[#:changed "0.13" @elem{Added the @racket[#:mixin] argument.}]
 }
 
 @defproc[(text [s (maybe-obs/c gui:label-string?)]

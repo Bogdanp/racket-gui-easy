@@ -211,7 +211,8 @@
                #:column-widths (maybe-obs/c
                                 (listof
                                  (or/c (list/c exact-nonnegative-integer? gui:dimension-integer?)
-                                       (list/c exact-nonnegative-integer? gui:dimension-integer? gui:dimension-integer? gui:dimension-integer?)))))
+                                       (list/c exact-nonnegative-integer? gui:dimension-integer? gui:dimension-integer? gui:dimension-integer?))))
+               #:mixin (make-mixin-contract gui:list-box%))
               (is-a?/c view<%>))]
   [text (->* ((maybe-obs/c gui:label-string?))
              (#:color (maybe-obs/c (or/c #f string? (is-a?/c gui:color%)))
