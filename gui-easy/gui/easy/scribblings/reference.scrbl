@@ -625,18 +625,29 @@
   Returns a representation of a textual label.
 }
 
+@subsection{Combinators}
+
+@defproc[(add-hooks [#:on-create create-proc (-> any) void]
+                    [#:on-destroy destroy-proc (-> any) void]
+                    [v (is-a?/c view<%>)]) (is-a?/c view<%>)]{
+  Returns a proxy of @racket[v] that calls @racket[create-proc] and
+  @racket[destroy-proc] when a GUI widget is created and destroyed,
+  respectively, from the view.
+
+  @history[#:added "0.14"]
+}
+
 @subsection{Interfaces}
 @subsubsection{@tt{view<%>}}
 @definterface[view<%> ()]{
-  A @racket[view<%>] object is a wrapper around a GUI object that
-  knows what its data dependecies are and how to respond to their
-  changes.
+  A @racket[view<%>] object is a wrapper around a GUI object that knows
+  what its data dependecies are and how to respond to their changes.
 
   A single @racket[view<%>] object may be used to manage multiple GUI
-  widgets.  Consequently, when implementing custom views, it's best
-  not to store any state within the view object itself.  Instead,
-  associate any internal state with the GUI widgets returned by
-  @racket[create], possibly via @racket[context-mixin].
+  widgets. Consequently, when implementing custom views, it's best not
+  to store any state within the view object itself. Instead, associate
+  any internal state with the GUI widgets returned by @racket[create],
+  possibly via @racket[context-mixin].
 
   @defmethod[(dependencies) (listof obs?)]{
     Returns the set of observers that this view depends on.

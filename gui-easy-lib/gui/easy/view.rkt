@@ -32,17 +32,11 @@
   [dialog (window/c gui:dialog% (listof (or/c 'no-caption 'no-sheet 'resize-border 'close-button)))]
 
   ;; Menus & Menu Items
-  [popup-menu (-> (is-a?/c view<%>) ...
-                  (is-a?/c popup-menu-view<%>))]
-  [menu-bar (-> (is-a?/c view<%>) ...
-                (is-a?/c menu-bar-view<%>))]
-  [menu (-> (maybe-obs/c maybe-label/c)
-            (is-a?/c view<%>) ...
-            (is-a?/c menu-view<%>))]
-  [menu-item (->* ((maybe-obs/c maybe-label/c))
-                  ((-> any))
-                  (is-a?/c view<%>))]
-  [menu-item-separator (-> (is-a?/c view<%>))]
+  [popup-menu (-> view/c ... (is-a?/c popup-menu-view<%>))]
+  [menu-bar (-> view/c ... (is-a?/c menu-bar-view<%>))]
+  [menu (-> (maybe-obs/c maybe-label/c) view/c ... (is-a?/c menu-view<%>))]
+  [menu-item (->* ((maybe-obs/c maybe-label/c)) ((-> any)) view/c)]
+  [menu-item-separator (-> view/c)]
 
   ;; Containers
   [hpanel (panel/c)]
@@ -61,18 +55,18 @@
               #:margin (maybe-obs/c margin/c)
               #:min-size (maybe-obs/c size/c)
               #:stretch (maybe-obs/c stretch/c))
-             #:rest (listof (is-a?/c view<%>))
-             (is-a?/c view<%>))]
+             #:rest (listof view/c)
+             view/c)]
   [observable-view (->* (obs?)
-                        ((-> any/c (is-a?/c view<%>))
+                        ((-> any/c view/c)
                          #:equal? (-> any/c any/c any/c))
-                        (is-a?/c view<%>))]
+                        view/c)]
   [rename observable-view dyn-view
-          (->* (obs? (-> any/c (is-a?/c view<%>)))
+          (->* (obs? (-> any/c view/c))
                (#:equal? (-> any/c any/c any/c))
-               (is-a?/c view<%>))]
+               view/c)]
   [list-view (->* ((maybe-obs/c any/c)
-                   (-> any/c any/c (is-a?/c view<%>)))
+                   (-> any/c any/c view/c))
                   (#:alignment (maybe-obs/c alignment/c)
                    #:enabled? (maybe-obs/c boolean?)
                    #:style (listof (or/c 'horizontal 'vertical 'border 'deleted
@@ -84,7 +78,7 @@
                    #:stretch (maybe-obs/c stretch/c)
                    #:key (-> any/c any/c)
                    #:mixin (make-mixin-contract gui:panel%))
-                  (is-a?/c view<%>))]
+                  view/c)]
 
   ;; Canvases & Snips
   [canvas (canvas/c (-> (is-a?/c gui:dc<%>) any/c any))]
@@ -102,7 +96,7 @@
               #:min-size (maybe-obs/c size/c)
               #:stretch (maybe-obs/c stretch/c)
               #:mixin (make-mixin-contract gui:snip-canvas%))
-             (is-a?/c view<%>))]
+             view/c)]
 
   ;; Widgets
   [button (->* ((maybe-obs/c
@@ -118,12 +112,12 @@
                 #:margin (maybe-obs/c margin/c)
                 #:min-size (maybe-obs/c size/c)
                 #:stretch (maybe-obs/c stretch/c))
-               (is-a?/c view<%>))]
+               view/c)]
   [checkbox (->* ((-> boolean? any))
                  (#:label (maybe-obs/c gui:label-string?)
                   #:checked? (maybe-obs/c boolean?)
                   #:enabled? (maybe-obs/c boolean?))
-                 (is-a?/c view<%>))]
+                 view/c)]
   [choice (->* ((maybe-obs/c (listof any/c))
                 (-> (or/c #f any/c) any))
                (#:choice->label (-> any/c gui:label-string?)
@@ -134,11 +128,11 @@
                 #:enabled? (maybe-obs/c boolean?)
                 #:min-size (maybe-obs/c size/c)
                 #:stretch (maybe-obs/c stretch/c))
-               (is-a?/c view<%>))]
+               view/c)]
   [image (->* ((maybe-obs/c path-string?))
               (#:size (maybe-obs/c size/c)
                #:mode (maybe-obs/c (or/c 'fit 'fill)))
-              (is-a?/c view<%>))]
+              view/c)]
   [input (->* ((maybe-obs/c any/c))
               ((-> (or/c 'input 'return) string? any)
                #:label (maybe-obs/c maybe-label/c)
@@ -155,7 +149,7 @@
                #:mixin (make-mixin-contract gui:text-field%)
                #:value=? (-> any/c any/c boolean?)
                #:value->text (-> any/c string?))
-              (is-a?/c view<%>))]
+              view/c)]
   [progress (->* ((maybe-obs/c gui:position-integer?))
                  (#:label (maybe-obs/c gui:label-string?)
                   #:enabled? (maybe-obs/c boolean?)
@@ -165,7 +159,7 @@
                   #:range (maybe-obs/c gui:positive-dimension-integer?)
                   #:min-size (maybe-obs/c size/c)
                   #:stretch (maybe-obs/c stretch/c))
-                 (is-a?/c view<%>))]
+                 view/c)]
   [radios (->* ((listof any/c)
                 (-> (or/c #f any/c) any))
                (#:choice->label (-> any/c gui:label-string?)
@@ -178,7 +172,7 @@
                 #:enabled? (maybe-obs/c boolean?)
                 #:min-size (maybe-obs/c size/c)
                 #:stretch (maybe-obs/c stretch/c))
-               (is-a?/c view<%>))]
+               view/c)]
   [slider (->* ((maybe-obs/c gui:position-integer?)
                 (-> gui:position-integer? any))
                (#:label (maybe-obs/c (or/c #f gui:label-string?))
@@ -190,8 +184,8 @@
                 #:max-value gui:position-integer?
                 #:min-size (maybe-obs/c size/c)
                 #:stretch (maybe-obs/c stretch/c))
-               (is-a?/c view<%>))]
-  [spacer (-> (is-a?/c view<%>))]
+               view/c)]
+  [spacer (-> view/c)]
   [table (->* ((listof gui:label-string?)
                (maybe-obs/c vector?))
               (table-action/c
@@ -213,11 +207,20 @@
                                  (or/c (list/c exact-nonnegative-integer? gui:dimension-integer?)
                                        (list/c exact-nonnegative-integer? gui:dimension-integer? gui:dimension-integer? gui:dimension-integer?))))
                #:mixin (make-mixin-contract gui:list-box%))
-              (is-a?/c view<%>))]
+              view/c)]
   [text (->* ((maybe-obs/c gui:label-string?))
              (#:color (maybe-obs/c (or/c #f string? (is-a?/c gui:color%)))
               #:font (is-a?/c gui:font%))
-             (is-a?/c view<%>))]))
+             view/c)]
+
+  ;; Combinators
+  [add-hooks (->* (view/c)
+                  (#:on-create (-> any)
+                   #:on-destroy (-> any))
+                  view/c)]))
+
+(define view/c
+  (is-a?/c view<%>))
 
 (define (canvas/c draw/c)
   (->* ((maybe-obs/c any/c) draw/c)
@@ -231,7 +234,7 @@
         #:min-size (maybe-obs/c size/c)
         #:stretch (maybe-obs/c stretch/c)
         #:mixin (make-mixin-contract gui:canvas%))
-       (is-a?/c view<%>)))
+       view/c))
 
 (define-syntax-rule (panel/c arg/c ...)
   (->* (arg/c ...)
@@ -245,8 +248,8 @@
         #:min-size (maybe-obs/c size/c)
         #:stretch (maybe-obs/c stretch/c)
         #:mixin (make-mixin-contract gui:panel%))
-       #:rest (listof (is-a?/c view<%>))
-       (is-a?/c view<%>)))
+       #:rest (listof view/c)
+       view/c))
 
 (define (window/c % style/c)
   (->* ()
@@ -258,8 +261,8 @@
         #:stretch (maybe-obs/c stretch/c)
         #:style style/c
         #:mixin (make-mixin-contract %))
-       #:rest (listof (is-a?/c view<%>))
-       (is-a?/c view<%>)))
+       #:rest (listof view/c)
+       view/c))
 
 (define table-action/c
   (-> (or/c 'select 'dclick 'column)
