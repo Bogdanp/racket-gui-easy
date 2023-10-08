@@ -110,25 +110,47 @@
 
 (define menu-item%
   (class* object% (view<%>)
-    (init-field @label action)
+    (init-field @label @enabled? @help @shortcut action)
     (super-new)
 
     (define/public (dependencies)
-      (filter obs? (list @label)))
+      (filter obs? (list @label @enabled? @help @shortcut)))
 
     (define/public (create parent)
-      (new gui:menu-item%
-           [parent parent]
-           [label (peek @label)]
-           [callback (λ (_self _event)
-                       (action))]))
+      (define the-item
+        (new gui:menu-item%
+             [parent parent]
+             [help-string (obs-peek @help)]
+             [label (peek @label)]
+             [callback (λ (_self _event)
+                         (action))]))
+      (begin0 the-item
+        (send the-item enable (obs-peek @enabled?))
+        (set-shortcut the-item (obs-peek @shortcut))))
 
     (define/public (update v what val)
       (case/dep what
-        [@label (send v set-label val)]))
+        [@enabled? (send v enable val)]
+        [@help (send v set-help-string val)]
+        [@label (send v set-label val)]
+        [@shortcut (set-shortcut v val)]))
 
     (define/public (destroy _v)
-      (void))))
+      (void))
+
+    (define/private (set-shortcut v s)
+      (cond
+        [s
+         ;; Contract guarantees at least one prefix and one key.
+         (define-values (p k)
+           (for/fold ([p null] [k #f] #:result (values (reverse p) k))
+                     ([v (in-list s)])
+             (values (if k (cons k p) p) v)))
+         (send v set-shortcut k)
+         (send v set-shortcut-prefix p)]
+        [else
+         (send v set-shortcut #f)
+         (send v set-shortcut-prefix null)]))))
 
 (define menu-item-separator%
   (class* object% (view<%>)
@@ -160,9 +182,15 @@
        [@label @label]
        [children children]))
 
-(define (menu-item @label [action void])
+(define (menu-item @label [action void]
+                   #:enabled? [@enabled? (obs #t)]
+                   #:help [@help (obs #f)]
+                   #:shortcut [@shortcut (obs #f)])
   (new menu-item%
-       [@label @label]
+       [@label (->obs @label)]
+       [@enabled? (->obs @enabled?)]
+       [@help (->obs @help)]
+       [@shortcut (->obs @shortcut)]
        [action action]))
 
 (define (menu-item-separator)

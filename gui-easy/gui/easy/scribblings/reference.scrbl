@@ -140,10 +140,23 @@
 }
 
 @defproc[(menu-item [label (maybe-obs/c maybe-label/c)]
-                    [action (-> any) void]) (is-a?/c view<%>)]{
+                    [action (-> any) void]
+                    [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                    [#:help help-text (maybe-obs/c (or/c #f string?)) #f]
+                    [#:shortcut shortcut (maybe-obs/c (or/c #f (*list/c
+                                                                (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
+                                                                (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
+                                                                (or/c char? symbol?)))) #f]) (is-a?/c view<%>)]{
 
   Returns a representation of a menu item that calls @racket[action]
   when clicked.
+
+  @history[
+    #:changed "0.15" @elem{
+      The @racket[#:enabled?], @racket[#:help] and @racket[#:shortcut]
+      arguments.
+    }
+  ]
 }
 
 @defproc[(menu-item-separator) (is-a?/c view<%>)]{

@@ -1,7 +1,7 @@
-#lang racket/base
+#lang racket/gui/easy
 
-(require (prefix-in gui: racket/gui)
-         racket/gui/easy)
+
+(define/obs @can-save? #t)
 
 (render
  (window
@@ -9,6 +9,17 @@
   (menu-bar
    (menu "&File"
          (menu-item "&New File")
-         (menu-item "&Open File..." (λ () (gui:get-file)))
+         (menu-item "&Open..." (λ () (gui:get-file)))
+         (menu-item
+          "&Save..."
+          #:enabled? @can-save?
+          #:help "Saves the file"
+          #:shortcut (if (eq? (system-type 'os) 'macosx)
+                         '(cmd #\s)
+                         '(ctl #\s)))
          (menu-item-separator)
-         (menu-item "&Print...")))))
+         (menu-item "&Print...")))
+  (button
+   "Toggle Save"
+   (lambda ()
+     (@can-save? . <~ . not)))))

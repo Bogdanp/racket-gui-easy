@@ -35,7 +35,15 @@
   [popup-menu (-> view/c ... (is-a?/c popup-menu-view<%>))]
   [menu-bar (-> view/c ... (is-a?/c menu-bar-view<%>))]
   [menu (-> (maybe-obs/c maybe-label/c) view/c ... (is-a?/c menu-view<%>))]
-  [menu-item (->* ((maybe-obs/c maybe-label/c)) ((-> any)) view/c)]
+  [menu-item (->* ((maybe-obs/c maybe-label/c))
+                  ((-> any)
+                   #:enabled? (maybe-obs/c any/c)
+                   #:help (maybe-obs/c (or/c #f string?))
+                   #:shortcut (maybe-obs/c (or/c #f (*list/c
+                                                     (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
+                                                     (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
+                                                     (or/c char? symbol?)))))
+                  view/c)]
   [menu-item-separator (-> view/c)]
 
   ;; Containers
