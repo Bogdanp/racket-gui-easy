@@ -139,18 +139,13 @@
       (void))
 
     (define/private (set-shortcut v s)
-      (cond
-        [s
-         ;; Contract guarantees at least one prefix and one key.
-         (define-values (p k)
-           (for/fold ([p null] [k #f] #:result (values (reverse p) k))
-                     ([v (in-list s)])
-             (values (if k (cons k p) p) v)))
-         (send v set-shortcut k)
-         (send v set-shortcut-prefix p)]
-        [else
-         (send v set-shortcut #f)
-         (send v set-shortcut-prefix null)]))))
+      ;; Contract guarantees at least one prefix and one key.
+      (define-values (p k)
+        (for/fold ([p null] [k #f] #:result (values (reverse p) k))
+                  ([v (in-list (or s null))])
+          (values (if k (cons k p) p) v)))
+      (send v set-shortcut k)
+      (send v set-shortcut-prefix p))))
 
 (define menu-item-separator%
   (class* object% (view<%>)
