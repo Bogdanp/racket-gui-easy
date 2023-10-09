@@ -1,7 +1,6 @@
 #lang racket/base
 
 (require racket/class
-         racket/contract
          (prefix-in gui: racket/gui)
          "../renderer.rkt"
          "common.rkt"
