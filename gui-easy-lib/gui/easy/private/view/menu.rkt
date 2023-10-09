@@ -52,21 +52,27 @@
 (define menu-bar%
   (class* container% (menu-bar-view<%>)
     (inherit-field children)
+    (init-field @enabled?)
     (inherit add-child update-children destroy-children child-dependencies)
     (super-new)
 
     (define/public (dependencies)
-      (child-dependencies))
+      (remove-duplicates
+       (append (filter obs? (list @enabled?))
+               (child-dependencies))))
 
     (define/public (create parent)
       (define the-menu-bar
         (new (context-mixin gui:menu-bar%)
              [parent parent]))
       (begin0 the-menu-bar
+        (send the-menu-bar enable (peek @enabled?))
         (for ([c (in-list children)])
           (add-child the-menu-bar c (send c create the-menu-bar)))))
 
     (define/public (update v what val)
+      (case/dep what
+        [@enabled? (send v enable val)])
       (update-children v what val))
 
     (define/public (destroy v)
@@ -82,26 +88,30 @@
 (define menu%
   (class* container% (menu-view<%>)
     (inherit-field children)
-    (init-field @label)
+    (init-field @label @enabled? @help)
     (inherit add-child update-children destroy-children child-dependencies)
     (super-new)
 
     (define/public (dependencies)
       (remove-duplicates
-       (append (filter obs? (list @label))
+       (append (filter obs? (list @label @enabled? @help))
                (child-dependencies))))
 
     (define/public (create parent)
       (define the-menu
         (new (context-mixin gui:menu%)
              [parent parent]
+             [help-string (peek @help)]
              [label (peek @label)]))
       (begin0 the-menu
+        (send the-menu enable (peek @enabled?))
         (for ([c (in-list children)])
           (add-child the-menu c (send c create the-menu)))))
 
     (define/public (update v what val)
       (case/dep what
+        [@enabled? (send v enable val)]
+        [@help (send v set-help-string val)]
         [@label (send v set-label val)])
       (update-children v what val))
 
@@ -120,13 +130,13 @@
       (define the-item
         (new gui:menu-item%
              [parent parent]
-             [help-string (obs-peek @help)]
+             [help-string (peek @help)]
              [label (peek @label)]
              [callback (λ (_self _event)
                          (action))]))
       (begin0 the-item
-        (send the-item enable (obs-peek @enabled?))
-        (set-shortcut the-item (obs-peek @shortcut))))
+        (send the-item enable (peek @enabled?))
+        (set-shortcut the-item (peek @shortcut))))
 
     (define/public (update v what val)
       (case/dep what
@@ -168,13 +178,20 @@
   (new popup-menu%
        [children children]))
 
-(define (menu-bar . children)
+(define (menu-bar #:enabled? [@enabled? (obs #t)]
+                  . children)
   (new menu-bar%
+       [@enabled? @enabled?]
        [children children]))
 
-(define (menu @label . children)
+(define (menu @label
+              #:enabled? [@enabled? (obs #t)]
+              #:help [@help (obs #f)]
+              . children)
   (new menu%
        [@label @label]
+       [@enabled? @enabled?]
+       [@help @help]
        [children children]))
 
 (define (menu-item @label [action void]

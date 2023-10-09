@@ -116,7 +116,8 @@
   ]
 }
 
-@defproc[(menu-bar [menu-or-item (is-a?/c view<%>)] ...) (is-a?/c view<%>)]{
+@defproc[(menu-bar [#:enabled? enabled? (maybe-obs/c any/c) #t]
+                   [menu-or-item (is-a?/c view<%>)] ...) (is-a?/c view<%>)]{
   Returns a representation of a menu-bar menu.
 
   @racketblock[
@@ -131,17 +132,29 @@
       "Help"
       (menu-item "Getting Started")))
   ]
+
+  @history[
+    #:changed "0.15" @elem{The @racket[#:enabled?] argument.}
+  ]
 }
 
 @defproc[(menu [label (maybe-obs/c maybe-label/c)]
+               [#:enabled? enabled? (maybe-obs/c any/c) #t]
+               [#:help help-text (maybe-obs/c (or/c #f string?)) #f]
                [item (is-a?/c view<%>)] ...) (is-a?/c view<%>)]{
 
   Returns a representation of a menu with @racket[item]s as children.
+
+  @history[
+    #:changed "0.15" @elem{
+      The @racket[#:enabled?] and @racket[#:help] arguments.
+    }
+  ]
 }
 
 @defproc[(menu-item [label (maybe-obs/c maybe-label/c)]
                     [action (-> any) void]
-                    [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                    [#:enabled? enabled? (maybe-obs/c any/c) #t]
                     [#:help help-text (maybe-obs/c (or/c #f string?)) #f]
                     [#:shortcut shortcut (maybe-obs/c (or/c #f (*list/c
                                                                 (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)

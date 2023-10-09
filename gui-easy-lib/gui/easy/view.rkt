@@ -33,8 +33,15 @@
 
   ;; Menus & Menu Items
   [popup-menu (-> view/c ... (is-a?/c popup-menu-view<%>))]
-  [menu-bar (-> view/c ... (is-a?/c menu-bar-view<%>))]
-  [menu (-> (maybe-obs/c maybe-label/c) view/c ... (is-a?/c menu-view<%>))]
+  [menu-bar (->* ()
+                 (#:enabled? (maybe-obs/c any/c))
+                 #:rest (listof view/c)
+                 (is-a?/c menu-bar-view<%>))]
+  [menu (->* ((maybe-obs/c maybe-label/c))
+             (#:enabled? (maybe-obs/c any/c)
+              #:help (maybe-obs/c (or/c #f string?)))
+             #:rest (listof view/c)
+             (is-a?/c menu-view<%>))]
   [menu-item (->* ((maybe-obs/c maybe-label/c))
                   ((-> any)
                    #:enabled? (maybe-obs/c any/c)
