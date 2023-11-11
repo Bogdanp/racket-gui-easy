@@ -2,7 +2,8 @@
 
 (require racket/gui/easy
          racket/gui/easy/operator
-         sgl)
+         sgl
+         racket/draw)
 
 (define @rot (@ 0))
 
@@ -18,6 +19,8 @@
                      (thunk
                       (gl-clear-color 0.0 0.0 0.0 1.0)
                       (gl-clear 'color-buffer-bit)
+
+                      (gl-enable 'multisample)
 
                       (let-values ([(x0 y0) (send dc get-origin)]
                                    [(w h) (send dc get-size)])
@@ -43,7 +46,11 @@
 
            #:mixin (λ (%)
                      (class %
-                       (super-new)
+                       (super-instantiate ()
+                                          (gl-config
+                                           (let ([cfg (new gl-config%)])
+                                             (send cfg set-multisample-size 4)
+                                             cfg)))
 
                        (define drag-start-x #f)
                        (define drag-start-rotation #f)
