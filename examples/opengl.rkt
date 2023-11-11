@@ -9,7 +9,7 @@
 (void
  (render
   (window
-   #:title "OpenGL in rackte/gui/easy"
+   #:title "OpenGL in racket/gui/easy"
 
    (canvas @rot
            (λ (dc rot)
