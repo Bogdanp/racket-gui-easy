@@ -878,6 +878,15 @@ that equality (via @racket[equal?]) is preserved for
   error.
 }
 
+@defproc[(obs-set! [o obs?]
+                   [v any/c]) void?]{
+
+  Sets the value of @racket[o] to @racket[v]. Equivalent to
+  @racket[(void (obs-update! o (λ (old-v) v)))].
+
+  @history[#:added "0.16"]
+}
+
 @defproc[(obs-peek [o obs?]) any/c]{
   Returns the current value contained within @racket[o].
 }

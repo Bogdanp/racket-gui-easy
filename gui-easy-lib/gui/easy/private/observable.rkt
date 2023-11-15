@@ -16,6 +16,7 @@
  obs-observe!
  obs-unobserve!
  obs-update!
+ obs-set!
  obs-peek
  obs-map
  obs-filter
@@ -121,6 +122,9 @@
   (when (obs-derived? o)
     (raise-argument-error 'obs-update! "(not/c obs-derived?)" o))
   (do-obs-update! o f))
+
+(define (obs-set! o v)
+  (void (obs-update! o (λ (_) v))))
 
 (define (obs-peek o)
   (unbox (obs-value-box o)))

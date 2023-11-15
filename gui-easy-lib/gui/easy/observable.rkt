@@ -14,6 +14,7 @@
   [obs-observe! (-> obs? (-> any/c any) void?)]
   [obs-unobserve! (-> obs? (-> any/c any) void?)]
   [obs-update! (-> obs? (-> any/c any/c) any/c)]
+  [obs-set! (-> obs? any/c void?)]
   [obs-peek (-> obs? any/c)]
   [obs-map (-> obs? (-> any/c any/c) obs?)]
   [obs-filter (->* (obs? (-> any/c any/c)) (any/c) obs?)]
