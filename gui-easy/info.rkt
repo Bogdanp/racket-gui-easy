@@ -7,7 +7,6 @@
 (define build-deps '("draw-doc"
                      "gui-doc"
                      "gui-lib"
-                     "gui-easy-lib"
                      "pict-doc"
                      "pict-lib"
                      "racket-doc"
