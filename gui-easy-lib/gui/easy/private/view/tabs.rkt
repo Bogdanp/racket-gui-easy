@@ -95,10 +95,9 @@
           (send the-panel set-context 'last-selection selection)
           (send the-panel set-context 'last-index index)
           (send the-panel set-selection index))
-        (send the-panel begin-container-sequence)
-        (for ([c (in-list children)])
-          (add-child the-panel c (send c create the-panel)))
-        (send the-panel end-container-sequence)))
+        (with-container-sequence the-panel
+          (for ([c (in-list children)])
+            (add-child the-panel c (send c create the-panel))))))
 
     (define/public (update v what val)
       (case/dep what

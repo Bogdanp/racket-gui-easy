@@ -3,7 +3,8 @@
 (require racket/class)
 
 (provide
- container%)
+ container%
+ with-container-sequence)
 
 (define container%
   (class object%
@@ -42,3 +43,13 @@
 
     (define/private (get-children-to-widgets v)
       (send v get-context! 'children-to-widgets make-hasheq))))
+
+(define-syntax-rule (with-container-sequence container body0 body ...)
+  (dynamic-wind
+    (lambda ()
+      (send container begin-container-sequence))
+    (lambda ()
+      body0
+      body ...)
+    (lambda ()
+      (send container end-container-sequence))))

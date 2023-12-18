@@ -46,10 +46,9 @@
     (define/public (create parent)
       (define the-panel (-make-panel parent))
       (begin0 the-panel
-        (send the-panel begin-container-sequence)
-        (for ([c (in-list children)])
-          (add-child the-panel c (send c create the-panel)))
-        (send the-panel end-container-sequence)))
+        (with-container-sequence the-panel
+          (for ([c (in-list children)])
+            (add-child the-panel c (send c create the-panel))))))
 
     (define/public (update v what val)
       (case/dep what

@@ -4,6 +4,7 @@
          (prefix-in gui: racket/gui)
          "../renderer.rkt"
          "common.rkt"
+         "container.rkt"
          "proxy.rkt"
          "view.rkt")
 
@@ -29,10 +30,9 @@
       (case/dep what
         [@data
          (unless (equal?-proc val (get-data v))
-           (send v begin-container-sequence)
-           (remove&destroy-child v)
-           (create&add-child v val)
-           (send v end-container-sequence))])
+           (with-container-sequence v
+             (remove&destroy-child v)
+             (create&add-child v val)))])
       (define child
         (send v get-context 'view #f))
       (when child

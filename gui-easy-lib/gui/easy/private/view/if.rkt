@@ -47,16 +47,15 @@
         [@cond-e
          (define this-bool (->bool val))
          (unless (eq? (get-last-bool v) this-bool)
-           (send v begin-container-sequence)
-           (when (has-then-view? v)
-             (remove&destroy-then-view v))
-           (when (has-else-view? v)
-             (remove&destroy-else-view v))
-           (if this-bool
-               (create&add-then-view v)
-               (create&add-else-view v))
-           (send v set-context 'last-bool this-bool)
-           (send v end-container-sequence))]))
+           (with-container-sequence v
+             (when (has-then-view? v)
+               (remove&destroy-then-view v))
+             (when (has-else-view? v)
+               (remove&destroy-else-view v))
+             (if this-bool
+                 (create&add-then-view v)
+                 (create&add-else-view v))
+             (send v set-context 'last-bool this-bool)))]))
 
     (define/public (destroy v)
       (when (has-then-view? v)
