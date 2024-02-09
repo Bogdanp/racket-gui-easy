@@ -144,7 +144,7 @@
                 #:min-size (maybe-obs/c size/c)
                 #:stretch (maybe-obs/c stretch/c))
                view/c)]
-  [image (->* ((maybe-obs/c path-string?))
+  [image (->* ((maybe-obs/c (or/c path-string? (is-a?/c gui:bitmap%))))
               (#:size (maybe-obs/c size/c)
                #:mode (maybe-obs/c (or/c 'fit 'fill)))
               view/c)]

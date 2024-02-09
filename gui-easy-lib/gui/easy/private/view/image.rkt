@@ -15,23 +15,23 @@
 (define backing-scale
   (gui:get-display-backing-scale))
 
-(struct props (path size mode))
+(struct props (image size mode))
 
 (define image%
   (class* object% (view<%>)
-    (init-field @path @size @mode)
+    (init-field @image @size @mode)
     (super-new)
 
     (define @props
-      (obs-combine props @path @size @mode))
+      (obs-combine props @image @size @mode))
 
     (define/public (dependencies)
       (filter obs? (list @props)))
 
     (define/public (create parent)
-      (match-define (props path size mode)
+      (match-define (props image size mode)
         (peek @props))
-      (define bmp (read-bitmap path))
+      (define bmp (read-bitmap image))
       (define bmp/scaled (scale bmp size mode))
       (define the-canvas
         (new (context-mixin gui:canvas%)
@@ -45,21 +45,21 @@
                                (let ([bmp (send self get-context 'bmp/scaled bmp/scaled)])
                                  (send dc draw-bitmap bmp 0 0)))]))
       (begin0 the-canvas
-        (send the-canvas set-context* 'path path 'bmp bmp 'bmp/scaled bmp/scaled)))
+        (send the-canvas set-context* 'image image 'bmp bmp 'bmp/scaled bmp/scaled)))
 
     (define/public (update v what val)
       (case/dep what
         [@props
-         (define last-path
-           (send v get-context 'path))
-         (match-define (props path size mode) val)
+         (define last-image
+           (send v get-context 'image))
+         (match-define (props image size mode) val)
          (define bmp
-           (if (equal? path last-path)
+           (if (equal? image last-image)
                (send v get-context 'bmp)
-               (read-bitmap path)))
+               (read-bitmap image)))
          (define bmp/scaled
            (scale bmp size mode))
-         (send v set-context* 'path path 'bmp bmp 'bmp/scaled bmp/scaled)
+         (send v set-context* 'image image 'bmp bmp 'bmp/scaled bmp/scaled)
          (send v min-width (send bmp/scaled get-width))
          (send v min-height (send bmp/scaled get-height))
          (send v refresh-now)]))
@@ -67,10 +67,12 @@
     (define/public (destroy v)
       (send v clear-context))
 
-    (define (read-bitmap path)
-      (gui:read-bitmap
-       #:try-@2x? #t
-       path))
+    (define (read-bitmap image)
+      (if (gui:is-a? image gui:bitmap%)
+          image
+          (gui:read-bitmap
+           #:try-@2x? #t
+           image)))
 
     (define (scale bmp size mode)
       (match size
@@ -99,10 +101,10 @@
                0 0 sw sh)
          (send bmp-dc get-bitmap)]))))
 
-(define (image @path
+(define (image @image
                #:size [@size (obs '(#f #f))]
                #:mode [@mode (obs 'fit)])
   (new image%
-       [@path (->obs @path)]
+       [@image (->obs @image)]
        [@size (->obs @size)]
        [@mode (->obs @mode)]))
