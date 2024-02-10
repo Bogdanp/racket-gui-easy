@@ -475,7 +475,7 @@
   to determine the selection index.
 }
 
-@defproc[(image [path (maybe-obs/c path-string?)]
+@defproc[(image [path-or-bitmap (maybe-obs/c (or/c path-string? (is-a?/c gui:bitmap%)))]
                 [#:size size (maybe-obs/c size/c) '(#f #f)]
                 [#:mode mode (maybe-obs/c (or/c 'fit 'fill)) 'fit]) (is-a?/c view<%>)]{
 
@@ -486,9 +486,12 @@
   will preserve its aspect ratio, otherwise it will stretch to fill
   the container.
 
-  @history[#:changed "0.11.1" @elem{The canvas background is now
-    @racket['transparent]. Now passes @racket[#t] to the
-    @racket[#:try-@2x?] argument of @racket[gui:read-bitmap].}]
+  @history[
+    #:changed "0.11.1" @elem{The canvas background is now
+     @racket['transparent]. Now passes @racket[#t] to the
+     @racket[#:try-@2x?] argument of @racket[gui:read-bitmap].}
+    #:changed "0.17" @elem{The first argument may now be a
+     @racket[gui:bitmap%].}]
 }
 
 @defproc[(input [value (maybe-obs/c any/c)]
