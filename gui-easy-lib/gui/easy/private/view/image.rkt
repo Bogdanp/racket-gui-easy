@@ -82,16 +82,20 @@
            (values
             (send bmp get-width)
             (send bmp get-height)))
+         (define r (/ sh sw))
+         (define-values (pw ph)
+           (values
+            (if w w (/ h r))      ; in case of either w or h is #f
+            (if h h (* w r))))
          (define-values (w* h*)
            (case mode
              [(fill)
               (values w h)]
 
              [(fit)
-              (define r (/ sh sw))
-              (if (>= (* w r) h)
-                  (values (exact-ceiling (/ h r)) h)
-                  (values w (exact-ceiling (* w r))))]))
+              (if (>= (* pw r) ph)
+                  (values (exact-ceiling (/ ph r)) ph)
+                  (values pw (exact-ceiling (* pw r))))]))
          (define bmp-dc
            (new gui:bitmap-dc%
                 [bitmap (gui:make-bitmap w* h* #:backing-scale backing-scale)]))
