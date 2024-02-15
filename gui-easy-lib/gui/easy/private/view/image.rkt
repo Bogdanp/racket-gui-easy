@@ -85,12 +85,12 @@
          (define r (/ sh sw))
          (define-values (pw ph)
            (values
-            (if w w (/ h r))      ; in case of either w or h is #f
+            (if w w (exact-ceiling (/ h r)))      ; in case of either w or h is #f
             (if h h (* w r))))
          (define-values (w* h*)
            (case mode
              [(fill)
-              (values w h)]
+              (values pw ph)]
 
              [(fit)
               (if (>= (* pw r) ph)
