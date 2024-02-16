@@ -45,21 +45,38 @@
                                (let ([bmp (send self get-context 'bmp/scaled bmp/scaled)])
                                  (send dc draw-bitmap bmp 0 0)))]))
       (begin0 the-canvas
-        (send the-canvas set-context* 'image image 'bmp bmp 'bmp/scaled bmp/scaled)))
+        (send the-canvas set-context*
+              'image image
+              'size size
+              'mode mode
+              'bmp bmp
+              'bmp/scaled bmp/scaled)))
 
     (define/public (update v what val)
       (case/dep what
         [@props
-         (define last-image
-           (send v get-context 'image))
+         (define last-image (send v get-context 'image))
+         (define last-size (send v get-context 'size))
+         (define last-mode (send v get-context 'mode))
+         (define last-bmp (send v get-context 'bmp))
+         (define last-bmp/scaled (send v get-context 'bmp/scaled))
          (match-define (props image size mode) val)
          (define bmp
            (if (equal? image last-image)
                (send v get-context 'bmp)
                (read-bitmap image)))
          (define bmp/scaled
-           (scale bmp size mode))
-         (send v set-context* 'image image 'bmp bmp 'bmp/scaled bmp/scaled)
+           (if (and (equal? bmp last-bmp)
+                    (equal? size last-size)
+                    (equal? mode last-mode))
+               last-bmp/scaled
+               (scale bmp size mode)))
+         (send v set-context*
+               'image image
+               'size size
+               'mode mode
+               'bmp bmp
+               'bmp/scaled bmp/scaled)
          (send v min-width (send bmp/scaled get-width))
          (send v min-height (send bmp/scaled get-height))
          (send v refresh-now)]))
