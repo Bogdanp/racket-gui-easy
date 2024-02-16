@@ -8,7 +8,13 @@
 (define @path (@ #f))
 (define @width (@ 200))
 (define @height (@ 200))
-(define @size (obs-combine list @width @height))
+(define @size
+  (obs-combine
+   (λ (w h)
+     (list
+      (and (> w 0) w)
+      (and (> h 0) h)))
+   @width @height))
 (define @mode (@ 'fit))
 
 ;; The contract on `image' requires the path to be a valid filesystem
@@ -38,12 +44,12 @@
         (@mode . λ:= . (compose1 string->symbol string-downcase)))
        (slider
         #:label "Width"
-        #:min-value 1
+        #:min-value 0
         #:max-value 800
         @width (λ:= @width))
        (slider
         #:label "Height"
-        #:min-value 1
+        #:min-value 0
         #:max-value 800
         @height (λ:= @height)))
       (image (@path . ~> . path-fallback) #:size @size #:mode @mode))]

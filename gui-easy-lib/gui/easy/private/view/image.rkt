@@ -78,31 +78,31 @@
       (match size
         ['(#f #f) bmp]
         [`(,w ,h)
-         (define-values (sw sh)
+         (define-values (src-w src-h)
            (values
             (send bmp get-width)
             (send bmp get-height)))
-         (define r (/ sh sw))
+         (define aspect-ratio (/ src-h src-w))
          (define-values (pw ph)
            (values
-            (if w w (exact-ceiling (/ h r)))      ; in case of either w or h is #f
-            (if h h (* w r))))
-         (define-values (w* h*)
+            (or w (exact-ceiling (/ h aspect-ratio)))
+            (or h (exact-ceiling (* w aspect-ratio)))))
+         (define-values (dst-w dst-h)
            (case mode
              [(fill)
               (values pw ph)]
 
              [(fit)
-              (if (>= (* pw r) ph)
-                  (values (exact-ceiling (/ ph r)) ph)
-                  (values pw (exact-ceiling (* pw r))))]))
+              (if (>= (* pw aspect-ratio) ph)
+                  (values (exact-ceiling (/ ph aspect-ratio)) ph)
+                  (values pw (exact-ceiling (* pw aspect-ratio))))]))
          (define bmp-dc
            (new gui:bitmap-dc%
-                [bitmap (gui:make-bitmap w* h* #:backing-scale backing-scale)]))
+                [bitmap (gui:make-bitmap dst-w dst-h #:backing-scale backing-scale)]))
          (send bmp-dc draw-bitmap-section-smooth
                bmp
-               0 0 w* h*
-               0 0 sw sh)
+               0 0 dst-w dst-h
+               0 0 src-w src-h)
          (send bmp-dc get-bitmap)]))))
 
 (define (image @image
