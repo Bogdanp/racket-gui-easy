@@ -17,6 +17,7 @@
  menu-view<%>
  menu
  menu-item
+ checkable-menu-item
  menu-item-separator)
 
 (define popup-menu-view<%>
@@ -157,6 +158,47 @@
       (send v set-shortcut k)
       (send v set-shortcut-prefix p))))
 
+(define checkable-menu-item%
+  (class* object% (view<%>)
+    (init-field @label @checked? @enabled? @help @shortcut action)
+    (super-new)
+
+    (define/public (dependencies)
+      (filter obs? (list @label @checked? @enabled? @help @shortcut)))
+
+    (define/public (create parent)
+      (define the-item
+        (new gui:checkable-menu-item%
+             [parent parent]
+             [help-string (peek @help)]
+             [label (peek @label)]
+             [callback (λ (_self _event)
+                         (action (send _self is-checked?)))]
+             [checked (peek @checked?)]))
+      (begin0 the-item
+        (send the-item enable (peek @enabled?))
+        (set-shortcut the-item (peek @shortcut))))
+
+    (define/public (update v what val)
+      (case/dep what
+        [@checked? (send v check val)]
+        [@enabled? (send v enable val)]
+        [@help (send v set-help-string val)]
+        [@label (send v set-label val)]
+        [@shortcut (set-shortcut v val)]))
+
+    (define/public (destroy _v)
+      (void))
+
+    (define/private (set-shortcut v s)
+      ;; Contract guarantees at least one prefix and one key.
+      (define-values (p k)
+        (for/fold ([p null] [k #f] #:result (values (reverse p) k))
+                  ([v (in-list (or s null))])
+          (values (if k (cons k p) p) v)))
+      (send v set-shortcut k)
+      (send v set-shortcut-prefix p))))
+
 (define menu-item-separator%
   (class* object% (view<%>)
     (super-new)
@@ -200,6 +242,19 @@
                    #:shortcut [@shortcut (obs #f)])
   (new menu-item%
        [@label (->obs @label)]
+       [@enabled? (->obs @enabled?)]
+       [@help (->obs @help)]
+       [@shortcut (->obs @shortcut)]
+       [action action]))
+
+(define (checkable-menu-item @label [action void]
+                             #:checked? [@checked? (obs #f)]
+                             #:enabled? [@enabled? (obs #t)]
+                             #:help [@help (obs #f)]
+                             #:shortcut [@shortcut (obs #f)])
+  (new checkable-menu-item%
+       [@label (->obs @label)]
+       [@checked? (->obs @checked?)]
        [@enabled? (->obs @enabled?)]
        [@help (->obs @help)]
        [@shortcut (->obs @shortcut)]

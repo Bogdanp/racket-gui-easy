@@ -51,6 +51,16 @@
                                                      (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
                                                      (or/c char? symbol?)))))
                   view/c)]
+  [checkable-menu-item (->* ((maybe-obs/c maybe-label/c))
+                            ((-> boolean? any)
+                             #:checked? (maybe-obs/c boolean?)
+                             #:enabled? (maybe-obs/c any/c)
+                             #:help (maybe-obs/c (or/c #f string?))
+                             #:shortcut (maybe-obs/c (or/c #f (*list/c
+                                                               (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
+                                                               (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
+                                                               (or/c char? symbol?)))))
+                            view/c)]
   [menu-item-separator (-> view/c)]
 
   ;; Containers
