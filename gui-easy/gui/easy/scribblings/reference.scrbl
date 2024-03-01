@@ -182,7 +182,13 @@
                                                                           (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
                                                                           (or/c char? symbol?)))) #f]) (is-a?/c view<%>)]{
 
-  Returns a representation of a menu item with a checkbox. The @racket[action] callback is called with the current checked state when the menu item is clicked. Use @racket[#:checked?] to set or update the checkbox programmatically.}
+  Returns a representation of a menu item with a checkbox. The
+  @racket[action] callback is called with the current checked state
+  when the menu item is clicked. Use @racket[#:checked?] to set or
+  update the checkbox programmatically.
+
+  @history[#:added "0.18"]
+}
 
 @defproc[(menu-item-separator) (is-a?/c view<%>)]{
   Returns a representation of a menu item separator.
