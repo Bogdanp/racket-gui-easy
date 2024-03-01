@@ -53,7 +53,7 @@
                   view/c)]
   [checkable-menu-item (->* ((maybe-obs/c maybe-label/c))
                             ((-> boolean? any)
-                             #:checked? (maybe-obs/c boolean?)
+                             #:checked? (maybe-obs/c any/c)
                              #:enabled? (maybe-obs/c any/c)
                              #:help (maybe-obs/c (or/c #f string?))
                              #:shortcut (maybe-obs/c (or/c #f (*list/c
