@@ -147,16 +147,7 @@
         [@shortcut (set-shortcut v val)]))
 
     (define/public (destroy _v)
-      (void))
-
-    (define/private (set-shortcut v s)
-      ;; Contract guarantees at least one prefix and one key.
-      (define-values (p k)
-        (for/fold ([p null] [k #f] #:result (values (reverse p) k))
-                  ([v (in-list (or s null))])
-          (values (if k (cons k p) p) v)))
-      (send v set-shortcut k)
-      (send v set-shortcut-prefix p))))
+      (void))))
 
 (define checkable-menu-item%
   (class* object% (view<%>)
@@ -188,16 +179,16 @@
         [@shortcut (set-shortcut v val)]))
 
     (define/public (destroy _v)
-      (void))
+      (void))))
 
-    (define/private (set-shortcut v s)
-      ;; Contract guarantees at least one prefix and one key.
-      (define-values (p k)
-        (for/fold ([p null] [k #f] #:result (values (reverse p) k))
-                  ([v (in-list (or s null))])
-          (values (if k (cons k p) p) v)))
-      (send v set-shortcut k)
-      (send v set-shortcut-prefix p))))
+(define (set-shortcut v s)
+  ;; Contract guarantees at least one prefix and one key.
+  (define-values (p k)
+    (for/fold ([p null] [k #f] #:result (values (reverse p) k))
+              ([v (in-list (or s null))])
+      (values (if k (cons k p) p) v)))
+  (send v set-shortcut k)
+  (send v set-shortcut-prefix p))
 
 (define menu-item-separator%
   (class* object% (view<%>)
