@@ -174,7 +174,7 @@
 
 @defproc[(checkable-menu-item [label (maybe-obs/c maybe-label/c)]
                               [action (-> boolean? any) void]
-                              [#:checked? checked? (maybe-obs/c boolean?) #f]
+                              [#:checked? checked? (maybe-obs/c any/c) #f]
                               [#:enabled? enabled? (maybe-obs/c any/c) #t]
                               [#:help help-text (maybe-obs/c (or/c #f string?)) #f]
                               [#:shortcut shortcut (maybe-obs/c (or/c #f (*list/c
