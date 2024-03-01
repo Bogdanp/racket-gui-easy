@@ -172,6 +172,18 @@
   ]
 }
 
+@defproc[(checkable-menu-item [label (maybe-obs/c maybe-label/c)]
+                              [action (-> boolean? any) void]
+                              [#:checked? checked? (maybe-obs/c boolean?) #f]
+                              [#:enabled? enabled? (maybe-obs/c any/c) #t]
+                              [#:help help-text (maybe-obs/c (or/c #f string?)) #f]
+                              [#:shortcut shortcut (maybe-obs/c (or/c #f (*list/c
+                                                                          (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
+                                                                          (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
+                                                                          (or/c char? symbol?)))) #f]) (is-a?/c view<%>)]{
+
+  Returns a representation of a menu item with a checkbox. The @racket[action] callback is called with the current checked state when the menu item is clicked. Use @racket[#:checked?] to set or update the checkbox programmatically.}
+
 @defproc[(menu-item-separator) (is-a?/c view<%>)]{
   Returns a representation of a menu item separator.
 }
