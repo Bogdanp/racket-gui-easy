@@ -3,6 +3,7 @@
 (define/obs @menu-bar-enabled? #t)
 (define/obs @file-menu-enabled? #t)
 (define/obs @can-save? #t)
+(define/obs @checked? #f)
 
 (render
  (window
@@ -22,7 +23,12 @@
                     '(cmd #\s)
                     '(ctl #\s)))
     (menu-item-separator)
-    (menu-item "&Print...")))
+    (checkable-menu-item
+     (@checked? . ~> . (λ (checked?) (if checked?
+                                         "This is checked"
+                                         "This is not checked")))
+     (λ:= @checked?)
+     #:checked? @checked?)))
   (vpanel
    (button
     "Toggle Menu Bar"
