@@ -455,6 +455,7 @@
                  [action (-> any)]
                  [#:enabled? enabled? (maybe-obs/c boolean?) #t]
                  [#:style style (listof (or/c 'border 'multi-line 'deleted)) null]
+                 [#:font font (is-a?/c gui:font%) gui:normal-control-font]
                  [#:margin margin (maybe-obs/c margin/c) '(0 0)]
                  [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
                  [#:stretch stretch
