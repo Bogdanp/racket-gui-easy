@@ -1,7 +1,5 @@
 #lang racket/gui/easy
 
-(require racket/class)
-
 (define/obs @choice 'a)
 
 (render
