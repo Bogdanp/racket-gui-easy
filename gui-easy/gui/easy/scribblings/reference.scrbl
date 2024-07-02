@@ -347,10 +347,14 @@
                     [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
                     [#:mixin mix (make-mixin-contract gui:panel%) values]) (is-a?/c view<%>)]{
 
-  Returns a representation of a panel that renders the
-  @racket[entries] by passing each one as a @tech{derived observable}
-  to @racket[make-view].  Each entry must have a unique
-  @racket[#:key].
+  Returns a representation of a panel that renders the @racket[entries]
+  by passing each one as a @tech{derived observable} to
+  @racket[make-view]. The @racket[make-view] procedure is called with
+  the key and the derived observable of each entry. The @racket[#:key]
+  procedure must return a unique value for each entry in the list, as
+  compared using @racket[equal?].
+
+  See @filepath{examples/list.rkt} for an example.
 }
 
 @defproc[(observable-view [data (obs/c any/c)]
