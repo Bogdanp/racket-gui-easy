@@ -13,21 +13,29 @@
 
 @centered[@image[(build-path media "1.1-hello-world.png") #:scale 0.5]]
 
-@racketblock[
+@codeblock|{
+  #lang racket/base
+
+  (require racket/gui/easy)
+
   (window
    (text "Hello, World!"))
-]
+}|
 
 The code above describes a view hierarchy rooted in a window that
 contains the text ``Hello, World!''.  By itself, it doesn't do much,
 but you can take it and pass it to @racket[render] to convert it into
 a native GUI:
 
-@racketblock[
+@codeblock|{
+  #lang racket/base
+
+  (require racket/gui/easy)
+
   (render
    (window
     (text "Hello, World!")))
-]
+}|
 
 @section{Counter}
 
@@ -35,15 +43,20 @@ a native GUI:
 
 State in @tt{gui-easy} is held by @tech{observables}.
 
-@racketblock[
-  (define |@count| (|@| 0))
+@codeblock|{
+  #lang racket/base
+
+  (require racket/gui/easy
+           racket/gui/easy/operator)
+
+  (define @count (@ 0))
   (render
    (window
     (hpanel
-     (button "-" (λ () (|@count| . <~ . sub1)))
-     (text (|@count| . ~> . number->string))
-     (button "+" (λ () (|@count| . <~ . add1))))))
-]
+     (button "-" (λ () (@count . <~ . sub1)))
+     (text (@count . ~> . number->string))
+     (button "+" (λ () (@count . <~ . add1))))))
+}|
 
 Here we define an observable called @racket[|@count|] that holds the
 current value of a counter.  The two @racket[button]s change the value
@@ -58,22 +71,27 @@ laid out horizontally by the @racket[hpanel].
 Since views are at their core just descriptions of a GUI, it's easy to
 abstract over them and make them reusable.
 
-@racketblock[
-  (define (counter |@count| action)
+@codeblock|{
+  #lang racket/base
+
+  (require racket/gui/easy
+           racket/gui/easy/operator)
+
+  (define (counter @count action)
     (hpanel
      (button "-" (λ () (action sub1)))
-     (text (|@count| . ~> . number->string))
+     (text (@count . ~> . number->string))
      (button "+" (λ () (action add1)))))
 
-  (define |@counter-1| (|@| 0))
-  (define |@counter-2| (|@| 0))
+  (define @counter-1 (@ 0))
+  (define @counter-2 (@ 0))
 
   (render
    (window
     (vpanel
-     (counter |@counter-1| (λ (proc) (|@counter-1| . <~ . proc)))
-     (counter |@counter-2| (λ (proc) (|@counter-2| . <~ . proc))))))
-]
+     (counter @counter-1 (λ (proc) (@counter-1 . <~ . proc)))
+     (counter @counter-2 (λ (proc) (@counter-2 . <~ . proc))))))
+}|
 
 @section{Dynamic Counters}
 
@@ -82,8 +100,13 @@ abstract over them and make them reusable.
 Taking the previous example further, we can render a dynamic list of
 counters.
 
-@racketblock[
-  (define |@counters| (|@| '((0 . 0))))
+@codeblock|{
+  #lang racket/base
+
+  (require racket/gui/easy
+           racket/gui/easy/operator)
+
+  (define @counters (@ '((0 . 0))))
 
   (define (append-counter counts)
     (define next-id (add1 (apply max (map car counts))))
@@ -95,11 +118,11 @@ counters.
           (cons k (proc (cdr entry)))
           entry)))
 
-  (define (counter |@count| action)
+  (define (counter @count action)
     (hpanel
      #:stretch '(#t #f)
      (button "-" (λ () (action sub1)))
-     (text (|@count| . ~> . number->string))
+     (text (@count . ~> . number->string))
      (button "+" (λ () (action add1)))))
 
   (render
@@ -109,16 +132,16 @@ counters.
      (hpanel
       #:alignment '(center top)
       #:stretch '(#t #f)
-      (button "Add counter" (λ () (|@counters| . <~ . append-counter))))
+      (button "Add counter" (λ () (@counters . <~ . append-counter))))
      (list-view
-      |@counters|
+      @counters
       #:key car
-      (λ (k |@entry|)
+      (λ (k @entry)
         (counter
-         (|@entry| . ~> . cdr)
+         (@entry . ~> . cdr)
          (λ (proc)
-           (|@counters| . <~ . (λ (counts) (update-count counts k proc))))))))))
-]
+           (@counters . <~ . (λ (counts) (update-count counts k proc))))))))))
+}|
 
 Here the @racket[|@counters|] observable holds a list of pairs where
 the first element of a pair is the id of each counter and the second
