@@ -34,6 +34,8 @@
    update-observers-box!
    derived?)
 
+  #:property prop:object-name (λ (this) (obs-name this))
+
   #:methods gen:equal+hash
   [(define (equal-proc o1 o2 _recursive-equal?)
      (and (obs? o1)
@@ -257,9 +259,10 @@
                                 (channel-put ch stop)))))
 
 (module+ test
-  (require rackunit)
+  (require rackunit
+           (submod ".."))
 
-  (define @a (make-obs 1))
+  (define @a (obs 1))
   (check-equal? (obs-peek @a) 1)
   (check-equal? (obs-update! @a add1) 2)
   (check-equal? (obs-peek @a) 2)
@@ -273,7 +276,7 @@
   (check-equal? (obs-update! @a add1) 3)
   (check-equal? (obs-peek @b) "3")
 
-  (define @c (make-obs 10))
+  (define @c (obs 10))
   (define @d (obs-combine list @a @b @c))
   (check-equal? (obs-peek @d) (list 3 "3" 10))
   (obs-update! @a add1)
@@ -291,4 +294,8 @@
   (obs-update! @a add1)
   (check-equal? (obs-peek @evens) 6)
   (check-equal? (obs-peek @odds) 5)
-  (obs-update! @a add1))
+  (obs-update! @a add1)
+
+  (test-case "observable names"
+    (define @foo (obs 42 #:name '@foo))
+    (check-equal? (object-name @foo) '@foo)))
