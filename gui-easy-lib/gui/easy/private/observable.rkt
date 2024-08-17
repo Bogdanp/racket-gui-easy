@@ -34,7 +34,8 @@
    update-observers-box!
    derived?)
 
-  #:property prop:object-name (λ (this) (obs-name this))
+  #:property prop:object-name
+  (λ (this) (obs-name this))
 
   #:methods gen:equal+hash
   [(define (equal-proc o1 o2 _recursive-equal?)

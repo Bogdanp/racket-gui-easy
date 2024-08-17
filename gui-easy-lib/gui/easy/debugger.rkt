@@ -76,7 +76,7 @@
                        (vector
                         (parameterize ([date-display-format 'iso-8601])
                           (date->string (seconds->date ts) #t))
-                        (~a (obs-name obs))
+                        (~a (object-name obs))
                         (~label after)))
         (lambda (event entries selection)
           (case event
