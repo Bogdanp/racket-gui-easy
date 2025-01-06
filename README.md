@@ -1,8 +1,6 @@
 # gui-easy-lib
 
-Declarative GUIs in Racket.  This is still a work in progress so
-expect some breaking changes.
-
+Declarative GUIs in Racket.
 
 ## Installation
 
@@ -11,7 +9,6 @@ The package is available on the [Racket Package Index][pkg].
 ``` bash
 $ raco pkg install gui-easy
 ```
-
 
 ## Development
 
@@ -29,13 +26,11 @@ From the root of the repository:
 $ raco pkg update gui-easy-lib/ gui-easy/
 ```
 
-
 ## Running the demos
 
 After you have installed `gui-easy-lib`.  You can run the _example
 code_ from the `examples/` folder using _DrRacket_ or via the
 command-line.
-
 
 ## License
 
