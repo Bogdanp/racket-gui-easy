@@ -96,9 +96,11 @@
              [stretchable-height h-s?]))
       (define keys-to-children
         (get-keys-to-children the-panel))
+      (define entries (peek @entries))
+      (send the-panel set-context 'current-keys (map key-proc entries))
       (begin0 the-panel
         (with-container-sequence the-panel
-          (for ([e (in-list (peek @entries))])
+          (for ([e (in-list entries)])
             (define k (key-proc e))
             (define v (make-view k (make-keyed-obs k e)))
             (define w (send v create the-panel))
@@ -122,24 +124,26 @@
                    (add-child-handlers! v child-v)
                    (add-child v child-v child-w)
                    (hash-set! keys-to-children k child-v)))))
-           (for ([(old-k old-v) (in-hash keys-to-children)])
-             (unless (member old-k new-keys)
-               (define old-w (get-child v old-v))
-               (define focused? (send old-w has-focus?))
-               (send old-v destroy old-w)
-               (send v delete-child old-w)
-               (remove-child-handlers! v old-v)
-               (remove-child v old-v)
-               (hash-remove! keys-to-children old-k)
-               (when focused?
-                 (define children (send v get-children))
-                 (cond
-                   [(null? children) (send v focus)]
-                   [else (send (last children) focus)]))))
-           (send v change-children
-                 (λ (_)
-                   (for/list ([k (in-list new-keys)])
-                     (get-child v (hash-ref keys-to-children k))))))]
+           (unless (equal? new-keys (send v get-context 'current-keys null))
+             (for ([(old-k old-v) (in-hash keys-to-children)])
+               (unless (member old-k new-keys)
+                 (define old-w (get-child v old-v))
+                 (define focused? (send old-w has-focus?))
+                 (send old-v destroy old-w)
+                 (send v delete-child old-w)
+                 (remove-child-handlers! v old-v)
+                 (remove-child v old-v)
+                 (hash-remove! keys-to-children old-k)
+                 (when focused?
+                   (define children (send v get-children))
+                   (cond
+                     [(null? children) (send v focus)]
+                     [else (send (last children) focus)]))))
+             (send v change-children
+                   (λ (_)
+                     (for/list ([k (in-list new-keys)])
+                       (get-child v (hash-ref keys-to-children k)))))
+             (send v set-context 'current-keys new-keys)))]
         [@alignment
          (send/apply v set-alignment val)]
         [@enabled?
