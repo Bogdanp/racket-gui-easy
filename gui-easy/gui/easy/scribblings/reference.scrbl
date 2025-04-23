@@ -969,6 +969,26 @@ that equality (via @racket[equal?]) is preserved for
   values change at most once every @racket[duration-ms] milliseconds.
 }
 
+@deftogether[(
+@defproc[(impersonate-obs [o obs?]
+                          [#:ref ref-proc (or/c #f (-> obs? any/c any/c))]
+                          [#:set set-proc (or/c #f (-> obs? any/c any/c))])
+         obs?]
+@defproc[(chaperone-obs [o obs?]
+                        [#:ref ref-proc (or/c #f (-> obs? any/c any/c))]
+                        [#:set set-proc (or/c #f (-> obs? any/c any/c))])
+         obs?]
+)]{
+
+  Returns an impersonator or chaperone of an observable where wrappers
+  optionally redirect access and update of the observable's value,
+  analogous to @racket[impersonate-box] and @racket[chaperone-box]. In
+  the case of @racket[chaperone-obs], the value produced by a wrapper
+  procedure must be a chaperone of the wrapper's second argument.
+
+  @history[#:added "0.19"]
+}
+
 
 @section{View Helpers}
 

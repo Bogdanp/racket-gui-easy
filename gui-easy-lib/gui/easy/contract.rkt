@@ -47,17 +47,10 @@
             [(obs? o)
              (check-init-value (obs-peek o) neg-party)
              (impersonate-obs o
-                              (λ (_ name) name)
-                              (λ (_ update-proc)
-                                (chaperone-procedure
-                                 update-proc
-                                 (λ (proc)
-                                   (values
-                                    (λ (v)
-                                      (check-updated-value v neg-party)
-                                      v)
-                                    proc)))))]
-
+                              #:set
+                              (lambda (_ v)
+                                (check-updated-value v neg-party)
+                                v))]
             [else
              (raise-blame-error
               #:missing-party neg-party

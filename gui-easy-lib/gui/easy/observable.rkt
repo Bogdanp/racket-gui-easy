@@ -25,4 +25,12 @@
                      obs?)]
   [obs-throttle (->* (obs?)
                      (#:duration exact-nonnegative-integer?)
-                     obs?)]))
+                     obs?)]
+  [chaperone-obs (->* (obs?)
+                      (#:ref (or/c #f (-> obs? any/c any/c))
+                       #:set (or/c #f (-> obs? any/c any/c)))
+                      obs?)]
+  [impersonate-obs (->* (obs?)
+                        (#:ref (or/c #f (-> obs? any/c any/c))
+                         #:set (or/c #f (-> obs? any/c any/c)))
+                        obs?)]))
