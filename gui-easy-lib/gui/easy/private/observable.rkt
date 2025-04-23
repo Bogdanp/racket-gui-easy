@@ -8,6 +8,7 @@
 (provide
  (rename-out [make-obs obs])
  impersonate-obs
+ chaperone-obs
  ->obs
  obs?
  obs-name
@@ -28,7 +29,7 @@
 (struct obs
   ([name #:mutable]
    handle
-   value-box
+   [value-box #:mutable] ; mutable only to allow impersonation on ref
    [update-value-box! #:mutable]
    observers-box
    update-observers-box!
@@ -82,21 +83,56 @@
        update-observers-box!
        derived?))
 
-(define (impersonate-obs o name-proc update-proc)
+(define (do-impersonate-obs o
+                            do-impersonate-box
+                            do-impersonate-procedure
+                            val-ref
+                            val-set)
+  (impersonate-struct o
+                      obs-value-box
+                      (and val-ref
+                           (lambda (o bx)
+                             (do-impersonate-box
+                              bx
+                              (lambda (_ v) (val-ref o v))
+                              (lambda (_ v) v))))
+                      set-obs-value-box!
+                      #f ; witness
+                      obs-update-value-box!
+                      (and val-set
+                           (λ (_ update-proc)
+                             (do-impersonate-procedure
+                              update-proc
+                              (λ (proc)
+                                (values (lambda (v) (val-set o v))
+                                        proc)))))
+                      set-obs-update-value-box!!
+                      #f))
+
+(define (chaperone-obs o
+                       #:ref [val-ref #f]
+                       #:set [val-set #f])
+  (do-impersonate-obs o
+                      chaperone-box
+                      chaperone-procedure
+                      val-ref
+                      val-set))
+
+(define (impersonate-obs o
+                         #:ref [val-ref #f]
+                         #:set [val-set #f])
+  (do-impersonate-obs o
+                      impersonate-box
+                      impersonate-procedure
+                      val-ref
+                      val-set))
+  
+(define (obs-rename o name)
   (impersonate-struct o
                       obs-name
-                      name-proc
+                      (λ (_ _name) name)
                       set-obs-name!
-                      (λ (_ name) name)
-                      obs-update-value-box!
-                      update-proc
-                      set-obs-update-value-box!!
-                      (λ (_ proc) proc)))
-
-(define (obs-rename o name)
-  (impersonate-obs o
-                   (λ (_ _name) name)
-                   (λ (_ update-proc) update-proc)))
+                      #f))
 
 (define (obs-observe! o observer)
   (void
