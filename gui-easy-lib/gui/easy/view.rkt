@@ -2,7 +2,7 @@
 
 (require (prefix-in gui: mrlib/snip-canvas)
          racket/class
-         racket/contract
+         racket/contract/base
          (prefix-in gui: racket/gui)
          racket/lazy-require
          "contract.rkt"
@@ -33,33 +33,33 @@
 
   ;; Menus & Menu Items
   [popup-menu (-> view/c ... (is-a?/c popup-menu-view<%>))]
-  [menu-bar (->* ()
-                 (#:enabled? (maybe-obs/c any/c))
+  [menu-bar (->* []
+                 [#:enabled? (maybe-obs/c any/c)]
                  #:rest (listof view/c)
                  (is-a?/c menu-bar-view<%>))]
-  [menu (->* ((maybe-obs/c maybe-label/c))
-             (#:enabled? (maybe-obs/c any/c)
-              #:help (maybe-obs/c (or/c #f string?)))
+  [menu (->* [(maybe-obs/c maybe-label/c)]
+             [#:enabled? (maybe-obs/c any/c)
+              #:help (maybe-obs/c (or/c #f string?))]
              #:rest (listof view/c)
              (is-a?/c menu-view<%>))]
-  [menu-item (->* ((maybe-obs/c maybe-label/c))
-                  ((-> any)
+  [menu-item (->* [(maybe-obs/c maybe-label/c)]
+                  [(-> any)
                    #:enabled? (maybe-obs/c any/c)
                    #:help (maybe-obs/c (or/c #f string?))
                    #:shortcut (maybe-obs/c (or/c #f (*list/c
                                                      (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
                                                      (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
-                                                     (or/c char? symbol?)))))
+                                                     (or/c char? symbol?))))]
                   view/c)]
-  [checkable-menu-item (->* ((maybe-obs/c maybe-label/c))
-                            ((-> boolean? any)
+  [checkable-menu-item (->* [(maybe-obs/c maybe-label/c)]
+                            [(-> boolean? any)
                              #:checked? (maybe-obs/c any/c)
                              #:enabled? (maybe-obs/c any/c)
                              #:help (maybe-obs/c (or/c #f string?))
                              #:shortcut (maybe-obs/c (or/c #f (*list/c
                                                                (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
                                                                (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
-                                                               (or/c char? symbol?)))))
+                                                               (or/c char? symbol?))))]
                             view/c)]
   [menu-item-separator (-> view/c)]
 
@@ -67,9 +67,9 @@
   [hpanel (panel/c)]
   [vpanel (panel/c)]
   [group (panel/c (maybe-obs/c gui:label-string?))]
-  [tabs (->* ((maybe-obs/c list?)
-              (-> (or/c 'new 'close 'reorder 'select) list? (or/c #f any/c) any))
-             (#:choice->label (-> any/c gui:label-string?)
+  [tabs (->* [(maybe-obs/c list?)
+              (-> (or/c 'new 'close 'reorder 'select) list? (or/c #f any/c) any)]
+             [#:choice->label (-> any/c gui:label-string?)
               #:choice=? (-> any/c any/c boolean?)
               #:selection (maybe-obs/c (or/c #f any/c))
               #:alignment (maybe-obs/c alignment/c)
@@ -79,20 +79,20 @@
               #:spacing (maybe-obs/c gui:spacing-integer?)
               #:margin (maybe-obs/c margin/c)
               #:min-size (maybe-obs/c size/c)
-              #:stretch (maybe-obs/c stretch/c))
+              #:stretch (maybe-obs/c stretch/c)]
              #:rest (listof view/c)
              view/c)]
-  [observable-view (->* (obs?)
-                        ((-> any/c view/c)
-                         #:equal? (-> any/c any/c any/c))
+  [observable-view (->* [obs?]
+                        [(-> any/c view/c)
+                         #:equal? (-> any/c any/c any/c)]
                         view/c)]
   [rename observable-view dyn-view
-          (->* (obs? (-> any/c view/c))
-               (#:equal? (-> any/c any/c any/c))
+          (->* [obs? (-> any/c view/c)]
+               [#:equal? (-> any/c any/c any/c)]
                view/c)]
-  [list-view (->* ((maybe-obs/c any/c)
-                   (-> any/c any/c view/c))
-                  (#:alignment (maybe-obs/c alignment/c)
+  [list-view (->* [(maybe-obs/c any/c)
+                   (-> any/c any/c view/c)]
+                  [#:alignment (maybe-obs/c alignment/c)
                    #:enabled? (maybe-obs/c boolean?)
                    #:style (listof (or/c 'horizontal 'vertical 'border 'deleted
                                          'hscroll 'auto-hscroll 'hide-hscroll
@@ -102,16 +102,16 @@
                    #:min-size (maybe-obs/c size/c)
                    #:stretch (maybe-obs/c stretch/c)
                    #:key (-> any/c any/c)
-                   #:mixin (make-mixin-contract gui:panel%))
+                   #:mixin (make-mixin-contract gui:panel%)]
                   view/c)]
 
   ;; Canvases & Snips
   [canvas (canvas/c (-> (is-a?/c gui:dc<%>) any/c any))]
   [pict-canvas (canvas/c (-> any/c pict?))]
   [snip-canvas (canvas/c (-> any/c gui:dimension-integer? gui:dimension-integer? (is-a?/c gui:snip%)))]
-  [snip (->* ((maybe-obs/c any/c)
-              (-> any/c gui:dimension-integer? gui:dimension-integer? (is-a?/c gui:snip%)))
-             ((-> (is-a?/c gui:snip%) any/c any)
+  [snip (->* [(maybe-obs/c any/c)
+              (-> any/c gui:dimension-integer? gui:dimension-integer? (is-a?/c gui:snip%))]
+             [(-> (is-a?/c gui:snip%) any/c any)
               #:label (maybe-obs/c (or/c #f gui:label-string?))
               #:enabled? (maybe-obs/c boolean?)
               #:style (listof (or/c 'no-border 'control-border 'combo
@@ -120,46 +120,46 @@
               #:margin (maybe-obs/c margin/c)
               #:min-size (maybe-obs/c size/c)
               #:stretch (maybe-obs/c stretch/c)
-              #:mixin (make-mixin-contract gui:snip-canvas%))
+              #:mixin (make-mixin-contract gui:snip-canvas%)]
              view/c)]
 
   ;; Widgets
-  [button (->* ((maybe-obs/c
+  [button (->* [(maybe-obs/c
                  (or/c gui:label-string?
                        (is-a?/c gui:bitmap%)
                        (list/c (is-a?/c gui:bitmap%)
                                gui:label-string?
                                (or/c 'left 'top 'right 'bottom))))
-                (-> any))
-               (#:enabled? (maybe-obs/c boolean?)
+                (-> any)]
+               [#:enabled? (maybe-obs/c boolean?)
                 #:style (listof (or/c 'border 'multi-line 'deleted))
                 #:font (is-a?/c gui:font%)
                 #:margin (maybe-obs/c margin/c)
                 #:min-size (maybe-obs/c size/c)
-                #:stretch (maybe-obs/c stretch/c))
+                #:stretch (maybe-obs/c stretch/c)]
                view/c)]
-  [checkbox (->* ((-> boolean? any))
-                 (#:label (maybe-obs/c gui:label-string?)
+  [checkbox (->* [(-> boolean? any)]
+                 [#:label (maybe-obs/c gui:label-string?)
                   #:checked? (maybe-obs/c boolean?)
-                  #:enabled? (maybe-obs/c boolean?))
+                  #:enabled? (maybe-obs/c boolean?)]
                  view/c)]
-  [choice (->* ((maybe-obs/c (listof any/c))
-                (-> (or/c #f any/c) any))
-               (#:choice->label (-> any/c gui:label-string?)
+  [choice (->* [(maybe-obs/c (listof any/c))
+                (-> (or/c #f any/c) any)]
+               [#:choice->label (-> any/c gui:label-string?)
                 #:choice=? (-> any/c any/c boolean?)
                 #:selection (maybe-obs/c (or/c #f any/c))
                 #:label (maybe-obs/c maybe-label/c)
                 #:style (listof (or/c 'horizontal-label 'vertical-label 'deleted))
                 #:enabled? (maybe-obs/c boolean?)
                 #:min-size (maybe-obs/c size/c)
-                #:stretch (maybe-obs/c stretch/c))
+                #:stretch (maybe-obs/c stretch/c)]
                view/c)]
-  [image (->* ((maybe-obs/c (or/c path-string? (is-a?/c gui:bitmap%))))
-              (#:size (maybe-obs/c size/c)
-               #:mode (maybe-obs/c (or/c 'fit 'fill)))
+  [image (->* [(maybe-obs/c (or/c path-string? (is-a?/c gui:bitmap%)))]
+              [#:size (maybe-obs/c size/c)
+               #:mode (maybe-obs/c (or/c 'fit 'fill))]
               view/c)]
-  [input (->* ((maybe-obs/c any/c))
-              ((-> (or/c 'input 'return) string? any)
+  [input (->* [(maybe-obs/c any/c)]
+              [(-> (or/c 'input 'return) string? any)
                #:label (maybe-obs/c maybe-label/c)
                #:enabled? (maybe-obs/c boolean?)
                #:background-color (maybe-obs/c (or/c #f (is-a?/c gui:color%)))
@@ -173,21 +173,21 @@
                #:stretch (maybe-obs/c stretch/c)
                #:mixin (make-mixin-contract gui:text-field%)
                #:value=? (-> any/c any/c boolean?)
-               #:value->text (-> any/c string?))
+               #:value->text (-> any/c string?)]
               view/c)]
-  [progress (->* ((maybe-obs/c gui:position-integer?))
-                 (#:label (maybe-obs/c gui:label-string?)
+  [progress (->* [(maybe-obs/c gui:position-integer?)]
+                 [#:label (maybe-obs/c gui:label-string?)
                   #:enabled? (maybe-obs/c boolean?)
                   #:style (listof (or/c 'horizontal 'vertical 'plain
                                         'vertical-label 'horizontal-label
                                         'deleted))
                   #:range (maybe-obs/c gui:positive-dimension-integer?)
                   #:min-size (maybe-obs/c size/c)
-                  #:stretch (maybe-obs/c stretch/c))
+                  #:stretch (maybe-obs/c stretch/c)]
                  view/c)]
-  [radios (->* ((listof any/c)
-                (-> (or/c #f any/c) any))
-               (#:choice->label (-> any/c gui:label-string?)
+  [radios (->* [(listof any/c)
+                (-> (or/c #f any/c) any)]
+               [#:choice->label (-> any/c gui:label-string?)
                 #:choice=? (-> any/c any/c boolean?)
                 #:selection (maybe-obs/c (or/c #f any/c))
                 #:label (maybe-obs/c maybe-label/c)
@@ -196,11 +196,11 @@
                                       'deleted))
                 #:enabled? (maybe-obs/c boolean?)
                 #:min-size (maybe-obs/c size/c)
-                #:stretch (maybe-obs/c stretch/c))
+                #:stretch (maybe-obs/c stretch/c)]
                view/c)]
-  [slider (->* ((maybe-obs/c gui:position-integer?)
-                (-> gui:position-integer? any))
-               (#:label (maybe-obs/c (or/c #f gui:label-string?))
+  [slider (->* [(maybe-obs/c gui:position-integer?)
+                (-> gui:position-integer? any)]
+               [#:label (maybe-obs/c (or/c #f gui:label-string?))
                 #:enabled? (maybe-obs/c boolean?)
                 #:style (listof (or/c 'horizontal 'vertical 'plain
                                       'vertical-label 'horizontal-label
@@ -208,12 +208,12 @@
                 #:min-value gui:position-integer?
                 #:max-value gui:position-integer?
                 #:min-size (maybe-obs/c size/c)
-                #:stretch (maybe-obs/c stretch/c))
+                #:stretch (maybe-obs/c stretch/c)]
                view/c)]
   [spacer (-> view/c)]
-  [table (->* ((listof gui:label-string?)
-               (maybe-obs/c vector?))
-              (table-action/c
+  [table (->* [(listof gui:label-string?)
+               (maybe-obs/c vector?)]
+              [table-action/c
                #:label (maybe-obs/c (or/c #f gui:label-string?))
                #:entry->row (-> any/c vector?)
                #:selection (maybe-obs/c (or/c #f exact-nonnegative-integer? (listof exact-nonnegative-integer?)))
@@ -231,25 +231,25 @@
                                 (listof
                                  (or/c (list/c exact-nonnegative-integer? gui:dimension-integer?)
                                        (list/c exact-nonnegative-integer? gui:dimension-integer? gui:dimension-integer? gui:dimension-integer?))))
-               #:mixin (make-mixin-contract gui:list-box%))
+               #:mixin (make-mixin-contract gui:list-box%)]
               view/c)]
-  [text (->* ((maybe-obs/c gui:label-string?))
-             (#:color (maybe-obs/c (or/c #f string? (is-a?/c gui:color%)))
-              #:font (is-a?/c gui:font%))
+  [text (->* [(maybe-obs/c gui:label-string?)]
+             [#:color (maybe-obs/c (or/c #f string? (is-a?/c gui:color%)))
+              #:font (is-a?/c gui:font%)]
              view/c)]
 
   ;; Combinators
-  [add-hooks (->* (view/c)
-                  (#:on-create (-> any)
-                   #:on-destroy (-> any))
+  [add-hooks (->* [view/c]
+                  [#:on-create (-> any)
+                   #:on-destroy (-> any)]
                   view/c)]))
 
 (define view/c
   (is-a?/c view<%>))
 
 (define (canvas/c draw/c)
-  (->* ((maybe-obs/c any/c) draw/c)
-       (#:label (maybe-obs/c (or/c #f gui:label-string?))
+  (->* [(maybe-obs/c any/c) draw/c]
+       [#:label (maybe-obs/c (or/c #f gui:label-string?))
         #:enabled? (maybe-obs/c boolean?)
         #:style (listof (or/c 'border 'control-border 'combo
                               'vscroll 'hscroll 'resize-corner
@@ -258,7 +258,7 @@
         #:margin (maybe-obs/c margin/c)
         #:min-size (maybe-obs/c size/c)
         #:stretch (maybe-obs/c stretch/c)
-        #:mixin (make-mixin-contract gui:canvas%))
+        #:mixin (make-mixin-contract gui:canvas%)]
        view/c))
 
 (define-syntax-rule (panel/c arg/c ...)
@@ -277,15 +277,15 @@
        view/c))
 
 (define (window/c % style/c)
-  (->* ()
-       (#:title (maybe-obs/c string?)
+  (->* []
+       [#:title (maybe-obs/c string?)
         #:size (maybe-obs/c size/c)
         #:alignment (maybe-obs/c alignment/c)
         #:position (maybe-obs/c position/c)
         #:min-size (maybe-obs/c size/c)
         #:stretch (maybe-obs/c stretch/c)
         #:style style/c
-        #:mixin (make-mixin-contract %))
+        #:mixin (make-mixin-contract %)]
        #:rest (listof view/c)
        view/c))
 

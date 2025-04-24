@@ -1,7 +1,7 @@
 #lang racket/base
 
 (require racket/class
-         racket/contract
+         racket/contract/base
          racket/fixnum
          (prefix-in gui: racket/gui))
 
@@ -14,7 +14,7 @@
 
 (define color
   (case-lambda
-    [(color)
+    [(color) ;; noqa
      (if (fixnum? color)
          (make-object gui:color%
                       (fxand (fxrshift color 24) #xFF)

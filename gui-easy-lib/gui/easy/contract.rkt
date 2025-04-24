@@ -1,6 +1,7 @@
 #lang racket/base
 
-(require racket/contract
+(require racket/contract/base
+         racket/contract/combinator
          (prefix-in gui: racket/gui)
          "private/observable.rkt")
 
@@ -63,7 +64,8 @@
     [else (or/c c (obs/c c))]))
 
 (module+ test
-  (require rackunit)
+  (require racket/contract/region
+           rackunit)
 
   (test-case "(maybe-obs/c any/c)"
     (check-eq? (maybe-obs/c any/c) any/c))

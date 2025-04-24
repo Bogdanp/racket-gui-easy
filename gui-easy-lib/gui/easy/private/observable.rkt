@@ -91,7 +91,7 @@
   (impersonate-struct o
                       obs-value-box
                       (and val-ref
-                           (lambda (o bx)
+                           (lambda (o bx) ;; noqa
                              (do-impersonate-box
                               bx
                               (lambda (_ v) (val-ref o v))
@@ -100,12 +100,13 @@
                       #f ; witness
                       obs-update-value-box!
                       (and val-set
-                           (λ (_ update-proc)
+                           (λ (o update-proc) ;; noqa
                              (do-impersonate-procedure
                               update-proc
                               (λ (proc)
-                                (values (lambda (v) (val-set o v))
-                                        proc)))))
+                                (values
+                                 (λ (v) (val-set o v))
+                                 proc)))))
                       set-obs-update-value-box!!
                       #f))
 
@@ -126,7 +127,7 @@
                       impersonate-procedure
                       val-ref
                       val-set))
-  
+
 (define (obs-rename o name)
   (impersonate-struct o
                       obs-name

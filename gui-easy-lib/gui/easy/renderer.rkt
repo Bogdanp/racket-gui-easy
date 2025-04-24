@@ -1,7 +1,7 @@
 #lang racket/base
 
 (require racket/class
-         racket/contract
+         racket/contract/base
          (prefix-in gui: racket/gui)
          "private/renderer.rkt"
          "private/view.rkt")
@@ -12,8 +12,8 @@
   [embed (-> (is-a?/c gui:area<%>)
              (is-a?/c view<%>)
              (is-a?/c renderer<%>))]
-  [render (->* ((is-a?/c window-view<%>))
-               ((or/c (is-a?/c renderer<%>) #f))
+  [render (->* [(is-a?/c window-view<%>)]
+               [(or/c (is-a?/c renderer<%>) #f)]
                (is-a?/c renderer<%>))]
   [render-popup-menu (-> (is-a?/c renderer<%>)
                          (is-a?/c popup-menu-view<%>)

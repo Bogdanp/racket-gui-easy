@@ -52,7 +52,7 @@
       (begin0 root
         (do-add-dependencies (send tree dependencies) tree root)))
 
-    (define/public (add-dependencies deps tree root)
+    (define/public (add-dependencies deps tree root) ;; noqa
       (do-add-dependencies deps tree root))
 
     (define/public (remove-dependencies s)
@@ -68,7 +68,7 @@
              (send tree destroy root))
            (set! root #f)))))
 
-    (define (do-add-dependencies deps tree root)
+    (define (do-add-dependencies deps tree root) ;; noqa
       (define s
         (dependency-set deps (for/list ([dep (in-list deps)])
                                (define (proc v)

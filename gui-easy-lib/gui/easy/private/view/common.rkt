@@ -2,7 +2,7 @@
 
 (require (for-syntax racket/base
                      racket/format
-                     syntax/parse)
+                     syntax/parse/pre)
          "../logger.rkt"
          "../observable.rkt")
 

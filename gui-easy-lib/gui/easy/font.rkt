@@ -1,7 +1,7 @@
 #lang racket/base
 
 (require racket/class
-         racket/contract
+         racket/contract/base
          racket/draw
          (prefix-in gui: racket/gui)
          racket/string)
@@ -12,14 +12,14 @@
   [font* (font/c (or/c string? (listof string?)) (or/c #f (is-a?/c gui:font%)))]))
 
 (define (font/c name/c res/c)
-  (->* (name/c (real-in 0 1024.0))
-       (#:family gui:font-family/c
+  (->* [name/c (real-in 0 1024.0)]
+       [#:family gui:font-family/c
         #:style gui:font-style/c
         #:weight gui:font-weight/c
         #:underline? any/c
         #:smoothing gui:font-smoothing/c
         #:hinting gui:font-hinting/c
-        #:size-in-pixels? any/c)
+        #:size-in-pixels? any/c]
        res/c))
 
 (define (font face size

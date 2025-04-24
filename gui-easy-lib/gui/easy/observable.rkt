@@ -1,13 +1,13 @@
 #lang racket/base
 
-(require racket/contract
+(require racket/contract/base
          "private/observable.rkt")
 
 (provide
  (contract-out
-  [obs (->* (any/c)
-            (#:name symbol?
-             #:derived? boolean?)
+  [obs (->* [any/c]
+            [#:name symbol?
+             #:derived? boolean?]
             obs?)]
   [obs? (-> any/c boolean?)]
   [obs-rename (-> obs? symbol? obs?)]
@@ -17,20 +17,20 @@
   [obs-set! (-> obs? any/c void?)]
   [obs-peek (-> obs? any/c)]
   [obs-map (-> obs? (-> any/c any/c) obs?)]
-  [obs-filter (->* (obs? (-> any/c any/c)) (any/c) obs?)]
-  [obs-filter-map (->* (obs? (-> any/c any/c)) (any/c) obs?)]
+  [obs-filter (->* [obs? (-> any/c any/c)] [any/c] obs?)]
+  [obs-filter-map (->* [obs? (-> any/c any/c)] [any/c] obs?)]
   [obs-combine (-> procedure? obs? obs? ... obs?)]
-  [obs-debounce (->* (obs?)
-                     (#:duration exact-nonnegative-integer?)
+  [obs-debounce (->* [obs?]
+                     [#:duration exact-nonnegative-integer?]
                      obs?)]
-  [obs-throttle (->* (obs?)
-                     (#:duration exact-nonnegative-integer?)
+  [obs-throttle (->* [obs?]
+                     [#:duration exact-nonnegative-integer?]
                      obs?)]
-  [chaperone-obs (->* (obs?)
-                      (#:ref (or/c #f (-> obs? any/c any/c))
-                       #:set (or/c #f (-> obs? any/c any/c)))
+  [chaperone-obs (->* [obs?]
+                      [#:ref (or/c #f (-> obs? any/c any/c))
+                       #:set (or/c #f (-> obs? any/c any/c))]
                       obs?)]
-  [impersonate-obs (->* (obs?)
-                        (#:ref (or/c #f (-> obs? any/c any/c))
-                         #:set (or/c #f (-> obs? any/c any/c)))
+  [impersonate-obs (->* [obs?]
+                        [#:ref (or/c #f (-> obs? any/c any/c))
+                         #:set (or/c #f (-> obs? any/c any/c))]
                         obs?)]))

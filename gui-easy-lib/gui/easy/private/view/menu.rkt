@@ -1,7 +1,7 @@
 #lang racket/base
 
 (require racket/class
-         racket/contract
+         racket/contract/base
          (prefix-in gui: racket/gui)
          racket/list
          "../observable.rkt"
