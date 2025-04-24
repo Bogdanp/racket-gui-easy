@@ -7,19 +7,19 @@ jobs:
     - name: Checkout
       uses: actions/checkout@master
     - name: Cache dependencies
-      uses: actions/cache@v2
+      uses: actions/cache@v4
       with:
         path: |
           ~/.cache/racket
           ~/.local/share/racket
         key: ${{ runner.os }}-racket-cs-8.8
     - name: Install Racket
-      uses: Bogdanp/setup-racket@v1.9.1
+      uses: Bogdanp/setup-racket@v1.12
       with:
         architecture: 'x64'
         distribution: 'full'
         variant: 'CS'
-        version: '8.8'
+        version: '8.16'
     - name: Install Package & Deps
       run: raco pkg install --auto --skip-installed gui-easy-lib/ gui-easy/
     - name: Update Package
