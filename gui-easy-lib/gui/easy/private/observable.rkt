@@ -100,13 +100,13 @@
                       #f ; witness
                       obs-update-value-box!
                       (and val-set
-                           (λ (o update-proc) ;; noqa
+                           (λ (o update-proc) ; update-proc: (a -> b) -> b ;; noqa
                              (do-impersonate-procedure
-                              update-proc
-                              (λ (proc)
-                                (values
-                                 (λ (v) (val-set o v))
-                                 proc)))))
+                              update-proc ; update-proc': (a -> b) -> c
+                              (λ (proc) ; proc: a -> b
+                                (λ (v) ; proc': a -> c
+                                  ; val-set: b -> c
+                                  (val-set o (proc v)))))))
                       set-obs-update-value-box!!
                       #f))
 

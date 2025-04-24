@@ -48,10 +48,9 @@
             [(obs? o)
              (check-init-value (obs-peek o) neg-party)
              (impersonate-obs o
-                              #:set
-                              (lambda (_ v)
-                                (check-updated-value v neg-party)
-                                v))]
+                              #:set (lambda (_ v)
+                                      (begin0 v
+                                        (check-updated-value v neg-party))))]
             [else
              (raise-blame-error
               #:missing-party neg-party
@@ -83,6 +82,7 @@
      #rx"expected: \\(>=/c 5\\)"
      (λ ()
        (obs-update! o sub1)))
+    (check-equal? (obs-peek o) 5)
     (check-exn
      #rx"promised: \\(>=/c 5\\)"
      (λ ()
