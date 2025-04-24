@@ -970,14 +970,14 @@ that equality (via @racket[equal?]) is preserved for
 }
 
 @deftogether[(
-@defproc[(impersonate-obs [o obs?]
-                          [#:ref ref-proc (or/c #f (-> obs? any/c any/c))]
-                          [#:set set-proc (or/c #f (-> obs? any/c any/c))])
-         obs?]
-@defproc[(chaperone-obs [o obs?]
-                        [#:ref ref-proc (or/c #f (-> obs? any/c any/c))]
-                        [#:set set-proc (or/c #f (-> obs? any/c any/c))])
-         obs?]
+  @defproc[(impersonate-obs [o obs?]
+                            [#:ref ref-proc (or/c #f (-> obs? any/c any/c)) #f]
+                            [#:set set-proc (or/c #f (-> obs? any/c any/c)) #f])
+           obs?]
+  @defproc[(chaperone-obs [o obs?]
+                          [#:ref ref-proc (or/c #f (-> obs? any/c any/c)) #f]
+                          [#:set set-proc (or/c #f (-> obs? any/c any/c)) #f])
+           obs?]
 )]{
 
   Returns an impersonator or chaperone of an observable where wrappers
