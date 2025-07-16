@@ -10,6 +10,7 @@
              #:derived? boolean?]
             obs?)]
   [obs? (-> any/c boolean?)]
+  [obs-name (-> obs? symbol?)]
   [obs-rename (-> obs? symbol? obs?)]
   [obs-observe! (-> obs? (-> any/c any) void?)]
   [obs-unobserve! (-> obs? (-> any/c any) void?)]
