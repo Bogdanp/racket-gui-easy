@@ -878,6 +878,15 @@ that equality (via @racket[equal?]) is preserved for
   observable may be updated.
 }
 
+@defproc[(obs-name [o obs?]) symbol?]{
+  Returns the name of @racket[o].
+
+  @tech{Observables} implement @racket[prop:object-name], so the name of
+  an observable is also accessible generically via @racket[object-name].
+
+  @history[#:added "0.20"]
+}
+
 @defproc[(obs-rename [o obs?]
                      [name symbol?]) obs?]{
 
