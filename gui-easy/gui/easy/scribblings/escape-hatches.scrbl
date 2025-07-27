@@ -6,6 +6,11 @@
                      racket/gui/easy
                      racket/gui/easy/operator))
 
+; Example links cited within this section
+@(define example-link-close-window
+  (link "https://github.com/Bogdanp/racket-gui-easy/blob/master/examples/close-window.rkt"
+        @filepath{examples/close-window.rkt}))
+
 @title{Escape Hatches}
 
 Some views take a @racket[#:mixin] argument that can be used to alter
@@ -14,5 +19,5 @@ as ``escape hatches'' when the library doesn't provide a piece of
 functionality you need, but that functionality is available on the
 native widget.
 
-See "examples/close-window.rkt" for a example of using a mixin to
+See @|example-link-close-window| for an example of using a mixin to
 programmatically toggle a window's visibility.
