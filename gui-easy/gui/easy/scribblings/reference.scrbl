@@ -11,6 +11,17 @@
                      racket/gui/easy/operator
                      (prefix-in gui: racket/gui)))
 
+; Example links cited within this section
+@(define example-link-tabs
+  (link "https://github.com/Bogdanp/racket-gui-easy/blob/master/examples/tabs.rkt"
+        @filepath{examples/tabs.rkt}))
+@(define example-link-list
+  (link "https://github.com/Bogdanp/racket-gui-easy/blob/master/examples/list.rkt"
+        @filepath{examples/list.rkt}))
+
+
+
+
 @title{Reference}
 @defmodule[racket/gui/easy]
 
@@ -63,6 +74,19 @@
 
 
 @section{Views}
+
+@deftech{View}s are functions that return a @racket[view<%>] instance.
+
+Views might wrap a specific GUI widget, like a text message or button, or
+they might construct a tree of smaller views, forming a larger component.
+
+Views are typically @tech{Observable}-aware in ways that make sense for ach individual view.
+For instance the text view takes as input an observable string and the rendered text label updates
+with changes to that observable.
+
+Many @racketmodname[racket/gui] widgets are already wrapped by GUI Easy, but programmers can
+implement the @racket[view<%>] interface themselves in order to integrate arbitrary widgets, such as
+those from 3rd-party packages in the Racket ecosystem, into their projects.
 
 @subsection[#:tag "windows&dialogs"]{Windows & Dialogs}
 
@@ -285,7 +309,7 @@
   selection changes to an adjacent tab).  When tabs are reordered, the
   choices provided to the action represent the new tab order.
 
-  See @filepath{examples/tabs.rkt} for an example.
+  See @|example-link-tabs| for an example.
 
   @history[
     #:changed "0.3" @elem{Added the @racket[#:choice=?] argument.}
@@ -354,7 +378,7 @@
   procedure must return a unique value for each entry in the list, as
   compared using @racket[equal?].
 
-  See @filepath{examples/list.rkt} for an example.
+  See @|example-link-list| for an example.
 }
 
 @defproc[(observable-view [data (obs/c any/c)]
@@ -818,7 +842,7 @@
 
 @section{Observables}
 
-@deftech{Observables} are containers for values that may change over
+@deftech{Observable}s are containers for values that may change over
 time.  Their changes may be observed by arbitrary functions.
 
 @; Require the private module to avoid requiring racket/gui/base.

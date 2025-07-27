@@ -9,6 +9,16 @@
 
 @title{Quickstart}
 
+gui-easy can be broadly split up into two parts: observables and views.
+
+Observables contain values and notify subscribed observers of changes to
+their contents and Views are representations of Racket GUI widget trees
+that, when rendered, produce concrete instances of those trees and handle
+the details of wiring state and widgets together.
+
+The core abstractions of observables and views correspond to a model-view-controller
+(MVC) architecture for graphical applications as popularized by Smalltalk-80.
+
 @section{Hello, World!}
 
 @centered[@image[(build-path media "1.1-hello-world.png") #:scale 0.5]]
@@ -154,5 +164,11 @@ individual counter by passing in a derived observable to its
 
 @(define repo-link
   (link "https://github.com/Bogdanp/racket-gui-easy" "Git repository"))
+@(define easygui-publications-funarch23
+   (link "https://arxiv.org/abs/2308.16024" """D. B. Knoble and B. Popa, ‘Functional Shell and
+Reusable Components for Easy GUIs’"""))
 
-For more examples, see the "examples" directory in the @|repo-link|.
+
+For more information about the core concepts of gui-easy and its design,
+see @|easygui-publications-funarch23|. For more examples, see the "examples"
+directory in the @|repo-link|.
