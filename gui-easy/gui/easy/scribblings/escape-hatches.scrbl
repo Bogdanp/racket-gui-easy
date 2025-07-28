@@ -6,7 +6,7 @@
                      racket/gui/easy
                      racket/gui/easy/operator))
 
-; Example links cited within this section
+@; Example links cited within this section
 @(define example-link-close-window
   (link "https://github.com/Bogdanp/racket-gui-easy/blob/master/examples/close-window.rkt"
         @filepath{examples/close-window.rkt}))

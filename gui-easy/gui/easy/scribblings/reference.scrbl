@@ -11,7 +11,7 @@
                      racket/gui/easy/operator
                      (prefix-in gui: racket/gui)))
 
-; Example links cited within this section
+@; Example links cited within this section
 @(define example-link-tabs
   (link "https://github.com/Bogdanp/racket-gui-easy/blob/master/examples/tabs.rkt"
         @filepath{examples/tabs.rkt}))
