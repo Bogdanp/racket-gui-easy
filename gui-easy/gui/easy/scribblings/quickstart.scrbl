@@ -12,7 +12,7 @@
 gui-easy can be broadly split up into two parts: observables and views.
 
 Observables contain values and notify subscribed observers of changes to
-their contents and Views are representations of Racket GUI widget trees
+their contents. Views are representations of Racket GUI widget trees
 that, when rendered, produce concrete instances of those trees and handle
 the details of wiring state and widgets together.
 
@@ -24,12 +24,12 @@ The core abstractions of observables and views correspond to a model-view-contro
 @centered[@image[(build-path media "1.1-hello-world.png") #:scale 0.5]]
 
 @codeblock|{
-  #lang racket/base
+#lang racket/base
 
-  (require racket/gui/easy)
+(require racket/gui/easy)
 
-  (window
-   (text "Hello, World!"))
+(window
+(text "Hello, World!"))
 }|
 
 The code above describes a view hierarchy rooted in a window that
@@ -38,13 +38,13 @@ but you can take it and pass it to @racket[render] to convert it into
 a native GUI:
 
 @codeblock|{
-  #lang racket/base
+#lang racket/base
 
-  (require racket/gui/easy)
+(require racket/gui/easy)
 
-  (render
-   (window
-    (text "Hello, World!")))
+(render
+(window
+(text "Hello, World!")))
 }|
 
 @section{Counter}
@@ -54,18 +54,18 @@ a native GUI:
 State in @tt{gui-easy} is held by @tech{observables}.
 
 @codeblock|{
-  #lang racket/base
+#lang racket/base
 
-  (require racket/gui/easy
-           racket/gui/easy/operator)
+(require racket/gui/easy
+racket/gui/easy/operator)
 
-  (define @count (@ 0))
-  (render
-   (window
-    (hpanel
-     (button "-" (λ () (@count . <~ . sub1)))
-     (text (@count . ~> . number->string))
-     (button "+" (λ () (@count . <~ . add1))))))
+(define @count (@ 0))
+(render
+(window
+(hpanel
+(button "-" (λ () (@count . <~ . sub1)))
+(text (@count . ~> . number->string))
+(button "+" (λ () (@count . <~ . add1))))))
 }|
 
 Here we define an observable called @racket[|@count|] that holds the
@@ -82,25 +82,25 @@ Since views are at their core just descriptions of a GUI, it's easy to
 abstract over them and make them reusable.
 
 @codeblock|{
-  #lang racket/base
+#lang racket/base
 
-  (require racket/gui/easy
-           racket/gui/easy/operator)
+(require racket/gui/easy
+racket/gui/easy/operator)
 
-  (define (counter @count action)
-    (hpanel
-     (button "-" (λ () (action sub1)))
-     (text (@count . ~> . number->string))
-     (button "+" (λ () (action add1)))))
+(define (counter @count action)
+(hpanel
+(button "-" (λ () (action sub1)))
+(text (@count . ~> . number->string))
+(button "+" (λ () (action add1)))))
 
-  (define @counter-1 (@ 0))
-  (define @counter-2 (@ 0))
+(define @counter-1 (@ 0))
+(define @counter-2 (@ 0))
 
-  (render
-   (window
-    (vpanel
-     (counter @counter-1 (λ (proc) (@counter-1 . <~ . proc)))
-     (counter @counter-2 (λ (proc) (@counter-2 . <~ . proc))))))
+(render
+(window
+(vpanel
+(counter @counter-1 (λ (proc) (@counter-1 . <~ . proc)))
+(counter @counter-2 (λ (proc) (@counter-2 . <~ . proc))))))
 }|
 
 @section{Dynamic Counters}
@@ -111,46 +111,46 @@ Taking the previous example further, we can render a dynamic list of
 counters.
 
 @codeblock|{
-  #lang racket/base
+#lang racket/base
 
-  (require racket/gui/easy
-           racket/gui/easy/operator)
+(require racket/gui/easy
+racket/gui/easy/operator)
 
-  (define @counters (@ '((0 . 0))))
+(define @counters (@ '((0 . 0))))
 
-  (define (append-counter counts)
-    (define next-id (add1 (apply max (map car counts))))
-    (append counts `((,next-id . 0))))
+(define (append-counter counts)
+(define next-id (add1 (apply max (map car counts))))
+(append counts `((,next-id . 0))))
 
-  (define (update-count counts k proc)
-    (for/list ([entry (in-list counts)])
-      (if (eq? (car entry) k)
-          (cons k (proc (cdr entry)))
-          entry)))
+(define (update-count counts k proc)
+(for/list ([entry (in-list counts)])
+(if (eq? (car entry) k)
+(cons k (proc (cdr entry)))
+entry)))
 
-  (define (counter @count action)
-    (hpanel
-     #:stretch '(#t #f)
-     (button "-" (λ () (action sub1)))
-     (text (@count . ~> . number->string))
-     (button "+" (λ () (action add1)))))
+(define (counter @count action)
+(hpanel
+#:stretch '(#t #f)
+(button "-" (λ () (action sub1)))
+(text (@count . ~> . number->string))
+(button "+" (λ () (action add1)))))
 
-  (render
-   (window
-    #:size '(#f 200)
-    (vpanel
-     (hpanel
-      #:alignment '(center top)
-      #:stretch '(#t #f)
-      (button "Add counter" (λ () (@counters . <~ . append-counter))))
-     (list-view
-      @counters
-      #:key car
-      (λ (k @entry)
-        (counter
-         (@entry . ~> . cdr)
-         (λ (proc)
-           (@counters . <~ . (λ (counts) (update-count counts k proc))))))))))
+(render
+(window
+#:size '(#f 200)
+(vpanel
+(hpanel
+#:alignment '(center top)
+#:stretch '(#t #f)
+(button "Add counter" (λ () (@counters . <~ . append-counter))))
+(list-view
+@counters
+#:key car
+(λ (k @entry)
+(counter
+(@entry . ~> . cdr)
+(λ (proc)
+(@counters . <~ . (λ (counts) (update-count counts k proc))))))))))
 }|
 
 Here the @racket[|@counters|] observable holds a list of pairs where
@@ -161,14 +161,23 @@ individual counter by passing in a derived observable to its
 @racket[make-view] argument.
 
 @section{More}
-
-@(define repo-link
-  (link "https://github.com/Bogdanp/racket-gui-easy" "Git repository"))
-@(define easygui-publications-funarch23
-   (link "https://arxiv.org/abs/2308.16024" """D. B. Knoble and B. Popa, ‘Functional Shell and
-Reusable Components for Easy GUIs’"""))
-
-
+        
 For more information about the core concepts of gui-easy and its design,
-see @|easygui-publications-funarch23|. For more examples, see the "examples"
-directory in the @|repo-link|.
+see @cite["knoblepopa23"]. For more examples, see the "examples"
+directory in the @cite["repo-link"].
+
+
+@(bibliography
+  @(bib-entry #:key "knoblepopa23"
+              #:title "Functional Shell and Reusable Components for Easy GUIs"
+              #:author "D. B. Knoble and B. Popa"
+              #:location "FUNARCH 2023: Proceedings of the 1st ACM SIGPLAN International Workshop on
+Functional Software Architecture"
+              #:date "31 August 2023 "
+              #:url "https://arxiv.org/abs/2308.16024")
+  @(bib-entry #:key "repo-link"
+              #:title "Declarative GUIs in Racket"
+              #:author "B. Popa"
+              #:location "Online"
+              #:date "Accessed: 28 July 2025"
+              #:url "https://github.com/Bogdanp/racket-gui-easy"))
