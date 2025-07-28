@@ -80,7 +80,7 @@
 Views might wrap a specific GUI widget, like a text message or button, or
 they might construct a tree of smaller views, forming a larger component.
 
-Views are typically @tech{Observable}-aware in ways that make sense for ach individual view.
+Views are typically @tech{Observable}-aware in ways that make sense for each individual view.
 For instance the text view takes as input an observable string and the rendered text label updates
 with changes to that observable.
 
