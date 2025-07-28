@@ -11,8 +11,9 @@
 @title{@tt{gui-easy}: Declarative GUIs}
 @author[(author+email "Bogdan Popa" "bogdan@defn.io")]
 
-The goal of GUI Easy is to simplify user interface construction in Racket
-by wrapping the existing imperative API (@racketmodname[racket/gui]) in a functional shell.
+The goal of GUI Easy is to simplify user interface
+construction in Racket by wrapping the existing imperative API
+(@racketmodname[racket/gui]) in a functional shell.
 
 @(define-runtime-path youtubestub.tex "youtubestub.tex")
 @(define embed-style

@@ -19,9 +19,6 @@
   (link "https://github.com/Bogdanp/racket-gui-easy/blob/master/examples/list.rkt"
         @filepath{examples/list.rkt}))
 
-
-
-
 @title{Reference}
 @defmodule[racket/gui/easy]
 
@@ -75,18 +72,21 @@
 
 @section{Views}
 
-@deftech{View}s are functions that return a @racket[view<%>] instance.
+@deftech{Views} are functions that return a @racket[view<%>] instance.
 
-Views might wrap a specific GUI widget, like a text message or button, or
-they might construct a tree of smaller views, forming a larger component.
+Views might wrap a specific GUI widget, like a text message or button,
+or they might construct a tree of smaller views, forming a larger
+component.
 
-Views are typically @tech{Observable}-aware in ways that make sense for each individual view.
-For instance the text view takes as input an observable string and the rendered text label updates
-with changes to that observable.
+Views are typically @tech{Observable}-aware in ways that make sense
+for each individual view. For instance the text view takes as input an
+observable string and the rendered text label updates with changes to
+that observable.
 
-Many @racketmodname[racket/gui] widgets are already wrapped by GUI Easy, but programmers can
-implement the @racket[view<%>] interface themselves in order to integrate arbitrary widgets, such as
-those from 3rd-party packages in the Racket ecosystem, into their projects.
+Many @racketmodname[racket/gui] widgets are already wrapped by GUI Easy,
+but programmers can implement the @racket[view<%>] interface themselves
+in order to integrate arbitrary widgets, such as those from 3rd-party
+packages in the Racket ecosystem, into their projects.
 
 @subsection[#:tag "windows&dialogs"]{Windows & Dialogs}
 
@@ -842,7 +842,7 @@ those from 3rd-party packages in the Racket ecosystem, into their projects.
 
 @section{Observables}
 
-@deftech{Observable}s are containers for values that may change over
+@deftech{Observables} are containers for values that may change over
 time.  Their changes may be observed by arbitrary functions.
 
 @; Require the private module to avoid requiring racket/gui/base.
