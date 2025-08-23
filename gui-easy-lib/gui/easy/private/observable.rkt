@@ -155,7 +155,9 @@
     (for ([obs (in-list (reverse (unbox (obs-observers-box o))))])
       (with-handlers ([exn:fail?
                        (lambda (e)
-                         ((error-display-handler) (exn-message e) e))])
+                         ((error-display-handler)
+                          (format "do-obs-update!: ~a" (exn-message e))
+                          e))])
         (obs v)))))
 
 (define (obs-update! o f)

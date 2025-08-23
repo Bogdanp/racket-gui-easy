@@ -66,7 +66,8 @@
            (for-each do-remove-dependencies depss)
            (parameterize ([current-renderer this])
              (send tree destroy root))
-           (set! root #f)))))
+           (set! root #f)))
+       #;high-priority? #f))
 
     (define (do-add-dependencies deps tree root) ;; noqa
       (define s
@@ -75,7 +76,8 @@
                                  (gui:queue-callback
                                   (lambda ()
                                     (parameterize ([current-renderer this])
-                                      (send tree update root dep v)))))
+                                      (send tree update root dep v)))
+                                  #;high-priority? #f))
                                (begin0 proc
                                  (obs-observe! dep proc)))))
       (begin0 s
