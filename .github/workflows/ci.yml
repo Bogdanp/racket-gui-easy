@@ -6,13 +6,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@master
-    - name: Cache dependencies
-      uses: actions/cache@v4
-      with:
-        path: |
-          ~/.cache/racket
-          ~/.local/share/racket
-        key: ${{ runner.os }}-racket-cs-8.8
     - name: Install Racket
       uses: Bogdanp/setup-racket@v1.12
       with:
