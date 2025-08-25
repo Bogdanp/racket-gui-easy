@@ -30,9 +30,9 @@
 
 ;; We don't guarantee it anywhere, but values are dispatched to
 ;; observers in subscription order. In recent versions of Racket, we can
-;; faciliate this by using treelists. In older versions, we use regular
+;; facilitate this by using treelists. In older versions, we use regular
 ;; lists and append new observers to the end of the list, assuming that
-;; any given observable won't enough observers to cause problems.
+;; any given observable won't have enough observers to cause problems.
 ;;
 ;; Why not just keep a list and always reverse on update? Any given
 ;; observable is probably going to be updated more than it is going to
