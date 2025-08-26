@@ -185,14 +185,14 @@
   (define old-v (unbox (obs-value-box o)))
   (define updated-v ((obs-update-value-box! o) proc))
   (log-change o old-v updated-v)
-  (define obss (unbox (obs-observers-box o)))
-  (for ([obs (in-observers obss)])
+  (define observers (unbox (obs-observers-box o)))
+  (for ([observer (in-observers observers)])
     (with-handlers ([exn:fail?
                      (lambda (e)
                        ((error-display-handler)
                         (format "do-obs-update!: ~a" (exn-message e))
                         e))])
-      (obs updated-v)))
+      (observer updated-v)))
   updated-v)
 
 (define (obs-update! o f)
@@ -206,80 +206,93 @@
 (define (obs-peek o)
   (unbox (obs-value-box o)))
 
-(define (obs-map a f)
-  (define b (make-obs (f (obs-peek a)) #:derived? #t))
-  (define b-box (make-weak-box b))
-  (define (g v)
-    (define maybe-b (weak-box-value b-box))
-    (when maybe-b
-      (define w (f v))
-      (do-obs-update! maybe-b (λ (_) w))))
-  (obs-observe! a g)
-  (will-register
-   executor b
-   (lambda (_)
-     (log-gui-easy-debug "obs-map: unobserve ~.s" f)
-     (obs-unobserve! a g)))
-  b)
-
-(define (obs-filter a f [d #f])
-  (obs-filter-map a (λ (v) (and (f v) v)) d))
-
-(define (obs-filter-map a f [d #f])
+(define (obs-map a proc)
   (define b
     (make-obs
      #:derived? #t
-     (or (f (obs-peek a)) d)))
-  (define b-box (make-weak-box b))
-  (define (g v)
-    (define w (f v))
-    (when w
-      (define maybe-b
-        (weak-box-value b-box))
-      (when maybe-b
-        (do-obs-update! maybe-b (λ (_) w)))))
-  (obs-observe! a g)
+     (proc (obs-peek a))))
+  (define b-box
+    (make-weak-box b))
+  (define (observer v)
+    (define maybe-b (weak-box-value b-box))
+    (when maybe-b
+      (define updated-v (proc v))
+      (do-obs-update! maybe-b (λ (_) updated-v))))
+  (obs-observe! a observer)
   (will-register
    executor b
    (lambda (_)
-     (log-gui-easy-debug "obs-filter: unobserved ~.s" f)
-     (obs-unobserve! a g)))
+     (log-gui-easy-debug "obs-map: unobserve ~.s" proc)
+     (obs-unobserve! a observer)))
   b)
 
-(define (obs-combine f . os)
+(define (obs-filter a proc [default #f])
+  (obs-filter-map a (λ (v) (and (proc v) v)) default))
+
+(define (obs-filter-map a proc [default #f])
+  (define b
+    (make-obs
+     #:derived? #t
+     (or (proc (obs-peek a)) default)))
+  (define b-box
+    (make-weak-box b))
+  (define (observer v)
+    (define updated-v (proc v))
+    (when updated-v
+      (define maybe-b
+        (weak-box-value b-box))
+      (when maybe-b
+        (do-obs-update! maybe-b (λ (_) updated-v)))))
+  (obs-observe! a observer)
+  (will-register
+   executor b
+   (lambda (_)
+     (log-gui-easy-debug "obs-filter: unobserved ~.s" proc)
+     (obs-unobserve! a observer)))
+  b)
+
+(define (obs-combine proc . os)
   (define vals
     (for/vector
         #:length (length os)
         ([o (in-list os)])
       (obs-peek o)))
-  (define b (make-obs (apply f (vector->list vals)) #:derived? #t))
-  (define b-box (make-weak-box b))
-  (define gs
+  (define b
+    (make-obs
+     #:derived? #t
+     (apply proc (vector->list vals))))
+  (define b-box
+    (make-weak-box b))
+  (define observers
     (for/list ([o (in-list os)]
                [i (in-naturals)])
-      (define (g v)
+      (define (observer v)
         (define maybe-b (weak-box-value b-box))
         (when maybe-b
           (vector-set! vals i v)
-          (define w (apply f (vector->list vals)))
-          (do-obs-update! maybe-b (λ (_) w))))
-      (obs-observe! o g)
-      g))
+          (define updated-v (apply proc (vector->list vals)))
+          (do-obs-update! maybe-b (λ (_) updated-v))))
+      (obs-observe! o observer)
+      observer))
   (will-register
    executor b
    (lambda (_)
-     (log-gui-easy-debug "obs-combine: unobserve ~.s" f)
+     (log-gui-easy-debug "obs-combine: unobserve ~.s" proc)
      (for ([o (in-list os)]
-           [g (in-list gs)])
-       (obs-unobserve! o g))))
+           [observer (in-list observers)])
+       (obs-unobserve! o observer))))
   b)
 
 (define nothing (gensym "nothing"))
 (define stop (gensym "stop"))
 
 (define (obs-debounce a #:duration [duration 200])
-  (define b (make-obs (obs-peek a) #:derived? #t))
-  (define b-box (make-weak-box b))
+  (define b
+    (make-obs
+     #:derived? #t
+     (obs-peek a)))
+  (define b-box
+    (make-weak-box b))
   (define thd
     (thread
      (lambda ()
@@ -302,20 +315,24 @@
                  (when maybe-b
                    (do-obs-update! maybe-b (λ (_) pending)))
                  (loop nothing)))))))))
-  (define (proc v)
+  (define (observer v)
     (thread-send thd v))
-  (obs-observe! a proc)
+  (obs-observe! a observer)
   (will-register
    executor b
    (lambda (_)
-     (log-gui-easy-debug "obs-debounce: unobserve ~.s" proc)
-     (obs-unobserve! a proc)
+     (log-gui-easy-debug "obs-debounce: unobserve ~.s" observer)
+     (obs-unobserve! a observer)
      (thread-send thd stop)))
   b)
 
 (define (obs-throttle a #:duration [duration 200])
-  (define b (make-obs (obs-peek a) #:derived? #t))
-  (define b-box (make-weak-box b))
+  (define b
+    (make-obs
+     #:derived? #t
+     (obs-peek a)))
+  (define b-box
+    (make-weak-box b))
   (define thd
     (thread
      (lambda ()
@@ -340,14 +357,14 @@
                  (when maybe-b
                    (do-obs-update! maybe-b (λ (_) pending)))
                  (loop nothing #f)))))))))
-  (define (proc v)
+  (define (observer v)
     (thread-send thd v))
-  (obs-observe! a proc)
+  (obs-observe! a observer)
   (will-register
    executor b
    (lambda (_)
-     (log-gui-easy-debug "obs-throttle: unobserve ~.s" proc)
-     (obs-unobserve! a proc)
+     (log-gui-easy-debug "obs-throttle: unobserve ~.s" observer)
+     (obs-unobserve! a observer)
      (thread-send thd stop)))
   b)
 
@@ -389,6 +406,22 @@
   (check-equal? (obs-peek @evens) 6)
   (check-equal? (obs-peek @odds) 5)
   (obs-update! @a add1)
+
+  (test-case "obs-map gc"
+    (define b #f)
+    (define @a (obs 1)) ;; noqa
+    (define @b (obs-map @a add1)) ;; noqa
+    (obs-observe! @b (λ (v) (set! b v)))
+    (obs-update! @a add1)
+    (sync (system-idle-evt))
+    (check-equal? b 3)
+    (set! @b #f)
+    (collect-garbage)
+    (collect-garbage)
+    (sync (system-idle-evt))
+    (obs-update! @a add1)
+    (sync (system-idle-evt))
+    (check-equal? b 3))
 
   (test-case "observable names"
     (define @foo (obs 42 #:name '@foo))
