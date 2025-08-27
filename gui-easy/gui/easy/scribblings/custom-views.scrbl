@@ -6,10 +6,18 @@
                      racket/gui/easy
                      racket/gui/easy/operator))
 
+@; Example links cited within this section
+@(define example-link-hn
+   (link "https://github.com/Bogdanp/racket-gui-easy/blob/master/examples/hn.rkt"
+         @filepath{examples/hn.rkt}))
+@(define example-link-panel
+   (link "https://github.com/Bogdanp/racket-gui-easy/blob/master/gui-easy-lib/gui/easy/private/view/panel.rkt"
+         @filepath{gui-easy-lib/gui/easy/private/view/panel.rkt}))
+
 @title{Custom Views}
 
 @(define canvas-list-link
-  (link "https://github.com/massung/racket-canvas-list/" (tt "canvas-list<%>")))
+   (link "https://github.com/massung/racket-canvas-list/" (tt "canvas-list<%>")))
 
 You can create your own views by implementing the @racket[view<%>]
 interface.
@@ -143,7 +151,7 @@ When the view becomes visible again, its @method[view<%> create]
 method will be called again and the whole cycle will repeat itself.
 
 That's all there is to it when it comes to custom controls.  See the
-@filepath{hn.rkt} example for a program that uses a custom view.
+@|example-link-hn| example for a program that uses a custom view.
 
 
 @section{Custom Containers}
@@ -154,5 +162,4 @@ them in their @method[view<%> dependencies] method.  Additionally,
 their @method[view<%> update] method is in charge of dispatching
 updates to their children.
 
-See @filepath{gui-easy-lib/gui/easy/private/view/panel.rkt} for an
-example.
+See @|example-link-panel| for an example.
