@@ -119,7 +119,7 @@
          (send* v
            (stretchable-width w-s?)
            (stretchable-height h-s?))]))
-
+    
     (define/public (destroy v)
       (send v clear-context))))
 
@@ -136,7 +136,16 @@
                #:mixin [mix values]
                #:value=? [value=? equal?]
                #:value->text [value->text values])
-  (new (input% (mix gui:text-field%))
+  ; The modified text-field makes the action responsive to the control receiving or losing the focus.
+  (define modified-text-field% (class gui:text-field%
+                                 (super-new)
+                                 (define/override (on-focus focused?)
+                                   (action
+                                    (case focused?
+                                      [(#t) 'has-focus]
+                                      [(#f) 'lost-focus])
+                                    (send this get-value)))))  
+  (new (input% (mix modified-text-field%))
        [@label @label]
        [@content @content]
        [@enabled? @enabled?]
