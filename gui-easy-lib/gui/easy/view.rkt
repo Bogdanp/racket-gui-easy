@@ -159,7 +159,7 @@
                #:mode (maybe-obs/c (or/c 'fit 'fill))]
               view/c)]
   [input (->* [(maybe-obs/c any/c)]
-              [(-> (or/c 'input 'return) string? any)
+              [(-> (or/c 'input 'return 'has-focus 'lost-focus) string? any)
                #:label (maybe-obs/c maybe-label/c)
                #:enabled? (maybe-obs/c boolean?)
                #:background-color (maybe-obs/c (or/c #f (is-a?/c gui:color%)))
