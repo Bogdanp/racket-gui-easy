@@ -51,7 +51,7 @@
       (when background-color
         (send the-field set-field-background background-color))
       (begin0 the-field
-        (send the-field set-context 'last-val content)))
+              (send the-field set-context 'last-val content)))
 
     (define (call-preserving-position ed thunk)
       (define old-text (send ed get-text))
@@ -69,57 +69,57 @@
         (and (= start 0)
              (= end (string-length old-text))))
       (begin0 (thunk)
-        ;; When the contents of the editor are empty, avoid changing
-        ;; the position since doing so would place the cursor before
-        ;; any newly-inserted text.
-        (unless (string=? "" old-text)
-          (if full-selection?
-              (send ed set-position 0 (string-length (send ed get-text)))
-              (send ed set-position start end)))))
+              ;; When the contents of the editor are empty, avoid changing
+              ;; the position since doing so would place the cursor before
+              ;; any newly-inserted text.
+              (unless (string=? "" old-text)
+                (if full-selection?
+                    (send ed set-position 0 (string-length (send ed get-text)))
+                    (send ed set-position start end)))))
 
     (define/public (update v what val)
       (case/dep what
-        [@label
-         (send v set-label val)]
-        [@content
-         (define last-val (send v get-context 'last-val))
-         (define text
-           (value->text val))
-         (cond
-           [(not (value=? val last-val))
-            (send v set-context 'last-val val)
-            (call-preserving-position
-             (send v get-editor)
-             (lambda ()
-               (send v set-value text)
-               (send v refresh)))]
+                [@label
+                 (send v set-label val)]
+                [@content
+                 (define last-val (send v get-context 'last-val))
+                 (define text
+                   (value->text val))
+                 (cond
+                   [(not (value=? val last-val))
+                    (send v set-context 'last-val val)
+                    (call-preserving-position
+                     (send v get-editor)
+                     (lambda ()
+                       (send v set-value text)
+                       (send v refresh)))]
 
-           [(string=? text "")
-            (send v set-value "")
-            (send v refresh)]
+                   [(string=? text "")
+                    (send v set-value "")
+                    (send v refresh)]
 
-           [else
-            (void)])]
-        [@enabled?
-         (send v enable val)]
-        [@background-color
-         (send v set-field-background val)]
-        [@margin
-         (match-define (list h-m v-m) val)
-         (send* v
-           (horiz-margin h-m)
-           (vert-margin v-m))]
-        [@min-size
-         (match-define (list w h) val)
-         (send* v
-           (min-width (or w 0))
-           (min-height (or h 0)))]
-        [@stretch
-         (match-define (list w-s? h-s?) val)
-         (send* v
-           (stretchable-width w-s?)
-           (stretchable-height h-s?))]))
-
+                   [else
+                    (void)])]
+                [@enabled?
+                 (send v enable val)]
+                [@background-color
+                 (send v set-field-background val)]
+                [@margin
+                 (match-define (list h-m v-m) val)
+                 (send* v
+                   (horiz-margin h-m)
+                   (vert-margin v-m))]
+                [@min-size
+                 (match-define (list w h) val)
+                 (send* v
+                   (min-width (or w 0))
+                   (min-height (or h 0)))]
+                [@stretch
+                 (match-define (list w-s? h-s?) val)
+                 (send* v
+                   (stretchable-width w-s?)
+                   (stretchable-height h-s?))]))
+    
     (define/public (destroy v)
       (send v clear-context))))
 
@@ -136,17 +136,27 @@
                #:mixin [mix values]
                #:value=? [value=? equal?]
                #:value->text [value->text values])
-  (new (input% (mix gui:text-field%))
-       [@label @label]
-       [@content @content]
-       [@enabled? @enabled?]
-       [@background-color @background-color]
-       [@margin @margin]
-       [@min-size @min-size]
-       [@stretch @stretch]
-       [action action]
-       [style style]
-       [font font]
-       [keymap keymap]
-       [value=? value=?]
-       [value->text value->text]))
+  ; The modified text-field makes the action responsive to the control receiving or losing the focus.
+  (define modified-text-field% (class gui:text-field%
+                                 (super-new)
+                                 (define/override (on-focus focused?)
+                                   (action
+                                    (case focused?
+                                      [(#t) 'has-focus]
+                                      [(#f) 'lost-focus])
+                                    (send this get-value)))))  
+    (new (input% (mix modified-text-field%))
+         [@label @label]
+         [@content @content]
+         [@enabled? @enabled?]
+         [@background-color @background-color]
+         [@margin @margin]
+         [@min-size @min-size]
+         [@stretch @stretch]
+         [action action]
+         [style style]
+         [font font]
+         [keymap keymap]
+         [value=? value=?]
+         [value->text value->text]))
+  

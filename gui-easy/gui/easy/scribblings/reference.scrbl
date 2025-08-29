@@ -542,7 +542,7 @@ packages in the Racket ecosystem, into their projects.
 }
 
 @defproc[(input [value (maybe-obs/c any/c)]
-                [action (-> (or/c 'input 'return) string? any) void]
+                [action (-> (or/c 'input 'return 'has-focus 'lost-focus) string? any) void]
                 [#:label label (maybe-obs/c maybe-label/c) #f]
                 [#:enabled? enabled? (maybe-obs/c boolean?) #t]
                 [#:background-color background-color (maybe-obs/c (or/c #f (is-a?/c gui:color%))) #f]
@@ -559,7 +559,7 @@ packages in the Racket ecosystem, into their projects.
                 [#:value->text value->text (-> any/c string?) values]) (is-a?/c view<%>)]{
   Returns a representation of a text field that calls @racket[action]
   on change.  The first argument to the @racket[action] is the type of
-  event that caused the input to change and the second is the contents
+  event that the control is responding to and the second is the contents
   of the text field.
 
   The @racket[#:value=?] argument controls when changes to the input
@@ -574,6 +574,11 @@ packages in the Racket ecosystem, into their projects.
   The @racket[#:value->text] argument controls how the input values
   are rendered to strings.  If not provided, @racket[value] must be
   either a @racket[string?] or an observable of strings.
+
+  @history[
+    #:changed "0.21" @elem{@racket[input] also responds to the @racket['has-focus] and
+   @racket['lost-focus] events.}
+  ]
 }
 
 @defproc[(progress [value (maybe-obs/c gui:position-integer?)]
