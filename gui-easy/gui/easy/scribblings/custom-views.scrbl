@@ -22,8 +22,8 @@
 You can create your own views by implementing the @racket[view<%>]
 interface.
 
-As an example, let's wrap Jeffrey Massung's @|canvas-list-link|.  I find
-it helps to work backwards from the API you'd like to end up with.  In
+As an example, let's wrap Jeffrey Massung's @|canvas-list-link|. I find
+it helps to work backwards from the API you'd like to end up with. In
 this case, that would be:
 
 @racketblock[
@@ -36,8 +36,8 @@ this case, that would be:
 ]
 
 A @racketid[canvas-list] takes an observable of a list of entries, a
-function that knows how to draw each entry to a @racket[gui:dc<%>] and
-a callback for when the user double-clicks an entry.  The
+function that knows how to draw each entry to a @racket[gui:dc<%>]
+and a callback for when the user double-clicks an entry. The
 @racketid[canvas-list] function should then look something like this:
 
 @racketblock[
@@ -48,9 +48,9 @@ a callback for when the user double-clicks an entry.  The
          [action action]))
 ]
 
-All it needs to do is abstract over the instantiation of the
-underlying @racket[view<%>].  Next, we can define a skeleton
-implementation of @racketid[canvas-list-view%]:
+All it needs to do is abstract over the instantiation of the underlying
+@racket[view<%>]. Next, we can define a skeleton implementation of
+@racketid[canvas-list-view%]:
 
 @racketblock[
   (define canvas-list-view%
@@ -72,8 +72,8 @@ implementation of @racketid[canvas-list-view%]:
 ]
 
 Views must communicate what @tech{observables} they depend on to their
-parents.  Since the only dependency a canvas list has is its set of
-entries, that's straightforward:
+parents. Since the only dependency a canvas list has is its set of
+entries. That's straightforward:
 
 @racketblock[
   (define canvas-list-view%
@@ -87,9 +87,9 @@ entries, that's straightforward:
 ]
 
 When a view is rendered, its parent is in charge of calling its
-@method[view<%> create] method.  That method must instantiate a GUI
+@method[view<%> create] method. That method must instantiate a GUI
 object, associate it with the passed-in @racketid[parent], perform any
-initialization steps and then return it.  In our case:
+initialization steps and then return it. In our case:
 
 @racketblock[
   (define canvas-list-view%
@@ -108,11 +108,11 @@ initialization steps and then return it.  In our case:
       ...))
 ]
 
-When the @tech{observables} the view depends on change, its parent
-will call its @method[view<%> update] method with the GUI object that
-the view returned from its @method[view<%> create] method, the
-observable that changed and the observable's value when it changed.
-The view is then in charge of modifying its GUI object appropriately.
+When the @tech{observables} the view depends on change, its parent will
+call its @method[view<%> update] method with the GUI object that the
+view returned from its @method[view<%> create] method, the observable
+that changed and the observable's value when it changed. The view is
+then in charge of modifying its GUI object appropriately.
 
 @racketblock[
   (define canvas-list-view%
@@ -132,11 +132,10 @@ The view is then in charge of modifying its GUI object appropriately.
   program exits.
 }
 
-Finally, when a view is no longer visible, its @method[view<%>
-destroy] method is typically called to dispose of the GUI object and
-perform any teardown actions.  In our case, there's nothing to tear
-down so we can let garbage collection take care of destroying the
-@racketid[canvas-list%] object:
+Finally, when a view is no longer visible, its @method[view<%> destroy]
+method is called to dispose of the GUI object and perform any teardown
+actions. In our case, there's nothing to tear down so we can let garbage
+collection take care of destroying the @racketid[canvas-list%] object:
 
 @racketblock[
   (define canvas-list-view%
@@ -147,10 +146,10 @@ down so we can let garbage collection take care of destroying the
         (void))))
 ]
 
-When the view becomes visible again, its @method[view<%> create]
-method will be called again and the whole cycle will repeat itself.
+When the view becomes visible again, its @method[view<%> create] method
+will be called again and the whole cycle will repeat itself.
 
-That's all there is to it when it comes to custom controls.  See the
+That's all there is to it when it comes to custom controls. See the
 @|example-link-hn| example for a program that uses a custom view.
 
 
@@ -158,8 +157,8 @@ That's all there is to it when it comes to custom controls.  See the
 
 Containers are slightly more complicated to implement than controls.
 They must collect all their children's unique dependencies and list
-them in their @method[view<%> dependencies] method.  Additionally,
-their @method[view<%> update] method is in charge of dispatching
-updates to their children.
+them in their @method[view<%> dependencies] method. Additionally, their
+@method[view<%> update] method is in charge of dispatching updates to
+their children.
 
 See @|example-link-panel| for an example.
