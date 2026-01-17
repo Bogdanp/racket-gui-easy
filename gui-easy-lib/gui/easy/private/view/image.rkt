@@ -17,7 +17,7 @@
 
 (struct props (image size mode))
 
-(define image%
+(define (make-image% gui-canvas%)
   (class* object% (view<%>)
     (init-field @image @size @mode)
     (super-new)
@@ -34,7 +34,7 @@
       (define bmp (read-bitmap image))
       (define bmp/scaled (scale bmp size mode))
       (define the-canvas
-        (new (context-mixin gui:canvas%)
+        (new (context-mixin gui-canvas%)
              [parent parent]
              [style '(transparent)]
              [min-width (send bmp/scaled get-width)]
@@ -124,8 +124,9 @@
 
 (define (image @image
                #:size [@size (obs '(#f #f))]
-               #:mode [@mode (obs 'fit)])
-  (new image%
+               #:mode [@mode (obs 'fit)]
+               #:mixin [mix values])
+  (new (make-image% (mix gui:canvas%))
        [@image (->obs @image)]
        [@size (->obs @size)]
        [@mode (->obs @mode)]))

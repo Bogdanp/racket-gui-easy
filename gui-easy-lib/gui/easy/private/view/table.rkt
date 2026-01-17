@@ -10,7 +10,7 @@
 (provide
  table)
 
-(define (make-table% %)
+(define (make-table% gui-list-box%)
   (class* object% (view<%>)
     (init-field @label @enabled? @entries @selection @margin @min-size @stretch @column-widths
                 entry->row columns style font action)
@@ -29,7 +29,7 @@
       (define selection (peek @selection))
       (define column-widths (peek @column-widths))
       (define the-list-box
-        (new (context-mixin %)
+        (new (context-mixin gui-list-box%)
              [parent parent]
              [label (peek @label)]
              [choices null]

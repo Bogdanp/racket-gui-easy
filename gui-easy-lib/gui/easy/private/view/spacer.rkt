@@ -7,7 +7,7 @@
 (provide
  spacer)
 
-(define spacer%
+(define (make-spacer% gui-panel%)
   (class* object% (view<%>)
     (super-new)
 
@@ -15,7 +15,7 @@
       null)
 
     (define/public (create parent)
-      (new gui:panel%
+      (new gui-panel%
            [parent parent]))
 
     (define/public (update _v _what _val)
@@ -24,5 +24,5 @@
     (define/public (destroy _v)
       (void))))
 
-(define (spacer)
-  (new spacer%))
+(define (spacer #:mixin [mix values])
+  (new (make-spacer% (mix gui:panel%))))

@@ -10,7 +10,7 @@
 (provide
  slider)
 
-(define slider%
+(define (make-slider% gui-slider%)
   (class* object% (view<%>)
     (init-field @label @enabled? @value @min-size @stretch min-value max-value style action)
     (super-new)
@@ -21,7 +21,7 @@
     (define/public (create parent)
       (match-define (list min-w min-h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
-      (new gui:slider%
+      (new gui-slider%
            [parent parent]
            [label (peek @label)]
            [style style]
@@ -63,8 +63,9 @@
                 #:max-value [max-value 100]
                 #:min-size [@min-size '(#f #f)]
                 #:stretch [@stretch (list (memq 'horizontal style)
-                                          (memq 'vertical style))])
-  (new slider%
+                                          (memq 'vertical style))]
+                #:mixin [mix values])
+  (new (make-slider% (mix gui:slider%))
        [@value @value]
        [@label @label]
        [style style]

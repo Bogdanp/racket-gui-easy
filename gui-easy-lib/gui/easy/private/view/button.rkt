@@ -10,7 +10,7 @@
 (provide
  button)
 
-(define button%
+(define (make-button% gui-button%)
   (class* object% (view<%>)
     (init-field @label @enabled? @margin @min-size @stretch action style font)
     (super-new)
@@ -22,7 +22,7 @@
       (match-define (list h-m v-m) (peek @margin))
       (match-define (list w h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
-      (new gui:button%
+      (new gui-button%
            [parent parent]
            [label (peek @label)]
            [callback (λ (_self _event)
@@ -66,8 +66,9 @@
                 #:font [font gui:normal-control-font]
                 #:margin [@margin '(2 2)]
                 #:min-size [@min-size '(#f #f)]
-                #:stretch [@stretch '(#f #f)])
-  (new button%
+                #:stretch [@stretch '(#f #f)]
+                #:mixin [mix values])
+  (new (make-button% (mix gui:button%))
        [@label @label]
        [@enabled? @enabled?]
        [@margin @margin]
