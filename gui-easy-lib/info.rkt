@@ -1,7 +1,7 @@
 #lang info
 
 (define license 'BSD-3-Clause)
-(define version "0.21")
+(define version "0.22")
 (define collection "racket")
 (define deps
   '("base"

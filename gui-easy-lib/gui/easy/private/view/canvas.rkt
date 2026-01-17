@@ -18,7 +18,7 @@
 
 (define missing (gensym 'missing))
 
-(define (make-canvas% %)
+(define (make-canvas% gui-canvas%)
   (class* object% (view<%>)
     (init-field @input @label @enabled? @margin @min-size @stretch draw style)
     (super-new)
@@ -31,7 +31,7 @@
       (match-define (list min-w min-h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
       (define the-canvas
-        (new (context-mixin %)
+        (new (context-mixin gui-canvas%)
              [parent parent]
              [paint-callback (λ (self dc)
                                (define input (send self get-context 'input missing))

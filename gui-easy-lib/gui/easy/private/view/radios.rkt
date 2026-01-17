@@ -11,7 +11,7 @@
 (provide
  radios)
 
-(define radios%
+(define (make-radios% gui-radio-box%)
   (class* object% (view<%>)
     (init-field @label @enabled? @selection @min-size @stretch style choices choice->label choice=? action)
     (super-new)
@@ -28,7 +28,7 @@
       (match-define (list w-s? h-s?) (peek @stretch))
       (define selection (peek @selection-index))
       (define the-radio-box
-        (new gui:radio-box%
+        (new gui-radio-box%
              [parent parent]
              [label (peek @label)]
              [style style]
@@ -84,8 +84,9 @@
                 #:style [style '(vertical)]
                 #:enabled? [@enabled? #t]
                 #:min-size [@min-size '(#f #f)]
-                #:stretch [@stretch '(#f #f)])
-  (new radios%
+                #:stretch [@stretch '(#f #f)]
+                #:mixin [mix values])
+  (new (make-radios% (mix gui:radio-box%))
        [@selection (->obs @selection)]
        [@label @label]
        [@enabled? @enabled?]

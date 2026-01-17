@@ -125,7 +125,8 @@ packages in the Racket ecosystem, into their projects.
 
 @subsection{Menus & Menu Items}
 
-@defproc[(popup-menu [menu-or-item (is-a?/c view<%>)] ...) (is-a?/c popup-menu-view<%>)]{
+@defproc[(popup-menu [#:mixin mix (make-mixin-contract gui:popup-menu) values]
+                     [menu-or-item (is-a?/c view<%>)] ...) (is-a?/c popup-menu-view<%>)]{
   Returns a representation of a popup menu.  Popup menus are rendered
   using @racket[render-popup-menu].
 
@@ -138,9 +139,13 @@ packages in the Racket ecosystem, into their projects.
      (menu-item-separator)
      (menu-item "Quit"))
   ]
+
+  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
+
 }
 
 @defproc[(menu-bar [#:enabled? enabled? (maybe-obs/c any/c) #t]
+                   [#:mixin mix (make-mixin-contract gui:menu-bar%) values]
                    [menu-or-item (is-a?/c view<%>)] ...) (is-a?/c view<%>)]{
   Returns a representation of a menu-bar menu.
 
@@ -159,12 +164,14 @@ packages in the Racket ecosystem, into their projects.
 
   @history[
     #:changed "0.15" @elem{The @racket[#:enabled?] argument.}
+    #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}
   ]
 }
 
 @defproc[(menu [label (maybe-obs/c maybe-label/c)]
                [#:enabled? enabled? (maybe-obs/c any/c) #t]
                [#:help help-text (maybe-obs/c (or/c #f string?)) #f]
+               [#:mixin mix (make-mixin-contract gui:menu%) values]
                [item (is-a?/c view<%>)] ...) (is-a?/c view<%>)]{
 
   Returns a representation of a menu with @racket[item]s as children.
@@ -173,6 +180,7 @@ packages in the Racket ecosystem, into their projects.
     #:changed "0.15" @elem{
       The @racket[#:enabled?] and @racket[#:help] arguments.
     }
+    #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}
   ]
 }
 
@@ -183,7 +191,8 @@ packages in the Racket ecosystem, into their projects.
                     [#:shortcut shortcut (maybe-obs/c (or/c #f (*list/c
                                                                 (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
                                                                 (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
-                                                                (or/c char? symbol?)))) #f]) (is-a?/c view<%>)]{
+                                                                (or/c char? symbol?)))) #f]
+                     [#:mixin mix (make-mixin-contract gui:menu-item%) values]) (is-a?/c view<%>)]{
 
   Returns a representation of a menu item that calls @racket[action]
   when clicked.
@@ -193,6 +202,7 @@ packages in the Racket ecosystem, into their projects.
       The @racket[#:enabled?], @racket[#:help] and @racket[#:shortcut]
       arguments.
     }
+    #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}
   ]
 }
 
@@ -204,17 +214,21 @@ packages in the Racket ecosystem, into their projects.
                               [#:shortcut shortcut (maybe-obs/c (or/c #f (*list/c
                                                                           (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
                                                                           (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
-                                                                          (or/c char? symbol?)))) #f]) (is-a?/c view<%>)]{
+                                                                          (or/c char? symbol?)))) #f]
+                              [#:mixin mix (make-mixin-contract gui:checkable-menu-item%) values]) (is-a?/c view<%>)]{
 
   Returns a representation of a menu item with a checkbox. The
   @racket[action] callback is called with the current checked state
   when the menu item is clicked. Use @racket[#:checked?] to set or
   update the checkbox programmatically.
 
-  @history[#:added "0.18"]
+  @history[
+    #:added "0.18"
+    #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}
+  ]
 }
 
-@defproc[(menu-item-separator) (is-a?/c view<%>)]{
+@defproc[(menu-item-separator [#:mixin mix (make-mixin-contract gui:separator-menu-item%) values]) (is-a?/c view<%>)]{
   Returns a representation of a menu item separator.
 }
 
@@ -293,7 +307,8 @@ packages in the Racket ecosystem, into their projects.
                [#:spacing spacing (maybe-obs/c spacing/c) 0]
                [#:margin margin (maybe-obs/c margin/c) 0]
                [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
-               [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]) (is-a?/c view<%>)]{
+               [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
+               [#:mixin mix (make-mixin-contract gui:tab-panel%) values]) (is-a?/c view<%>)]{
 
   Returns a representation of a tab panel.
 
@@ -314,6 +329,7 @@ packages in the Racket ecosystem, into their projects.
   @history[
     #:changed "0.3" @elem{Added the @racket[#:choice=?] argument.}
     #:changed "0.3" @elem{The @racket[selection] is now a value in the set of choices instead of an index.}
+    #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}
   ]
 }
 
@@ -379,6 +395,8 @@ packages in the Racket ecosystem, into their projects.
   compared using @racket[equal?].
 
   See @|example-link-list| for an example.
+
+  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
 }
 
 @defproc[(observable-view [data (obs/c any/c)]
@@ -488,18 +506,24 @@ packages in the Racket ecosystem, into their projects.
                  [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
                  [#:stretch stretch
                             (maybe-obs/c stretch/c)
-                            '(#t #t)]) (is-a?/c view<%>)]{
+                            '(#t #t)]
+                 [#:mixin mix (make-mixin-contract gui:button%) values]) (is-a?/c view<%>)]{
 
   Returns a representation of a button that calls @racket[action] when
   clicked.
+
+  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
 }
 
 @defproc[(checkbox [action (-> boolean? any)]
                    [#:label label (maybe-obs/c gui:label-string?) #f]
                    [#:checked? checked? (maybe-obs/c boolean?) #f]
-                   [#:enabled? enabled? (maybe-obs/c boolean?) #f]) (is-a?/c view<%>)]{
+                   [#:enabled? enabled? (maybe-obs/c boolean?) #f]
+                   [#:mixin mix (make-mixin-contract gui:check-box%) values]) (is-a?/c view<%>)]{
   Returns a representation of a checkbox that calls @racket[action]
   when toggled.
+
+  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
 }
 
 @defproc[(choice [choices (maybe-obs/c (listof any/c))]
@@ -511,7 +535,8 @@ packages in the Racket ecosystem, into their projects.
                  [#:style style (listof (or/c 'horizontal-label 'vertical-label 'deleted)) null]
                  [#:enabled? enabled? (maybe-obs/c boolean?) #t]
                  [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
-                 [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]) (is-a?/c view<%>)]{
+                 [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
+                 [#:mixin mix (make-mixin-contract gui:choice%) values]) (is-a?/c view<%>)]{
 
   Returns a representation of a choice widget that calls
   @racket[action] whenever the current selection changes.
@@ -520,11 +545,14 @@ packages in the Racket ecosystem, into their projects.
   displayed and the @racket[#:choice=?] argument controls how the
   current @racket[#:selection] is compared against the list of choices
   to determine the selection index.
+
+  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
 }
 
 @defproc[(image [path-or-bitmap (maybe-obs/c (or/c path-string? (is-a?/c gui:bitmap%)))]
                 [#:size size (maybe-obs/c size/c) '(#f #f)]
-                [#:mode mode (maybe-obs/c (or/c 'fit 'fill)) 'fit]) (is-a?/c view<%>)]{
+                [#:mode mode (maybe-obs/c (or/c 'fit 'fill)) 'fit]
+                [#:mixin mix (make-mixin-contract gui:canvas%) values]) (is-a?/c view<%>)]{
 
   Returns a representation of an image.
 
@@ -538,7 +566,9 @@ packages in the Racket ecosystem, into their projects.
      @racket['transparent]. Now passes @racket[#t] to the
      @racket[#:try-@2x?] argument of @racket[gui:read-bitmap].}
     #:changed "0.17" @elem{The first argument may now be a
-     @racket[gui:bitmap%].}]
+     @racket[gui:bitmap%].}
+    #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}
+  ]
 }
 
 @defproc[(input [value (maybe-obs/c any/c)]
@@ -593,8 +623,11 @@ packages in the Racket ecosystem, into their projects.
                    [#:stretch stretch
                               (maybe-obs/c stretch/c)
                               (list (memq 'horizontal style)
-                                    (memq 'vertical   style))]) (is-a?/c view<%>)]{
+                                    (memq 'vertical   style))]
+                   [#:mixin mix (make-mixin-contract gui:gauge%) values]) (is-a?/c view<%>)]{
   Returns a representation of a progress bar.
+
+  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
 }
 
 @defproc[(radios [choices (listof any/c)]
@@ -606,7 +639,8 @@ packages in the Racket ecosystem, into their projects.
                  [#:style style (listof (or/c 'horizontal-label 'vertical-label 'deleted)) null]
                  [#:enabled? enabled? (maybe-obs/c boolean?) #t]
                  [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
-                 [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]) (is-a?/c view<%>)]{
+                 [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
+                 [#:mixin mix (make-mixin-contract gui:radio-box%) values]) (is-a?/c view<%>)]{
 
   Returns a representation of a radio box widget that calls
   @racket[action] whenever the current selection changes.
@@ -617,6 +651,8 @@ packages in the Racket ecosystem, into their projects.
   to determine the selection index.
 
   Unlike @racket[choice], the set of @racket[choices] cannot be changed.
+
+  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
 }
 
 @defproc[(slider [value (maybe-obs/c gui:position-integer?)]
@@ -632,13 +668,18 @@ packages in the Racket ecosystem, into their projects.
                  [#:stretch stretch
                             (maybe-obs/c stretch/c)
                             (list (memq 'horizontal style)
-                                  (memq 'vertical   style))]) (is-a?/c view<%>)]{
+                                  (memq 'vertical   style))]
+                 [#:mixin mix (make-mixin-contract gui:slider%) values]) (is-a?/c view<%>)]{
   Returns a representation of a slider that calls the @racket[action] on change.
+
+  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
 }
 
-@defproc[(spacer) (is-a?/c view<%>)]{
+@defproc[(spacer [#:mixin mix (make-mixin-contract gui:panel%) values]) (is-a?/c view<%>)]{
   Returns a representation of a spacer.  Spacers extend to fill the
   space of their parents.
+
+  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
 }
 
 @defproc[(table [columns (listof gui:label-string?)]
@@ -703,8 +744,11 @@ packages in the Racket ecosystem, into their projects.
 
 @defproc[(text [s (maybe-obs/c gui:label-string?)]
                [#:color color (maybe-obs/c (or/c #f string? (is-a?/c gui:color%))) #f]
-               [#:font font (is-a?/c gui:font%) gui:normal-control-font]) (is-a?/c view<%>)]{
+               [#:font font (is-a?/c gui:font%) gui:normal-control-font]
+               [#:mixin mix (make-mixin-contract gui:message%) values]) (is-a?/c view<%>)]{
   Returns a representation of a textual label.
+
+  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
 }
 
 @subsection{Combinators}

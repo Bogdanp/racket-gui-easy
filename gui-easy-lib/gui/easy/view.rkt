@@ -32,14 +32,19 @@
   [dialog (window/c gui:dialog% (listof (or/c 'no-caption 'no-sheet 'resize-border 'close-button)))]
 
   ;; Menus & Menu Items
-  [popup-menu (-> view/c ... (is-a?/c popup-menu-view<%>))]
+  [popup-menu (->* ()
+                   [#:mixin (make-mixin-contract gui:popup-menu%)]
+                   #:rest (listof view/c)
+                   (is-a?/c popup-menu-view<%>))]
   [menu-bar (->* []
-                 [#:enabled? (maybe-obs/c any/c)]
+                 [#:enabled? (maybe-obs/c any/c)
+                  #:mixin (make-mixin-contract gui:menu-bar%)]
                  #:rest (listof view/c)
                  (is-a?/c menu-bar-view<%>))]
   [menu (->* [(maybe-obs/c maybe-label/c)]
              [#:enabled? (maybe-obs/c any/c)
-              #:help (maybe-obs/c (or/c #f string?))]
+              #:help (maybe-obs/c (or/c #f string?))
+              #:mixin (make-mixin-contract gui:menu%)]
              #:rest (listof view/c)
              (is-a?/c menu-view<%>))]
   [menu-item (->* [(maybe-obs/c maybe-label/c)]
@@ -49,7 +54,8 @@
                    #:shortcut (maybe-obs/c (or/c #f (*list/c
                                                      (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
                                                      (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
-                                                     (or/c char? symbol?))))]
+                                                     (or/c char? symbol?))))
+                   #:mixin (make-mixin-contract gui:menu-item%)]
                   view/c)]
   [checkable-menu-item (->* [(maybe-obs/c maybe-label/c)]
                             [(-> boolean? any)
@@ -59,9 +65,12 @@
                              #:shortcut (maybe-obs/c (or/c #f (*list/c
                                                                (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
                                                                (or/c 'alt 'cmd 'meta 'ctl 'shift 'option)
-                                                               (or/c char? symbol?))))]
+                                                               (or/c char? symbol?))))
+                             #:mixin (make-mixin-contract gui:checkable-menu-item%)]
                             view/c)]
-  [menu-item-separator (-> view/c)]
+  [menu-item-separator (->* []
+                            [#:mixin (make-mixin-contract gui:separator-menu-item%)]
+                            view/c)]
 
   ;; Containers
   [hpanel (panel/c)]
@@ -136,12 +145,14 @@
                 #:font (is-a?/c gui:font%)
                 #:margin (maybe-obs/c margin/c)
                 #:min-size (maybe-obs/c size/c)
-                #:stretch (maybe-obs/c stretch/c)]
+                #:stretch (maybe-obs/c stretch/c)
+                #:mixin (make-mixin-contract gui:button%)]
                view/c)]
   [checkbox (->* [(-> boolean? any)]
                  [#:label (maybe-obs/c gui:label-string?)
                   #:checked? (maybe-obs/c boolean?)
-                  #:enabled? (maybe-obs/c boolean?)]
+                  #:enabled? (maybe-obs/c boolean?)
+                  #:mixin (make-mixin-contract gui:check-box%)]
                  view/c)]
   [choice (->* [(maybe-obs/c (listof any/c))
                 (-> (or/c #f any/c) any)]
@@ -152,11 +163,13 @@
                 #:style (listof (or/c 'horizontal-label 'vertical-label 'deleted))
                 #:enabled? (maybe-obs/c boolean?)
                 #:min-size (maybe-obs/c size/c)
-                #:stretch (maybe-obs/c stretch/c)]
+                #:stretch (maybe-obs/c stretch/c)
+                #:mixin (make-mixin-contract gui:choice%)]
                view/c)]
   [image (->* [(maybe-obs/c (or/c path-string? (is-a?/c gui:bitmap%)))]
               [#:size (maybe-obs/c size/c)
-               #:mode (maybe-obs/c (or/c 'fit 'fill))]
+               #:mode (maybe-obs/c (or/c 'fit 'fill))
+               #:mixin (make-mixin-contract gui:canvas%)]
               view/c)]
   [input (->* [(maybe-obs/c any/c)]
               [(-> (or/c 'input 'return 'has-focus 'lost-focus) string? any)
@@ -183,7 +196,8 @@
                                         'deleted))
                   #:range (maybe-obs/c gui:positive-dimension-integer?)
                   #:min-size (maybe-obs/c size/c)
-                  #:stretch (maybe-obs/c stretch/c)]
+                  #:stretch (maybe-obs/c stretch/c)
+                  #:mixin (make-mixin-contract gui:gauge%)]
                  view/c)]
   [radios (->* [(listof any/c)
                 (-> (or/c #f any/c) any)]
@@ -196,7 +210,8 @@
                                       'deleted))
                 #:enabled? (maybe-obs/c boolean?)
                 #:min-size (maybe-obs/c size/c)
-                #:stretch (maybe-obs/c stretch/c)]
+                #:stretch (maybe-obs/c stretch/c)
+                #:mixin (make-mixin-contract gui:radio-box%)]
                view/c)]
   [slider (->* [(maybe-obs/c gui:position-integer?)
                 (-> gui:position-integer? any)]
@@ -208,9 +223,12 @@
                 #:min-value gui:position-integer?
                 #:max-value gui:position-integer?
                 #:min-size (maybe-obs/c size/c)
-                #:stretch (maybe-obs/c stretch/c)]
+                #:stretch (maybe-obs/c stretch/c)
+                #:mixin (make-mixin-contract gui:slider%)]
                view/c)]
-  [spacer (-> view/c)]
+  [spacer (->* []
+               [#:mixin (make-mixin-contract gui:panel%)]
+               view/c)]
   [table (->* [(listof gui:label-string?)
                (maybe-obs/c vector?)]
               [table-action/c
@@ -235,7 +253,8 @@
               view/c)]
   [text (->* [(maybe-obs/c gui:label-string?)]
              [#:color (maybe-obs/c (or/c #f string? (is-a?/c gui:color%)))
-              #:font (is-a?/c gui:font%)]
+              #:font (is-a?/c gui:font%)
+              #:mixin (make-mixin-contract gui:message%)]
              view/c)]
 
   ;; Combinators

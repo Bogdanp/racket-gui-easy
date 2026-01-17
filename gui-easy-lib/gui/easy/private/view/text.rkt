@@ -9,7 +9,7 @@
 (provide
  text)
 
-(define text%
+(define (make-text% gui-message%)
   (class* object% (view<%>)
     (init-field @label @color font)
     (super-new)
@@ -20,7 +20,7 @@
     (define/public (create parent)
       (define color (peek @color))
       (define the-message
-        (new gui:message%
+        (new gui-message%
              [parent parent]
              [label (peek @label)]
              [font font]
@@ -39,8 +39,9 @@
 
 (define (text @label
               #:color [@color #f]
-              #:font [font gui:normal-control-font])
-  (new text%
+              #:font [font gui:normal-control-font]
+              #:mixin [mix values])
+  (new (make-text% (mix gui:message%))
        [@label @label]
        [@color @color]
        [font font]))

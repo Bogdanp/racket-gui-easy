@@ -9,7 +9,7 @@
 (provide
  checkbox)
 
-(define checkbox%
+(define (make-checkbox% gui-check-box%)
   (class* object% (view<%>)
     (init-field @label @checked? @enabled? action)
     (super-new)
@@ -18,7 +18,7 @@
       (filter obs? (list @label @checked? @enabled?)))
 
     (define/public (create parent)
-      (new gui:check-box%
+      (new gui-check-box%
            [parent parent]
            [label (peek @label)]
            [value (peek @checked?)]
@@ -38,8 +38,9 @@
 (define (checkbox action
                   #:label [@label ""]
                   #:checked? [@checked? #f]
-                  #:enabled? [@enabled? #t])
-  (new checkbox%
+                  #:enabled? [@enabled? #t]
+                  #:mixin [mix values])
+  (new (make-checkbox% (mix gui:check-box%))
        [@label @label]
        [@checked? @checked?]
        [@enabled? @enabled?]

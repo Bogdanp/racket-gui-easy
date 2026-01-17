@@ -12,7 +12,7 @@
 (provide
  tabs)
 
-(define tabs%
+(define (make-tabs% gui-tab-panel%)
   (class* container% (view<%>)
     (inherit-field children)
     (init-field @choices @selection @alignment @enabled? @spacing @margin @min-size @stretch style action choice->label choice=?)
@@ -38,7 +38,7 @@
       (define labels (map choice->label choices))
       (define the-panel
         (new (context-mixin
-              (class gui:tab-panel%
+              (class gui-tab-panel%
                 (super-new)
                 (define/private (get-last-choices)
                   (send this get-context 'last-choices null))
@@ -153,8 +153,9 @@
               #:margin [@margin '(0 0)]
               #:min-size [@min-size '(#f #f)]
               #:stretch [@stretch '(#t #t)]
+              #:mixin [mix values]
               . children)
-  (new tabs%
+  (new (make-tabs% (mix gui:tab-panel%))
        [@choices (->obs @choices)]
        [@selection (->obs @selection)]
        [@alignment @alignment]

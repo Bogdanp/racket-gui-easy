@@ -11,7 +11,7 @@
 (provide
  choice)
 
-(define choice%
+(define (make-choice% gui-choice%)
   (class* object% (view<%>)
     (init-field @label @enabled? @choices @selection @min-size @stretch style choice->label choice=? action)
     (super-new)
@@ -37,7 +37,7 @@
       (match-define (list w-s? h-s?) (peek @stretch))
       (match-define (list choices selection) (peek @choices&index))
       (define the-choice
-        (new (context-mixin gui:choice%)
+        (new (context-mixin gui-choice%)
              [parent parent]
              [label (peek @label)]
              [style style]
@@ -115,8 +115,9 @@
                 #:style [style null]
                 #:enabled? [@enabled? #t]
                 #:min-size [@min-size '(#f #f)]
-                #:stretch [@stretch '(#f #f)])
-  (new choice%
+                #:stretch [@stretch '(#f #f)]
+                #:mixin [mix values])
+  (new (make-choice% (mix gui:choice%))
        [@choices (->obs @choices)]
        [@selection (->obs @selection)]
        [@label @label]

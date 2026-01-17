@@ -24,7 +24,7 @@
   (interface (view<%>)
     [create (->m #f (is-a?/c gui:popup-menu%))]))
 
-(define popup-menu%
+(define (make-popup-menu% gui-popup-menu%)
   (class* container% (popup-menu-view<%>)
     (inherit-field children)
     (inherit add-child update-children destroy-children child-dependencies)
@@ -34,7 +34,7 @@
       (child-dependencies))
 
     (define/public (create _parent)
-      (define the-menu (new (context-mixin gui:popup-menu%)))
+      (define the-menu (new (context-mixin gui-popup-menu%)))
       (begin0 the-menu
         (for ([c (in-list children)])
           (add-child the-menu c (send c create the-menu)))))
@@ -50,7 +50,7 @@
     [create (->m (is-a?/c gui:frame%)
                  (is-a?/c gui:menu-bar%))]))
 
-(define menu-bar%
+(define (make-menu-bar% gui-menu-bar%)
   (class* container% (menu-bar-view<%>)
     (inherit-field children)
     (init-field @enabled?)
@@ -64,7 +64,7 @@
 
     (define/public (create parent)
       (define the-menu-bar
-        (new (context-mixin gui:menu-bar%)
+        (new (context-mixin gui-menu-bar%)
              [parent parent]))
       (begin0 the-menu-bar
         (send the-menu-bar enable (peek @enabled?))
@@ -86,7 +86,7 @@
                        (is-a?/c gui:menu%))
                  (is-a?/c gui:menu%))]))
 
-(define menu%
+(define (make-menu% gui-menu%)
   (class* container% (menu-view<%>)
     (inherit-field children)
     (init-field @label @enabled? @help)
@@ -100,7 +100,7 @@
 
     (define/public (create parent)
       (define the-menu
-        (new (context-mixin gui:menu%)
+        (new (context-mixin gui-menu%)
              [parent parent]
              [help-string (peek @help)]
              [label (peek @label)]))
@@ -119,7 +119,7 @@
     (define/public (destroy v)
       (destroy-children v))))
 
-(define menu-item%
+(define (make-menu-item% gui-menu-item%)
   (class* object% (view<%>)
     (init-field @label @enabled? @help @shortcut action)
     (super-new)
@@ -129,7 +129,7 @@
 
     (define/public (create parent)
       (define the-item
-        (new gui:menu-item%
+        (new gui-menu-item%
              [parent parent]
              [help-string (peek @help)]
              [label (peek @label)]
@@ -149,7 +149,7 @@
     (define/public (destroy _v)
       (void))))
 
-(define checkable-menu-item%
+(define (make-checkable-menu-item% gui-checkable-menu-item%)
   (class* object% (view<%>)
     (init-field @label @checked? @enabled? @help @shortcut action)
     (super-new)
@@ -159,7 +159,7 @@
 
     (define/public (create parent)
       (define the-item
-        (new gui:checkable-menu-item%
+        (new gui-checkable-menu-item%
              [parent parent]
              [help-string (peek @help)]
              [label (peek @label)]
@@ -190,7 +190,7 @@
   (send v set-shortcut k)
   (send v set-shortcut-prefix p))
 
-(define menu-item-separator%
+(define (make-menu-item-separator% gui-separator-menu-item%)
   (class* object% (view<%>)
     (super-new)
 
@@ -198,7 +198,7 @@
       null)
 
     (define/public (create parent)
-      (new gui:separator-menu-item%
+      (new gui-separator-menu-item%
            [parent parent]))
 
     (define/public (update _v _what _val)
@@ -207,21 +207,24 @@
     (define/public (destroy _v)
       (void))))
 
-(define (popup-menu . children)
-  (new popup-menu%
+(define (popup-menu #:mixin [mix values]
+                    . children)
+  (new (make-popup-menu% (mix gui:popup-menu%))
        [children children]))
 
 (define (menu-bar #:enabled? [@enabled? (obs #t)]
+                  #:mixin [mix values]
                   . children)
-  (new menu-bar%
+  (new (make-menu-bar% (mix gui:menu-bar%))
        [@enabled? @enabled?]
        [children children]))
 
 (define (menu @label
               #:enabled? [@enabled? (obs #t)]
               #:help [@help (obs #f)]
+              #:mixin [mix values]
               . children)
-  (new menu%
+  (new (make-menu% (mix gui:menu%))
        [@label @label]
        [@enabled? @enabled?]
        [@help @help]
@@ -230,8 +233,9 @@
 (define (menu-item @label [action void]
                    #:enabled? [@enabled? (obs #t)]
                    #:help [@help (obs #f)]
-                   #:shortcut [@shortcut (obs #f)])
-  (new menu-item%
+                   #:shortcut [@shortcut (obs #f)]
+                   #:mixin [mix values])
+  (new (make-menu-item% (mix gui:menu-item%))
        [@label (->obs @label)]
        [@enabled? (->obs @enabled?)]
        [@help (->obs @help)]
@@ -242,8 +246,9 @@
                              #:checked? [@checked? (obs #f)]
                              #:enabled? [@enabled? (obs #t)]
                              #:help [@help (obs #f)]
-                             #:shortcut [@shortcut (obs #f)])
-  (new checkable-menu-item%
+                             #:shortcut [@shortcut (obs #f)]
+                             #:mixin [mix values])
+  (new (make-checkable-menu-item% (mix gui:checkable-menu-item%))
        [@label (->obs @label)]
        [@checked? (->obs @checked?)]
        [@enabled? (->obs @enabled?)]
@@ -251,5 +256,5 @@
        [@shortcut (->obs @shortcut)]
        [action action]))
 
-(define (menu-item-separator)
-  (new menu-item-separator%))
+(define (menu-item-separator #:mixin [mix values])
+  (new (make-menu-item-separator% (mix gui:separator-menu-item%))))

@@ -10,7 +10,7 @@
 (provide
  progress)
 
-(define progress%
+(define (make-progress% gui-gauge%)
   (class* object% (view<%>)
     (init-field @label @enabled? @range @value @min-size @stretch style)
     (super-new)
@@ -22,7 +22,7 @@
       (match-define (list min-w min-h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
       (define the-gauge
-        (new gui:gauge%
+        (new gui-gauge%
              [parent parent]
              [label (peek @label)]
              [style style]
@@ -62,8 +62,9 @@
                   #:range [@range 100]
                   #:min-size [@min-size '(#f #f)]
                   #:stretch [@stretch (list (memq 'horizontal style)
-                                            (memq 'vertical style))])
-  (new progress%
+                                            (memq 'vertical style))]
+                  #:mixin [mix values])
+  (new (make-progress% (mix gui:gauge%))
        [@value @value]
        [@label @label]
        [style style]
