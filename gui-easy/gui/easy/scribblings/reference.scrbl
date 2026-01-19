@@ -502,7 +502,7 @@ packages in the Racket ecosystem, into their projects.
                  [#:enabled? enabled? (maybe-obs/c boolean?) #t]
                  [#:style style (listof (or/c 'border 'multi-line 'deleted)) null]
                  [#:font font (is-a?/c gui:font%) gui:normal-control-font]
-                 [#:margin margin (maybe-obs/c margin/c) '(0 0)]
+                 [#:margin margin (maybe-obs/c margin/c) '(2 2)]
                  [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
                  [#:stretch stretch
                             (maybe-obs/c stretch/c)
@@ -519,11 +519,20 @@ packages in the Racket ecosystem, into their projects.
                    [#:label label (maybe-obs/c gui:label-string?) #f]
                    [#:checked? checked? (maybe-obs/c boolean?) #f]
                    [#:enabled? enabled? (maybe-obs/c boolean?) #f]
+                   [#:margin margin (maybe-obs/c margin/c) '(2 2)]
+                   [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
+                   [#:stretch stretch
+                              (maybe-obs/c stretch/c)
+                              '(#f #f)]
                    [#:mixin mix (make-mixin-contract gui:check-box%) values]) (is-a?/c view<%>)]{
   Returns a representation of a checkbox that calls @racket[action]
   when toggled.
 
-  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
+  @history[
+    #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}
+    #:changed "0.23" @elem{Added the @racket[#:margin], @racket[#:min-size],
+                           and @racket[#:stretch] arguments.}
+   ]
 }
 
 @defproc[(choice [choices (maybe-obs/c (listof any/c))]
@@ -534,6 +543,7 @@ packages in the Racket ecosystem, into their projects.
                  [#:label label (maybe-obs/c maybe-label/c) #f]
                  [#:style style (listof (or/c 'horizontal-label 'vertical-label 'deleted)) null]
                  [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                 [#:margin margin (maybe-obs/c margin/c) '(2 2)]
                  [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
                  [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
                  [#:mixin mix (make-mixin-contract gui:choice%) values]) (is-a?/c view<%>)]{
@@ -546,12 +556,18 @@ packages in the Racket ecosystem, into their projects.
   current @racket[#:selection] is compared against the list of choices
   to determine the selection index.
 
-  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
+  @history[
+    #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}    
+    #:changed "0.23" @elem{Added the @racket[#:margin] argument.}
+  ]
 }
 
 @defproc[(image [path-or-bitmap (maybe-obs/c (or/c path-string? (is-a?/c gui:bitmap%)))]
                 [#:size size (maybe-obs/c size/c) '(#f #f)]
                 [#:mode mode (maybe-obs/c (or/c 'fit 'fill)) 'fit]
+                [#:margin margin (maybe-obs/c margin/c) '(0 0)]
+                [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
+                [#:stretch stretch (maybe-obs/c stretch/c) '(#f #f)]
                 [#:mixin mix (make-mixin-contract gui:canvas%) values]) (is-a?/c view<%>)]{
 
   Returns a representation of an image.
@@ -568,6 +584,8 @@ packages in the Racket ecosystem, into their projects.
     #:changed "0.17" @elem{The first argument may now be a
      @racket[gui:bitmap%].}
     #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}
+    #:changed "0.23" @elem{Added the @racket[#:margin], @racket[#:min-size],
+                           and @racket[#:stretch] arguments.}
   ]
 }
 
@@ -581,7 +599,7 @@ packages in the Racket ecosystem, into their projects.
                                              'deleted)) '(single)]
                 [#:font font (is-a?/c gui:font%) gui:normal-control-font]
                 [#:keymap keymap (is-a?/c gui:keymap%) (new gui:keymap%)]
-                [#:margin margin (maybe-obs/c margin/c) '(0 0)]
+                [#:margin margin (maybe-obs/c margin/c) '(2 2)]
                 [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
                 [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
                 [#:mixin mix (make-mixin-contract gui:text-field%) values]
@@ -619,6 +637,7 @@ packages in the Racket ecosystem, into their projects.
                                                 'vertical-label 'horizontal-label
                                                 'deleted)) '(horizontal)]
                    [#:range range (maybe-obs/c gui:positive-dimension-integer?) 100]
+                   [#:margin margin (maybe-obs/c margin/c) '(2 2)]
                    [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
                    [#:stretch stretch
                               (maybe-obs/c stretch/c)
@@ -629,7 +648,8 @@ packages in the Racket ecosystem, into their projects.
 
   @history[
     #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}
-    #:changed "0.23" @elem{Changed the @racket[#:label] argument to allow @racket[#false].}
+    #:changed "0.23" @elem{Changed the @racket[#:label] argument to allow @racket[#false],
+                           and added the @racket[#:margin] argument.}
   ]
 }
 
@@ -641,6 +661,7 @@ packages in the Racket ecosystem, into their projects.
                  [#:label label (maybe-obs/c maybe-label/c) #f]
                  [#:style style (listof (or/c 'horizontal-label 'vertical-label 'deleted)) null]
                  [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                 [#:margin margin (maybe-obs/c margin/c) '(2 2)]
                  [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
                  [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
                  [#:mixin mix (make-mixin-contract gui:radio-box%) values]) (is-a?/c view<%>)]{
@@ -655,7 +676,10 @@ packages in the Racket ecosystem, into their projects.
 
   Unlike @racket[choice], the set of @racket[choices] cannot be changed.
 
-  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
+  @history[
+    #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}
+    #:changed "0.23" @elem{Added the @racket[#:margin] argument.}
+  ]
 }
 
 @defproc[(slider [value (maybe-obs/c gui:position-integer?)]
@@ -667,6 +691,7 @@ packages in the Racket ecosystem, into their projects.
                                               'deleted)) '(horizontal)]
                  [#:min-value min-value gui:position-integer? 0]
                  [#:max-value max-value gui:position-integer? 100]
+                 [#:margin margin (maybe-obs/c margin/c) '(2 2)]
                  [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
                  [#:stretch stretch
                             (maybe-obs/c stretch/c)
@@ -675,7 +700,10 @@ packages in the Racket ecosystem, into their projects.
                  [#:mixin mix (make-mixin-contract gui:slider%) values]) (is-a?/c view<%>)]{
   Returns a representation of a slider that calls the @racket[action] on change.
 
-  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
+  @history[
+    #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}
+    #:changed "0.23" @elem{Added the @racket[#:margin] argument.}
+  ]
 }
 
 @defproc[(spacer [#:mixin mix (make-mixin-contract gui:panel%) values]) (is-a?/c view<%>)]{
@@ -748,10 +776,19 @@ packages in the Racket ecosystem, into their projects.
 @defproc[(text [s (maybe-obs/c gui:label-string?)]
                [#:color color (maybe-obs/c (or/c #f string? (is-a?/c gui:color%))) #f]
                [#:font font (is-a?/c gui:font%) gui:normal-control-font]
+               [#:margin margin (maybe-obs/c margin/c) '(2 2)]
+               [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
+               [#:stretch stretch
+                          (maybe-obs/c stretch/c)
+                          '(#f #f)]
                [#:mixin mix (make-mixin-contract gui:message%) values]) (is-a?/c view<%>)]{
   Returns a representation of a textual label.
 
-  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
+  @history[
+    #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}
+    #:changed "0.23" @elem{Added the @racket[#:margin], @racket[#:min-size],
+                           and @racket[#:stretch] arguments.}
+  ]
 }
 
 @subsection{Combinators}

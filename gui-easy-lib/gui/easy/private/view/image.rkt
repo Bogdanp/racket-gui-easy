@@ -19,31 +19,39 @@
 
 (define (make-image% gui-canvas%)
   (class* object% (view<%>)
-    (init-field @image @size @mode)
+    (init-field @image @size @mode @margin @min-size @stretch)
     (super-new)
 
     (define @props
       (obs-combine props @image @size @mode))
 
     (define/public (dependencies)
-      (filter obs? (list @props)))
+      (filter obs? (list @props @margin @min-size @stretch)))
 
     (define/public (create parent)
       (match-define (props image size mode)
         (peek @props))
+      (match-define (list h-m v-m) (peek @margin))
+      (match-define (list w h) (peek @min-size))
+      (match-define (list w-s? h-s?) (peek @stretch))
       (define bmp (read-bitmap image))
       (define bmp/scaled (scale bmp size mode))
       (define the-canvas
         (new (context-mixin gui-canvas%)
              [parent parent]
              [style '(transparent)]
-             [min-width (send bmp/scaled get-width)]
-             [min-height (send bmp/scaled get-height)]
-             [stretchable-width #f]
-             [stretchable-height #f]
+             [vert-margin v-m]
+             [horiz-margin h-m]
+             [min-width (or w (send bmp/scaled get-width))]
+             [min-height (or h (send bmp/scaled get-height))]
+             [stretchable-width w-s?]
+             [stretchable-height h-s?]
              [paint-callback (λ (self dc)
                                (let ([bmp (send self get-context 'bmp/scaled bmp/scaled)])
-                                 (send dc draw-bitmap bmp 0 0)))]))
+                                 (define-values (w h) (send dc get-size))
+                                 (send dc draw-bitmap bmp
+                                       (/ (- w (send bmp get-width)) 2)
+                                       (/ (- h (send bmp get-height)) 2))))]))
       (begin0 the-canvas
         (send the-canvas set-context*
               'image image
@@ -60,6 +68,7 @@
          (define last-mode (send v get-context 'mode))
          (define last-bmp (send v get-context 'bmp))
          (define last-bmp/scaled (send v get-context 'bmp/scaled))
+         (match-define (list h-m v-m) (peek @min-size))
          (match-define (props image size mode) val)
          (define bmp
            (if (equal? image last-image)
@@ -77,9 +86,25 @@
                'mode mode
                'bmp bmp
                'bmp/scaled bmp/scaled)
-         (send v min-width (send bmp/scaled get-width))
-         (send v min-height (send bmp/scaled get-height))
-         (send v refresh-now)]))
+         (send v min-width (or h-m (send bmp/scaled get-width)))
+         (send v min-height (or v-m (send bmp/scaled get-height)))
+         (send v refresh-now)]
+        [@margin
+         (match-define (list h-m v-m) val)
+         (define bmp/scaled (send v get-context 'bmp/scaled))
+         (send* v
+           (horiz-margin (or h-m (send bmp/scaled get-width)))
+           (vert-margin (or v-m (send bmp/scaled get-height))))]
+        [@min-size
+         (match-define (list w h) val)
+         (send* v
+           (min-width (or w 0))
+           (min-height (or h 0)))]
+        [@stretch
+         (match-define (list w-s? h-s?) val)
+         (send* v
+           (stretchable-width w-s?)
+           (stretchable-height h-s?))]))
 
     (define/public (destroy v)
       (send v clear-context))
@@ -125,8 +150,14 @@
 (define (image @image
                #:size [@size (obs '(#f #f))]
                #:mode [@mode (obs 'fit)]
+               #:margin [@margin '(0 0)]
+               #:min-size [@min-size '(#f #f)]
+               #:stretch [@stretch '(#f #f)]
                #:mixin [mix values])
   (new (make-image% (mix gui:canvas%))
        [@image (->obs @image)]
        [@size (->obs @size)]
-       [@mode (->obs @mode)]))
+       [@mode (->obs @mode)]
+       [@margin @margin]
+       [@min-size @min-size]
+       [@stretch @stretch]))

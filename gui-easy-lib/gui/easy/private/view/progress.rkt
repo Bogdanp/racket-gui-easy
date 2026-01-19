@@ -12,13 +12,14 @@
 
 (define (make-progress% gui-gauge%)
   (class* object% (view<%>)
-    (init-field @label @enabled? @range @value @min-size @stretch style)
+    (init-field @label @enabled? @range @value @margin @min-size @stretch style)
     (super-new)
 
     (define/public (dependencies)
-      (filter obs? (list @label @enabled? @range @value @min-size @stretch)))
+      (filter obs? (list @label @enabled? @range @value @margin @min-size @stretch)))
 
     (define/public (create parent)
+      (match-define (list h-m v-m) (peek @margin))
       (match-define (list min-w min-h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
       (define the-gauge
@@ -28,6 +29,8 @@
              [style style]
              [range (peek @range)]
              [enabled (peek @enabled?)]
+             [vert-margin v-m]
+             [horiz-margin h-m]
              [min-width min-w]
              [min-height min-h]
              [stretchable-width w-s?]
@@ -41,6 +44,11 @@
         [@enabled? (send v enable val)]
         [@range (send v set-range val)]
         [@value (send v set-value val)]
+        [@margin
+         (match-define (list h-m v-m) val)
+         (send* v
+           (horiz-margin h-m)
+           (vert-margin v-m))]
         [@min-size
          (match-define (list w h) val)
          (send* v
@@ -60,6 +68,7 @@
                   #:style [style '(horizontal)]
                   #:enabled? [@enabled? #t]
                   #:range [@range 100]
+                  #:margin [@margin '(2 2)]
                   #:min-size [@min-size '(#f #f)]
                   #:stretch [@stretch (list (memq 'horizontal style)
                                             (memq 'vertical style))]
@@ -70,5 +79,6 @@
        [style style]
        [@enabled? @enabled?]
        [@range @range]
+       [@margin @margin]
        [@min-size @min-size]
        [@stretch @stretch]))
