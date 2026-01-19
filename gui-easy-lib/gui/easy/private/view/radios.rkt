@@ -13,7 +13,7 @@
 
 (define (make-radios% gui-radio-box%)
   (class* object% (view<%>)
-    (init-field @label @enabled? @selection @min-size @stretch style choices choice->label choice=? action)
+    (init-field @label @enabled? @selection @margin @min-size @stretch style choices choice->label choice=? action)
     (super-new)
 
     (define @selection-index
@@ -21,9 +21,10 @@
                             (and selection (index-of choices selection choice=?)))))
 
     (define/public (dependencies)
-      (filter obs? (list @label @enabled? @selection-index @min-size @stretch)))
+      (filter obs? (list @label @enabled? @selection-index @margin @min-size @stretch)))
 
     (define/public (create parent)
+      (match-define (list h-m v-m) (peek @margin))
       (match-define (list min-w min-h) (peek @min-size))
       (match-define (list w-s? h-s?) (peek @stretch))
       (define selection (peek @selection-index))
@@ -37,6 +38,8 @@
              [callback (λ (self _event)
                          (define idx (send self get-selection))
                          (action (and idx (list-ref choices idx))))]
+             [vert-margin v-m]
+             [horiz-margin h-m]
              [min-width min-w]
              [min-height min-h]
              [stretchable-width w-s?]
@@ -62,6 +65,11 @@
          (send v set-label val)]
         [@enabled?
          (send v enable val)]
+        [@margin
+         (match-define (list h-m v-m) val)
+         (send* v
+           (horiz-margin h-m)
+           (vert-margin v-m))]
         [@min-size
          (match-define (list w h) val)
          (send* v
@@ -83,6 +91,7 @@
                 #:label [@label #f]
                 #:style [style '(vertical)]
                 #:enabled? [@enabled? #t]
+                #:margin [@margin '(2 2)]
                 #:min-size [@min-size '(#f #f)]
                 #:stretch [@stretch '(#f #f)]
                 #:mixin [mix values])
@@ -90,6 +99,7 @@
        [@selection (->obs @selection)]
        [@label @label]
        [@enabled? @enabled?]
+       [@margin @margin]
        [@min-size @min-size]
        [@stretch @stretch]
        [style style]

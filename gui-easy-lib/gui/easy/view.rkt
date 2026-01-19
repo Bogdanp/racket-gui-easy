@@ -152,6 +152,9 @@
                  [#:label (maybe-obs/c gui:label-string?)
                   #:checked? (maybe-obs/c boolean?)
                   #:enabled? (maybe-obs/c boolean?)
+                  #:margin (maybe-obs/c margin/c)
+                  #:min-size (maybe-obs/c size/c)
+                  #:stretch (maybe-obs/c stretch/c)
                   #:mixin (make-mixin-contract gui:check-box%)]
                  view/c)]
   [choice (->* [(maybe-obs/c (listof any/c))
@@ -162,6 +165,7 @@
                 #:label (maybe-obs/c maybe-label/c)
                 #:style (listof (or/c 'horizontal-label 'vertical-label 'deleted))
                 #:enabled? (maybe-obs/c boolean?)
+                #:margin (maybe-obs/c margin/c)
                 #:min-size (maybe-obs/c size/c)
                 #:stretch (maybe-obs/c stretch/c)
                 #:mixin (make-mixin-contract gui:choice%)]
@@ -169,6 +173,9 @@
   [image (->* [(maybe-obs/c (or/c path-string? (is-a?/c gui:bitmap%)))]
               [#:size (maybe-obs/c size/c)
                #:mode (maybe-obs/c (or/c 'fit 'fill))
+               #:margin (maybe-obs/c margin/c)
+               #:min-size (maybe-obs/c size/c)
+               #:stretch (maybe-obs/c stretch/c)
                #:mixin (make-mixin-contract gui:canvas%)]
               view/c)]
   [input (->* [(maybe-obs/c any/c)]
@@ -195,6 +202,7 @@
                                         'vertical-label 'horizontal-label
                                         'deleted))
                   #:range (maybe-obs/c gui:positive-dimension-integer?)
+                  #:margin (maybe-obs/c margin/c)
                   #:min-size (maybe-obs/c size/c)
                   #:stretch (maybe-obs/c stretch/c)
                   #:mixin (make-mixin-contract gui:gauge%)]
@@ -209,6 +217,7 @@
                                       'horizontal-label 'vertical-label
                                       'deleted))
                 #:enabled? (maybe-obs/c boolean?)
+                #:margin (maybe-obs/c margin/c)
                 #:min-size (maybe-obs/c size/c)
                 #:stretch (maybe-obs/c stretch/c)
                 #:mixin (make-mixin-contract gui:radio-box%)]
@@ -222,6 +231,7 @@
                                       'deleted))
                 #:min-value gui:position-integer?
                 #:max-value gui:position-integer?
+                #:margin (maybe-obs/c margin/c)
                 #:min-size (maybe-obs/c size/c)
                 #:stretch (maybe-obs/c stretch/c)
                 #:mixin (make-mixin-contract gui:slider%)]
@@ -254,6 +264,9 @@
   [text (->* [(maybe-obs/c gui:label-string?)]
              [#:color (maybe-obs/c (or/c #f string? (is-a?/c gui:color%)))
               #:font (is-a?/c gui:font%)
+              #:margin (maybe-obs/c margin/c)
+              #:min-size (maybe-obs/c size/c)
+              #:stretch (maybe-obs/c stretch/c)
               #:mixin (make-mixin-contract gui:message%)]
              view/c)]
 
