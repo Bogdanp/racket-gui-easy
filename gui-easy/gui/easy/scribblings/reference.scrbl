@@ -613,7 +613,7 @@ packages in the Racket ecosystem, into their projects.
 }
 
 @defproc[(progress [value (maybe-obs/c gui:position-integer?)]
-                   [#:label label (maybe-obs/c maybe-label/c) #f]
+                   [#:label label (maybe-obs/c (or/c #f maybe-label/c)) #f]
                    [#:enabled? enabled? (maybe-obs/c boolean?) #t]
                    [#:style style (listof (or/c 'horizontal 'vertical 'plain
                                                 'vertical-label 'horizontal-label
@@ -627,7 +627,10 @@ packages in the Racket ecosystem, into their projects.
                    [#:mixin mix (make-mixin-contract gui:gauge%) values]) (is-a?/c view<%>)]{
   Returns a representation of a progress bar.
 
-  @history[#:changed "0.22" @elem{Added the @racket[#:mixin] argument.}]
+  @history[
+    #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}
+    #:changed "0.23" @elem{Changed the @racket[#:label] argument to allow @racket[#false].}
+  ]
 }
 
 @defproc[(radios [choices (listof any/c)]

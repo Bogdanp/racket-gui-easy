@@ -189,7 +189,7 @@
                #:value->text (-> any/c string?)]
               view/c)]
   [progress (->* [(maybe-obs/c gui:position-integer?)]
-                 [#:label (maybe-obs/c gui:label-string?)
+                 [#:label (maybe-obs/c (or/c #f gui:label-string?))
                   #:enabled? (maybe-obs/c boolean?)
                   #:style (listof (or/c 'horizontal 'vertical 'plain
                                         'vertical-label 'horizontal-label
