@@ -88,7 +88,8 @@
               #:spacing (maybe-obs/c gui:spacing-integer?)
               #:margin (maybe-obs/c margin/c)
               #:min-size (maybe-obs/c size/c)
-              #:stretch (maybe-obs/c stretch/c)]
+              #:stretch (maybe-obs/c stretch/c)
+              #:mixin (make-mixin-contract gui:tab-panel%)]
              #:rest (listof view/c)
              view/c)]
   [observable-view (->* [obs?]
