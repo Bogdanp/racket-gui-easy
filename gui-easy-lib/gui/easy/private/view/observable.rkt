@@ -21,8 +21,11 @@
 
     (define/public (create parent)
       (define the-pane
-        (new (context-mixin gui:panel%)
-             [parent parent]))
+        (if (is-a? parent gui:area<%>)
+            (new (context-mixin gui:panel%)
+                 [parent parent])
+            (new menu-holder%
+                 [parent parent])))
       (begin0 the-pane
         (create&add-child the-pane (peek @data))))
 
@@ -50,7 +53,9 @@
     (define (create&add-child pane data)
       (define view (proxy (make-view data)))
       (define deps (send view dependencies))
-      (define widget (send view create pane))
+      (define widget (send view create (if (pane . is-a? . menu-holder%)
+                                           (send pane get-parent)
+                                           pane)))
       (define depset (send (current-renderer) add-dependencies deps this pane))
       (send pane set-context* 'data data 'view view 'widget widget 'deps depset)
       (copy-area<%>-properties widget pane))
@@ -63,14 +68,23 @@
         (define widget (send pane get-context 'widget))
         (send (current-renderer) remove-dependencies deps)
         (send view destroy widget)
-        (send pane delete-child widget)
+        (when (is-a? widget gui:subwindow<%>)
+          (send pane delete-child widget))
         (send pane clear-context)))
 
     (define (copy-area<%>-properties src dst)
-      (send dst min-width (send src min-width))
-      (send dst min-width (send src min-height))
-      (send dst stretchable-width (send src stretchable-width))
-      (send dst stretchable-height (send src stretchable-height)))))
+      (cond
+        [(is-a? src gui:area<%>)
+         (send dst min-width (send src min-width))
+         (send dst min-width (send src min-height))
+         (send dst stretchable-width (send src stretchable-width))
+         (send dst stretchable-height (send src stretchable-height))]
+        [(is-a? dst gui:area<%>)
+         ;; if a pane is just holding a menu bar, it shouldn't take up space
+         (send dst min-width 0)
+         (send dst min-width 0)
+         (send dst stretchable-width #false)
+         (send dst stretchable-height #false)]))))
 
 (define (observable-view @data
                          [make-view values]
@@ -79,3 +93,12 @@
        [@data @data]
        [make-view make-view]
        [equal?-proc equal?-proc]))
+
+;; acts like a "pane" for an observable view inside a menu or menu bar
+(define menu-holder%
+  (class (context-mixin object%)
+    (init-field parent)
+    (super-new)
+    (define/public (get-parent) parent)
+    (define/public (begin-container-sequence) (void))
+    (define/public (end-container-sequence) (void))))

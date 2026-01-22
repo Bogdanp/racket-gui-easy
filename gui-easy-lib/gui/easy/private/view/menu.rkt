@@ -47,7 +47,7 @@
 
 (define menu-bar-view<%>
   (interface (view<%>)
-    [create (->m (is-a?/c gui:frame%)
+    [create (->m (is-a?/c gui:area<%>)
                  (is-a?/c gui:menu-bar%))]))
 
 (define (make-menu-bar% gui-menu-bar%)
@@ -63,9 +63,13 @@
                (child-dependencies))))
 
     (define/public (create parent)
+      (define top-level
+        (send parent get-top-level-window))
       (define the-menu-bar
-        (new (context-mixin gui-menu-bar%)
-             [parent parent]))
+        (or
+         (send top-level get-menu-bar)
+         (new (context-mixin gui-menu-bar%)
+              [parent (send parent get-top-level-window)])))
       (begin0 the-menu-bar
         (send the-menu-bar enable (peek @enabled?))
         (for ([c (in-list children)])
@@ -117,7 +121,8 @@
       (update-children v what val))
 
     (define/public (destroy v)
-      (destroy-children v))))
+      (destroy-children v)
+      (send v delete))))
 
 (define (make-menu-item% gui-menu-item%)
   (class* object% (view<%>)
@@ -146,8 +151,8 @@
         [@label (send v set-label val)]
         [@shortcut (set-shortcut v val)]))
 
-    (define/public (destroy _v)
-      (void))))
+    (define/public (destroy v)
+      (send v delete))))
 
 (define (make-checkable-menu-item% gui-checkable-menu-item%)
   (class* object% (view<%>)
