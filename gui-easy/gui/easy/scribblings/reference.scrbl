@@ -403,14 +403,22 @@ packages in the Racket ecosystem, into their projects.
                           [make-view (-> any/c (is-a?/c view<%>)) values]
                           [#:equal? equal?-proc (-> any/c any/c boolean?) equal?]) (is-a?/c view<%>)]{
 
-  Returns a representation of a pane whose content is the result of
+  Returns a view corresponding to the result of
   applying @racket[make-view] to the value of @racket[data].  The
-  content of the pane changes every time @racket[data] changes and its
+  view changes every time @racket[data] changes and its
   current value is not equal (according to @racket[equal?-proc]) to
-  the previous value.  The pane automatically adjusts its area
-  properties when its child's area properties change to match.
+  the previous value.
 
-  @history[#:added "0.9"]
+  When the result observable view's parent is not a menu bar or menu,
+  the observable view acts as a pane that whose content is the result
+  of @racket[make-view]. When the content changes and the content is
+  not a menu bar, menu, or menu item, the observable view's pane
+  automatically adjusts its area properties to match that content.
+
+  @history[
+    #:added "0.9"
+    #:changed "0.24" @elem{Adapted to work for menu bars, menus, and menu items.}
+  ]
 }
 
 @subsection{Canvases & Snips}
