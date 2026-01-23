@@ -19,7 +19,7 @@
 
 (define-syntax (case/dep stx)
   (syntax-parse stx
-    [(_ what-e:expr [dep-e:expr e ...] ...+)
+    [(_ what-e:expr [dep-e:expr e ...] ...+ (~optional [#:else else-e ...]))
      (define-values (source line col pos)
        (values (syntax-source stx)
                (syntax-line stx)
@@ -39,7 +39,8 @@
                      (equal? what dep)))
               (log-gui-easy-debug "case/dep matched ~.s at ~a" 'dep-e loc)
               e ...]
-             ...)))]))
+             ...
+             (~? [else else-e ...]))))]))
 
 (define (peek @v)
   (if (obs? @v) (obs-peek @v) @v))

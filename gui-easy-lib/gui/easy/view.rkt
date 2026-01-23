@@ -120,6 +120,22 @@
   [canvas (canvas/c (-> (is-a?/c gui:dc<%>) any/c any))]
   [pict-canvas (canvas/c (-> any/c pict?))]
   [snip-canvas (canvas/c (-> any/c gui:dimension-integer? gui:dimension-integer? (is-a?/c gui:snip%)))]
+  [editor-canvas (->* [(maybe-obs/c (or/c (is-a?/c gui:editor<%>) #f))]
+                      [#:label (maybe-obs/c (or/c #f gui:label-string?))
+                       #:enabled? (maybe-obs/c boolean?)
+                       #:style (listof (or/c 'no-border 'combo 'deleted
+                                             'no-hscroll 'auto-hscroll 'hide-hscroll
+                                             'no-vscroll 'auto-vscroll 'hide-vscroll
+                                             'resize-corner 'no-focus 'transparent))                       
+                       #:scrolls-per-page (integer-in 1 10000)
+                       #:wheel-step (maybe-obs/c (or/c (integer-in 1 10000) #f))
+                       #:line-count (maybe-obs/c (or/c (integer-in 1 1000) #f))
+                       #:inset (maybe-obs/c margin/c)
+                       #:margin (maybe-obs/c margin/c)
+                       #:min-size (maybe-obs/c size/c)
+                       #:stretch (maybe-obs/c stretch/c)
+                       #:mixin (make-mixin-contract gui:editor-canvas%)]
+                      view/c)]
   [snip (->* [(maybe-obs/c any/c)
               (-> any/c gui:dimension-integer? gui:dimension-integer? (is-a?/c gui:snip%))]
              [(-> (is-a?/c gui:snip%) any/c any)

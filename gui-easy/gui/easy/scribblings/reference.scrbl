@@ -507,6 +507,28 @@ packages in the Racket ecosystem, into their projects.
   @racket[data] changes via @racket[update-snip].
 }
 
+@defproc[(editor-canvas [editor (maybe-obs/c (is-a?/c gui:editor<%>))]
+                        [#:label label (maybe-obs/c (or/c #f gui:label-string?)) #f]
+                        [#:enabled? enabled? (maybe-obs/c boolean?) #t]
+                        [#:style style (listof (or/c 'no-border 'combo 'deleted
+                                                     'no-hscroll 'auto-hscroll 'hide-hscroll
+                                                     'no-vscroll 'auto-vscroll 'hide-vscroll
+                                                     'resize-corner 'no-focus 'transparent)) '()]
+                        [#:scrolls-per-page scrolls-per-page (integer-in 1 10000) 100]
+                        [#:wheel-step wheel-step (maybe-obs/c (or/c (integer-in 1 10000) #f)) #f]
+                        [#:line-count line-count (maybe-obs/c (or/c (integer-in 1 1000) #f)) #f]
+                        [#:inset inset (maybe-obs/c margin/c) '(5 5)]
+                        [#:margin margin (maybe-obs/c margin/c) '(0 0)]
+                        [#:min-size min-size (maybe-obs/c size/c) '(#f #f)]
+                        [#:stretch stretch (maybe-obs/c stretch/c) '(#t #t)]
+                        [#:mixin mixin (make-mixin-contract gui:editor-canvas%) values]) (is-a?/c view<%>)]{
+
+  Returns a representation of an editor canvas whose editor is changed
+  whenever @racket[editor] changes.
+
+  @history[#:added "0.24"]
+}
+
 @subsection{Controls}
 
 @defproc[(button [label (maybe-obs/c
