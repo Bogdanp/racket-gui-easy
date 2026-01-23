@@ -20,6 +20,8 @@
                          gui:position-integer?
                          gui:position-integer?
                          void?)]
+  [render-menu-bar (-> (is-a?/c menu-bar-view<%>)
+                       (is-a?/c renderer<%>))]
   [renderer-root (-> (is-a?/c renderer<%>) any/c)]
   [renderer-destroy (-> (is-a?/c renderer<%>) void?)]))
 

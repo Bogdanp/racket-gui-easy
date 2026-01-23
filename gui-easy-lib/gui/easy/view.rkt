@@ -19,6 +19,7 @@
  view<%>
  window-view<%>
  popup-menu-view<%>
+ menu-bar-view<%>
  case/dep
  if-view
  cond-view
