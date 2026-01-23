@@ -14,7 +14,8 @@
 (provide
  canvas
  pict-canvas
- snip-canvas)
+ snip-canvas
+ editor-canvas)
 
 (define missing (gensym 'missing))
 
@@ -136,3 +137,65 @@
             (send dc draw-bitmap bmp 0 0))))
       (keyword-apply canvas kws kw-args @data draw args)))
    'snip-canvas))
+
+(define (make-editor-canvas% gui-canvas%)
+  (class* gui-canvas% (view<%>)
+    (init-field @editor @wheel-step @line-count @inset)
+    (super-new)
+
+    (define/override (dependencies)
+      (append (super dependencies)
+              (filter obs? (list @editor @wheel-step @line-count @inset))))
+
+    (define/override (create parent)
+      (define v (super create parent))
+      (send v set-editor (peek @editor))
+      (send v wheel-step (peek @wheel-step))
+      (send v set-line-count (peek @line-count))
+      (match-define (list h-i v-i) (peek @inset))
+      (send v vertical-inset v-i)
+      (send v horizontal-inset h-i)
+      v)
+
+    (define/override (update v what val)
+      (case/dep what
+        [@editor
+         (send v set-editor val)]
+        [@wheel-step
+         (send v wheeel-step val)]
+        [@line-count
+         (send v set-line-count val)]
+        [@inset
+         (match-define (list h-i v-i) val)
+         (send v vertical-inset v-i)
+         (send v horizontal-inset h-i)]
+        [#:else
+         (super update v what val)]))))
+
+(define (editor-canvas @editor
+                       #:label [@label #f]
+                       #:enabled? [@enabled? #t]
+                       #:style [style null]
+                       #:scrolls-per-page [scrolls-per-page 100]
+                       #:wheel-step [@wheel-step 3]
+                       #:line-count [@line-count #f]
+                       #:inset [@inset '(5 5)]
+                       #:margin [@margin '(0 0)]
+                       #:min-size [@min-size '(#f #f)]
+                       #:stretch [@stretch '(#t #t)]
+                       #:mixin [mix values])
+  (new (make-editor-canvas% (make-canvas% (class (mix gui:editor-canvas%)
+                                            (init-field paint-callback)
+                                            (super-new [scrolls-per-page scrolls-per-page]))))
+       [@editor @editor]
+       [@wheel-step @wheel-step]
+       [@line-count @line-count]
+       [@inset @inset]
+       [@input #f]
+       [@label @label]
+       [@enabled? @enabled?]
+       [@margin @margin]
+       [@min-size @min-size]
+       [@stretch @stretch]
+       [draw void]
+       [style style]))
