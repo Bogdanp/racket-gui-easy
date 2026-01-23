@@ -58,6 +58,15 @@
   @racket[parent].
 }
 
+@defproc[(render-menu-bar [view (is-a?/c menu-bar-view<%>)]) renderer?]{
+
+  Renders the menu bar represented by @racket[view] to be active when
+  no window is open in the application---if that concept exists on the
+  current platform and in the current eventspace.
+
+  @history[#:added "0.24"]
+}
+
 @defproc[(renderer-root [r renderer?]) any/c]{
   Returns the root widget of @racket[r].  This function is handy when
   you need to @racket[embed] a @racket[gui:top-level-window<%>].  The
@@ -146,7 +155,7 @@ packages in the Racket ecosystem, into their projects.
 
 @defproc[(menu-bar [#:enabled? enabled? (maybe-obs/c any/c) #t]
                    [#:mixin mix (make-mixin-contract gui:menu-bar%) values]
-                   [menu-or-item (is-a?/c view<%>)] ...) (is-a?/c view<%>)]{
+                   [menu-or-item (is-a?/c view<%>)] ...) (is-a?/c menu-bar-view<%>)]{
   Returns a representation of a menu-bar menu.
 
   @racketblock[
@@ -872,6 +881,22 @@ packages in the Racket ecosystem, into their projects.
   @defmethod[(create [parent #f]) (is-a?/c gui:popup-menu%)]{
     Returns a new @racket[gui:popup-menu%].
   }
+}
+
+@subsubsection{@tt{menu-bar-view<%>}}
+@definterface[menu-bar-view<%> (view<%>)]{
+  A @racket[menu-bar-view<%>] is like a regular @racket[view<%>] but
+  its @racket[create] method has additional constraints placed on it.
+
+  @defmethod[(create [parent (or/c (is-a?/c gui:area<%>) 'root)])
+             (or/c (is-a?/c gui:menu-bar%) #f)]{
+    Returns a @racket[gui:menu-bar%] or @racket[#f]. The result
+    is @racket[#f] if @racket[parent] is @racket['root] and the
+    current platform or eventspace does not support a menu bar
+    without a window.
+  }
+
+  @history[#:added "0.24"]
 }
 
 @subsubsection{@tt{context<%>}}

@@ -4,13 +4,15 @@
          racket/class
          (prefix-in gui: racket/gui)
          "logger.rkt"
-         "observable.rkt")
+         "observable.rkt"
+         "view/menu.rkt")
 
 (provide
  embed
 
  render
  render-popup-menu
+ render-menu-bar
 
  current-renderer
  renderer<%>
@@ -118,6 +120,13 @@
   (send window popup-menu menu x y)
   (send r destroy)
   (log-gui-easy-debug "destroyed popup menu ~a" id))
+
+(define (render-menu-bar tree)
+  (define r (new renderer% [tree tree]))
+  (define id (get-field id r))
+  (send r render 'root)
+  (log-gui-easy-debug "rendered root menu bar ~a" id)
+  r)
 
 (define (renderer-root r)
   (send r get-root))

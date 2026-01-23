@@ -47,8 +47,13 @@
 
 (define menu-bar-view<%>
   (interface (view<%>)
-    [create (->m (is-a?/c gui:area<%>)
-                 (is-a?/c gui:menu-bar%))]))
+    [create (->m (or/c (is-a?/c gui:area<%>)
+                       'root)
+                 (or/c (is-a?/c gui:menu-bar%)
+                       #f))]))
+
+;; would be nicer if `racket/gui` could report an existing root menu bar
+(define root-menu-bar #f)
 
 (define (make-menu-bar% gui-menu-bar%)
   (class* container% (menu-bar-view<%>)
@@ -63,18 +68,31 @@
                (child-dependencies))))
 
     (define/public (create parent)
-      (define top-level
-        (send parent get-top-level-window))
-      (define the-menu-bar
-        (or
-         (send top-level get-menu-bar)
-         (new (context-mixin gui-menu-bar%)
-              [parent (send parent get-top-level-window)])))
-      (begin0 the-menu-bar
-        (send the-menu-bar enable (peek @enabled?))
-        (for ([c (in-list children)])
-          (add-child the-menu-bar c (send c create the-menu-bar)))))
-
+      (cond
+        [(and (eq? parent 'root)
+              (not (gui:current-eventspace-has-menu-root?)))
+         #f]
+        [else
+         (define the-menu-bar
+           (cond
+             [(eq? parent 'root)
+              (or root-menu-bar
+                  (let ([mb (new (context-mixin gui-menu-bar%)
+                                 [parent 'root])])
+                    (set! root-menu-bar mb)
+                    mb))]
+             [else
+              (define top-level
+                (send parent get-top-level-window))
+              (or
+               (send top-level get-menu-bar)
+               (new (context-mixin gui-menu-bar%)
+                    [parent top-level]))]))
+         (begin0 the-menu-bar
+           (send the-menu-bar enable (peek @enabled?))
+           (for ([c (in-list children)])
+             (add-child the-menu-bar c (send c create the-menu-bar))))]))
+        
     (define/public (update v what val)
       (case/dep what
         [@enabled? (send v enable val)])
