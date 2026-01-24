@@ -27,7 +27,7 @@
   (class* container% (window-view<%>)
     (inherit-field children)
     (init-field @title @size @alignment @position @min-size @stretch style)
-    (inherit child-dependencies add-child get-child update-children destroy-children)
+    (inherit child-dependencies add-child update-children destroy-children)
     (super-new)
 
     (define/public (dependencies)

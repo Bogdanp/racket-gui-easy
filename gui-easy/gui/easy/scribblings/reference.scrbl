@@ -596,7 +596,7 @@ packages in the Racket ecosystem, into their projects.
   to determine the selection index.
 
   @history[
-    #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}    
+    #:changed "0.22" @elem{Added the @racket[#:mixin] argument.}
     #:changed "0.23" @elem{Added the @racket[#:margin] argument.}
   ]
 }
@@ -1170,8 +1170,11 @@ that equality (via @racket[equal?]) is preserved for
 
 @section{View Helpers}
 
-@defform[(case/dep what-expr
-          [dep-expr body ...] ...+)
+@defform[#:literals (else)
+         (case/dep what-expr clause ...+)
+         #:grammar ([clause
+                     [dep-expr body ...]
+                     [else body ...]])
          #:contracts ([what-expr obs?]
                       [dep-expr  obs?])]{
 

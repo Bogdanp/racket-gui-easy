@@ -16,7 +16,7 @@
   (class* container% (view<%>)
     (inherit-field children)
     (init-field @choices @selection @alignment @enabled? @spacing @margin @min-size @stretch style action choice->label choice=?)
-    (inherit child-dependencies add-child get-child update-children destroy-children)
+    (inherit child-dependencies add-child update-children destroy-children)
     (super-new)
 
     (define @choices&selection&index

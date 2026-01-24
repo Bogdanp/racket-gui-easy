@@ -169,7 +169,7 @@
          (match-define (list h-i v-i) val)
          (send v vertical-inset v-i)
          (send v horizontal-inset h-i)]
-        [#:else
+        [else
          (super update v what val)]))))
 
 (define (editor-canvas @editor
@@ -184,9 +184,11 @@
                        #:min-size [@min-size '(#f #f)]
                        #:stretch [@stretch '(#t #t)]
                        #:mixin [mix values])
-  (new (make-editor-canvas% (make-canvas% (class (mix gui:editor-canvas%)
-                                            (init-field paint-callback)
-                                            (super-new [scrolls-per-page scrolls-per-page]))))
+  (new (make-editor-canvas%
+        (make-canvas%
+         (class (mix gui:editor-canvas%)
+           (init-field [(_ paint-callback)])
+           (super-new [scrolls-per-page scrolls-per-page]))))
        [@editor @editor]
        [@wheel-step @wheel-step]
        [@line-count @line-count]
