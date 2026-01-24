@@ -52,10 +52,17 @@
                  (or/c (is-a?/c gui:menu-bar%)
                        #f))]))
 
-;; would be nicer if `racket/gui` could report an existing root menu bar
-(define root-menu-bar #f)
-
 (define (make-menu-bar% gui-menu-bar%)
+  ;; would be nicer if `racket/gui` could report an existing root menu bar
+  (define get-root-menu-bar
+    (let ([root-menu-bar #f])
+      (lambda ()
+        (unless root-menu-bar
+          (define mb
+            (new (context-mixin gui-menu-bar%)
+                 [parent 'root]))
+          (set! root-menu-bar mb))
+        root-menu-bar)))
   (class* container% (menu-bar-view<%>)
     (inherit-field children)
     (init-field @enabled?)
@@ -76,11 +83,7 @@
          (define the-menu-bar
            (cond
              [(eq? parent 'root)
-              (or root-menu-bar
-                  (let ([mb (new (context-mixin gui-menu-bar%)
-                                 [parent 'root])])
-                    (set! root-menu-bar mb)
-                    mb))]
+              (get-root-menu-bar)]
              [else
               (define top-level
                 (send parent get-top-level-window))
@@ -92,7 +95,7 @@
            (send the-menu-bar enable (peek @enabled?))
            (for ([c (in-list children)])
              (add-child the-menu-bar c (send c create the-menu-bar))))]))
-        
+
     (define/public (update v what val)
       (case/dep what
         [@enabled? (send v enable val)])
@@ -201,8 +204,8 @@
         [@label (send v set-label val)]
         [@shortcut (set-shortcut v val)]))
 
-    (define/public (destroy _v)
-      (void))))
+    (define/public (destroy v)
+      (send v delete))))
 
 (define (set-shortcut v s)
   ;; Contract guarantees at least one prefix and one key.
@@ -227,8 +230,8 @@
     (define/public (update _v _what _val)
       (void))
 
-    (define/public (destroy _v)
-      (void))))
+    (define/public (destroy v)
+      (send v delete))))
 
 (define (popup-menu #:mixin [mix values]
                     . children)
