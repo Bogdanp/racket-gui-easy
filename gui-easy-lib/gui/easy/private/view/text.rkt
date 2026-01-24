@@ -3,6 +3,7 @@
 (require racket/class
          (prefix-in gui: racket/gui)
          racket/match
+         "../class.rkt"
          "../observable.rkt"
          "common.rkt"
          "view.rkt")
@@ -12,7 +13,7 @@
 
 (define (make-text% gui-message%)
   (class* object% (view<%>)
-    (init-field @label @color @margin @min-size @stretch font)
+    (init-private-field @label @color @margin @min-size @stretch font)
     (super-new)
 
     (define/public (dependencies)
@@ -67,7 +68,7 @@
               #:font [font gui:normal-control-font]
               #:margin [@margin '(2 2)]
               #:min-size [@min-size '(#f #f)]
-              #:stretch [@stretch '(#f #f)]                
+              #:stretch [@stretch '(#f #f)]
               #:mixin [mix values])
   (new (make-text% (mix gui:message%))
        [@label @label]

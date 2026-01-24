@@ -4,6 +4,7 @@
          (prefix-in gui: racket/gui)
          racket/lazy-require
          racket/match
+         "../class.rkt"
          "../observable.rkt"
          "common.rkt"
          "view.rkt")
@@ -21,7 +22,7 @@
 
 (define (make-canvas% gui-canvas%)
   (class* object% (view<%>)
-    (init-field @input @label @enabled? @margin @min-size @stretch draw style)
+    (init-private-field @input @label @enabled? @margin @min-size @stretch draw style)
     (super-new)
 
     (define/public (dependencies)
@@ -140,7 +141,7 @@
 
 (define (make-editor-canvas% gui-canvas%)
   (class* gui-canvas% (view<%>)
-    (init-field @editor @wheel-step @line-count @inset)
+    (init-private-field @editor @wheel-step @line-count @inset)
     (super-new)
 
     (define/override (dependencies)
@@ -187,7 +188,7 @@
   (new (make-editor-canvas%
         (make-canvas%
          (class (mix gui:editor-canvas%)
-           (init-field [(_ paint-callback)])
+           (init-private-field [(_ paint-callback)])
            (super-new [scrolls-per-page scrolls-per-page]))))
        [@editor @editor]
        [@wheel-step @wheel-step]

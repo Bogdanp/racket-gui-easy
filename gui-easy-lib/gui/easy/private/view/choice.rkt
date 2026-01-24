@@ -4,6 +4,7 @@
          (prefix-in gui: racket/gui)
          racket/list
          racket/match
+         "../class.rkt"
          "../observable.rkt"
          "common.rkt"
          "view.rkt")
@@ -13,7 +14,7 @@
 
 (define (make-choice% gui-choice%)
   (class* object% (view<%>)
-    (init-field @label @enabled? @choices @selection @margin @min-size @stretch style choice->label choice=? action)
+    (init-private-field @label @enabled? @choices @selection @margin @min-size @stretch style choice->label choice=? action)
     (super-new)
 
     (define @choices&index

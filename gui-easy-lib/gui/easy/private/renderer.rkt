@@ -3,9 +3,9 @@
 (require box-extra
          racket/class
          (prefix-in gui: racket/gui)
+         "class.rkt"
          "logger.rkt"
-         "observable.rkt"
-         "view/menu.rkt")
+         "observable.rkt")
 
 (provide
  embed
@@ -40,13 +40,14 @@
 
 (define renderer%
   (class* object% (renderer<%>)
-    (init-field tree)
-    (field [id (next-id!)])
+    (init-private-field tree)
+    (define id (next-id!))
     (super-new)
 
     (define depss null)
     (define root #f)
     (define/public (get-root) root)
+    (define/public (get-id) id)
 
     (define/public (render parent)
       (parameterize ([current-renderer this])
@@ -93,7 +94,7 @@
 
 (define (embed parent tree)
   (define r (new renderer% [tree tree]))
-  (define id (get-field id r))
+  (define id (send r get-id))
   (send r render parent)
   (log-gui-easy-debug "rendered tree ~a" id)
   (begin0 r
@@ -101,7 +102,7 @@
 
 (define (render tree [parent #f])
   (define r (new renderer% [tree tree]))
-  (define id (get-field id r))
+  (define id (send r get-id))
   (define root (send r render (and parent (renderer-root parent))))
   (log-gui-easy-debug "rendered window ~a" id)
   (begin0 r
@@ -113,7 +114,7 @@
 
 (define (render-popup-menu parent tree x y)
   (define r (new renderer% [tree tree]))
-  (define id (get-field id r))
+  (define id (send r get-id))
   (define menu (send r render #f))
   (define window (send parent get-root))
   (log-gui-easy-debug "rendered popup menu ~a" id)
@@ -123,7 +124,7 @@
 
 (define (render-menu-bar tree)
   (define r (new renderer% [tree tree]))
-  (define id (get-field id r))
+  (define id (send r get-id))
   (send r render 'root)
   (log-gui-easy-debug "rendered root menu bar ~a" id)
   r)

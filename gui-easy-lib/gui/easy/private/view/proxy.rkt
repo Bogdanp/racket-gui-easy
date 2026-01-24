@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require racket/class
+         "../class.rkt"
          "../logger.rkt"
          "view.rkt")
 
@@ -15,7 +16,7 @@
 ;; replaced.
 (define proxy%
   (class* object% (view<%>)
-    (init-field target)
+    (init-private-field target)
     (super-new)
 
     (define destroyed? #f)

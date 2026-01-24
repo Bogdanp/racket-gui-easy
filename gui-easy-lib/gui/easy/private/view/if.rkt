@@ -4,6 +4,7 @@
          racket/class
          (prefix-in gui: racket/gui)
          syntax/parse/define
+         "../class.rkt"
          "../observable.rkt"
          "../renderer.rkt"
          "common.rkt"
@@ -20,7 +21,7 @@
 
 (define if-view%
   (class* container% (view<%>)
-    (init-field @cond-e then-proc else-proc)
+    (init-private-field @cond-e then-proc else-proc)
     (inherit add-child get-child has-child? remove-child)
     (super-new)
 

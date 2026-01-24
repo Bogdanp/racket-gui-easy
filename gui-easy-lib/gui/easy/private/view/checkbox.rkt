@@ -3,6 +3,7 @@
 (require racket/class
          (prefix-in gui: racket/gui)
          racket/match
+         "../class.rkt"
          "../observable.rkt"
          "common.rkt"
          "view.rkt")
@@ -12,7 +13,7 @@
 
 (define (make-checkbox% gui-check-box%)
   (class* object% (view<%>)
-    (init-field @label @checked? @enabled? @margin @min-size @stretch action)
+    (init-private-field @label @checked? @enabled? @margin @min-size @stretch action)
     (super-new)
 
     (define/public (dependencies)

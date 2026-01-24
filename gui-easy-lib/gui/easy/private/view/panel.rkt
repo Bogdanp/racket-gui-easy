@@ -4,6 +4,7 @@
          (prefix-in gui: racket/gui)
          racket/list
          racket/match
+         "../class.rkt"
          "../observable.rkt"
          "common.rkt"
          "container.rkt"
@@ -16,9 +17,8 @@
 
 (define (make-panel% %)
   (class* container% (view<%>)
-    (inherit-field children)
-    (init-field @alignment @enabled? @spacing @margin @min-size @stretch style)
-    (inherit child-dependencies add-child update-children destroy-children)
+    (init-private-field @alignment @enabled? @spacing @margin @min-size @stretch style)
+    (inherit child-dependencies add-child get-children update-children destroy-children)
     (super-new)
 
     (define/public (dependencies)
@@ -47,7 +47,7 @@
       (define the-panel (-make-panel parent))
       (begin0 the-panel
         (with-container-sequence the-panel
-          (for ([c (in-list children)])
+          (for ([c (in-list (get-children))])
             (add-child the-panel c (send c create the-panel))))))
 
     (define/public (update v what val)
@@ -119,9 +119,15 @@
 
 (define (make-group-box-panel% %)
   (class* (make-panel% %) (view<%>)
-    (init-field @label)
-    (inherit-field @alignment @enabled? @spacing @margin @min-size @stretch style)
-    (super-new)
+    (init-private-field @alignment @enabled? @spacing @margin @min-size @stretch @label style)
+    (super-new
+     [@alignment @alignment]
+     [@enabled? @enabled?]
+     [@spacing @spacing]
+     [@margin @margin]
+     [@min-size @min-size]
+     [@stretch @stretch]
+     [style style])
 
     (define/override (dependencies)
       (define deps (super dependencies))

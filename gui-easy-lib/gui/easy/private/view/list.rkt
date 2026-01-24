@@ -4,6 +4,7 @@
          (prefix-in gui: racket/gui)
          racket/list
          racket/match
+         "../class.rkt"
          "../observable.rkt"
          "../renderer.rkt"
          "common.rkt"
@@ -15,8 +16,9 @@
 
 (define (make-list-view% mix)
   (class* container% (view<%>)
-    (init-field @entries @alignment @enabled? @spacing @margin @min-size @stretch
-                make-view style key-proc)
+    (init-private-field
+     @entries @alignment @enabled? @spacing @margin @min-size @stretch
+     make-view style key-proc)
     (inherit add-child get-child has-child? remove-child destroy-children)
     (super-new [children null])
 

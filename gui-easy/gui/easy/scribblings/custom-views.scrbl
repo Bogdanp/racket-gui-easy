@@ -55,7 +55,7 @@ All it needs to do is abstract over the instantiation of the underlying
 @racketblock[
   (define canvas-list-view%
     (class* object% (view<%>)
-      (init-field |@entries| draw action)
+      (init |@entries| draw action)
       (super-new)
 
       (define/public (dependencies)

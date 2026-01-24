@@ -2,6 +2,7 @@
 
 (require racket/class
          (prefix-in gui: racket/gui)
+         "../class.rkt"
          "../renderer.rkt"
          "common.rkt"
          "container.rkt"
@@ -13,7 +14,7 @@
 
 (define observable-view%
   (class* object% (view<%>)
-    (init-field @data make-view equal?-proc)
+    (init-private-field @data make-view equal?-proc)
     (super-new)
 
     (define/public (dependencies)
@@ -97,7 +98,7 @@
 ;; acts like a "pane" for an observable view inside a menu or menu bar
 (define menu-holder%
   (class (context-mixin object%)
-    (init-field parent)
+    (init-private-field parent)
     (super-new)
     (define/public (get-parent) parent)
     (define/public (begin-container-sequence) (void))

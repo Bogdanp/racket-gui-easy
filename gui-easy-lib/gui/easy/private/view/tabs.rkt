@@ -4,6 +4,7 @@
          (prefix-in gui: racket/gui)
          racket/list
          racket/match
+         "../class.rkt"
          "../observable.rkt"
          "common.rkt"
          "container.rkt"
@@ -14,9 +15,8 @@
 
 (define (make-tabs% gui-tab-panel%)
   (class* container% (view<%>)
-    (inherit-field children)
-    (init-field @choices @selection @alignment @enabled? @spacing @margin @min-size @stretch style action choice->label choice=?)
-    (inherit child-dependencies add-child update-children destroy-children)
+    (init-private-field @choices @selection @alignment @enabled? @spacing @margin @min-size @stretch style action choice->label choice=?)
+    (inherit child-dependencies add-child get-children update-children destroy-children)
     (super-new)
 
     (define @choices&selection&index
@@ -96,7 +96,7 @@
           (send the-panel set-context 'last-index index)
           (send the-panel set-selection index))
         (with-container-sequence the-panel
-          (for ([c (in-list children)])
+          (for ([c (in-list (get-children))])
             (add-child the-panel c (send c create the-panel))))))
 
     (define/public (update v what val)

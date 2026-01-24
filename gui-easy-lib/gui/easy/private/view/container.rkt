@@ -1,6 +1,7 @@
 #lang racket/base
 
-(require racket/class)
+(require racket/class
+         "../class.rkt")
 
 (provide
  container%
@@ -8,13 +9,16 @@
 
 (define container%
   (class object%
-    (init-field children)
+    (init-private-field children)
     (super-new)
 
     (define deps-to-children (make-hash))
     (for* ([c (in-list children)]
            [d (in-list (send c dependencies))])
       (hash-update! deps-to-children d (λ (cs) (cons c cs)) null))
+
+    (define/public (get-children)
+      children)
 
     (define/public (child-dependencies)
       (hash-keys deps-to-children))

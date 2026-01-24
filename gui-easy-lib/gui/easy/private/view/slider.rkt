@@ -3,6 +3,7 @@
 (require racket/class
          (prefix-in gui: racket/gui)
          racket/match
+         "../class.rkt"
          "../observable.rkt"
          "common.rkt"
          "view.rkt")
@@ -12,7 +13,7 @@
 
 (define (make-slider% gui-slider%)
   (class* object% (view<%>)
-    (init-field @label @enabled? @value @margin @min-size @stretch min-value max-value style action)
+    (init-private-field @label @enabled? @value @margin @min-size @stretch min-value max-value style action)
     (super-new)
 
     (define/public (dependencies)
@@ -33,7 +34,7 @@
            [callback (λ (self _event)
                        (action (send self get-value)))]
            [vert-margin v-m]
-           [horiz-margin h-m]           
+           [horiz-margin h-m]
            [min-width min-w]
            [min-height min-h]
            [stretchable-width w-s?]

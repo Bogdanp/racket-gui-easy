@@ -4,6 +4,7 @@
          (prefix-in gui: racket/gui)
          racket/list
          racket/match
+         "../class.rkt"
          "../observable.rkt"
          "common.rkt"
          "view.rkt")
@@ -13,7 +14,7 @@
 
 (define (make-radios% gui-radio-box%)
   (class* object% (view<%>)
-    (init-field @label @enabled? @selection @margin @min-size @stretch style choices choice->label choice=? action)
+    (init-private-field @label @enabled? @selection @margin @min-size @stretch style choices choice->label choice=? action)
     (super-new)
 
     (define @selection-index

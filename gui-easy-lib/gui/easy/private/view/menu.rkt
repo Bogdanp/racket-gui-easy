@@ -4,6 +4,7 @@
          racket/contract/base
          (prefix-in gui: racket/gui)
          racket/list
+         "../class.rkt"
          "../observable.rkt"
          "common.rkt"
          "container.rkt"
@@ -26,8 +27,7 @@
 
 (define (make-popup-menu% gui-popup-menu%)
   (class* container% (popup-menu-view<%>)
-    (inherit-field children)
-    (inherit add-child update-children destroy-children child-dependencies)
+    (inherit add-child get-children update-children destroy-children child-dependencies)
     (super-new)
 
     (define/public (dependencies)
@@ -36,7 +36,7 @@
     (define/public (create _parent)
       (define the-menu (new (context-mixin gui-popup-menu%)))
       (begin0 the-menu
-        (for ([c (in-list children)])
+        (for ([c (in-list (get-children))])
           (add-child the-menu c (send c create the-menu)))))
 
     (define/public (update v what val)
@@ -64,9 +64,8 @@
           (set! root-menu-bar mb))
         root-menu-bar)))
   (class* container% (menu-bar-view<%>)
-    (inherit-field children)
-    (init-field @enabled?)
-    (inherit add-child update-children destroy-children child-dependencies)
+    (init-private-field @enabled?)
+    (inherit add-child get-children update-children destroy-children child-dependencies)
     (super-new)
 
     (define/public (dependencies)
@@ -93,7 +92,7 @@
                     [parent top-level]))]))
          (begin0 the-menu-bar
            (send the-menu-bar enable (peek @enabled?))
-           (for ([c (in-list children)])
+           (for ([c (in-list (get-children))])
              (add-child the-menu-bar c (send c create the-menu-bar))))]))
 
     (define/public (update v what val)
@@ -113,9 +112,8 @@
 
 (define (make-menu% gui-menu%)
   (class* container% (menu-view<%>)
-    (inherit-field children)
-    (init-field @label @enabled? @help)
-    (inherit add-child update-children destroy-children child-dependencies)
+    (init-private-field @label @enabled? @help)
+    (inherit add-child get-children update-children destroy-children child-dependencies)
     (super-new)
 
     (define/public (dependencies)
@@ -131,7 +129,7 @@
              [label (peek @label)]))
       (begin0 the-menu
         (send the-menu enable (peek @enabled?))
-        (for ([c (in-list children)])
+        (for ([c (in-list (get-children))])
           (add-child the-menu c (send c create the-menu)))))
 
     (define/public (update v what val)
@@ -147,7 +145,7 @@
 
 (define (make-menu-item% gui-menu-item%)
   (class* object% (view<%>)
-    (init-field @label @enabled? @help @shortcut action)
+    (init-private-field @label @enabled? @help @shortcut action)
     (super-new)
 
     (define/public (dependencies)
@@ -177,7 +175,7 @@
 
 (define (make-checkable-menu-item% gui-checkable-menu-item%)
   (class* object% (view<%>)
-    (init-field @label @checked? @enabled? @help @shortcut action)
+    (init-private-field @label @checked? @enabled? @help @shortcut action)
     (super-new)
 
     (define/public (dependencies)

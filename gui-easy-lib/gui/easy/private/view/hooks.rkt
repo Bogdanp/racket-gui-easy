@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require racket/class
+         "../class.rkt"
          "view.rkt")
 
 (provide
@@ -8,9 +9,7 @@
 
 (define proxy%
   (class* object% (view<%>)
-    (init-field on-create-proc
-                on-destroy-proc
-                the-view)
+    (init-private-field on-create-proc on-destroy-proc the-view)
     (super-new)
     (define/public (dependencies)
       (send the-view dependencies))

@@ -3,6 +3,7 @@
 (require racket/class
          (prefix-in gui: racket/gui)
          racket/match
+         "../class.rkt"
          "../observable.rkt"
          "common.rkt"
          "view.rkt")
@@ -12,8 +13,9 @@
 
 (define (make-table% gui-list-box%)
   (class* object% (view<%>)
-    (init-field @label @enabled? @entries @selection @margin @min-size @stretch @column-widths
-                entry->row columns style font action)
+    (init-private-field
+     @label @enabled? @entries @selection @margin @min-size @stretch @column-widths
+     entry->row columns style font action)
     (super-new)
 
     (define single?

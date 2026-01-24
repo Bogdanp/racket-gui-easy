@@ -5,6 +5,7 @@
          (prefix-in gui: racket/gui)
          racket/list
          racket/match
+         "../class.rkt"
          "../observable.rkt"
          "common.rkt"
          "container.rkt"
@@ -25,9 +26,8 @@
 
 (define (window-like% clazz)
   (class* container% (window-view<%>)
-    (inherit-field children)
-    (init-field @title @size @alignment @position @min-size @stretch style)
-    (inherit child-dependencies add-child update-children destroy-children)
+    (init-private-field @title @size @alignment @position @min-size @stretch style)
+    (inherit child-dependencies add-child get-children update-children destroy-children)
     (super-new)
 
     (define/public (dependencies)
@@ -61,7 +61,7 @@
       (when (eq? position 'center)
         (send the-window center 'both))
       (begin0 the-window
-        (for ([c (in-list children)])
+        (for ([c (in-list (get-children))])
           (add-child the-window c (send c create the-window)))))
 
     (define/public (update v what val)

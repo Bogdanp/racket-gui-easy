@@ -3,6 +3,7 @@
 (require (prefix-in gui: mrlib/snip-canvas)
          racket/class
          racket/match
+         "../class.rkt"
          "../observable.rkt"
          "common.rkt"
          "view.rkt")
@@ -12,7 +13,7 @@
 
 (define (make-snip% %)
   (class* object% (view<%>)
-    (init-field @data @label @enabled? @margin @min-size @stretch style make-snip update-snip)
+    (init-private-field @data @label @enabled? @margin @min-size @stretch style make-snip update-snip)
     (super-new)
 
     (define/public (dependencies)

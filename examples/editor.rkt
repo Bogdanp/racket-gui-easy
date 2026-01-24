@@ -16,30 +16,6 @@
 (define/obs @buffers null)
 (define/obs @buffer #f)
 
-(define editor-canvas%
-  (class* object% (view<%>)
-    (init-field @editor)
-    (super-new)
-
-    (define/public (dependencies)
-      (list @editor))
-
-    (define/public (create parent)
-      (new gui:editor-canvas%
-           [parent parent]
-           [editor (obs-peek @editor)]))
-
-    (define/public (update v what val)
-      (case/dep what
-        [@editor
-         (send v set-editor val)]))
-
-    (define/public (destroy v)
-      (void))))
-
-(define (editor-canvas @editor)
-  (new editor-canvas% [@editor @editor]))
-
 (define editor-styles
   (let ([sl (new gui:style-list%)])
     (define dt (new gui:style-delta%))

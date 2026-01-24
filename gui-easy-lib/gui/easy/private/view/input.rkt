@@ -3,6 +3,7 @@
 (require racket/class
          (prefix-in gui: racket/gui)
          racket/match
+         "../class.rkt"
          "../observable.rkt"
          "common.rkt"
          "keymap.rkt"
@@ -13,7 +14,7 @@
 
 (define (input% clazz)
   (class* object% (view<%>)
-    (init-field @label @content @enabled? @background-color @margin @min-size @stretch action style font keymap value=? value->text)
+    (init-private-field @label @content @enabled? @background-color @margin @min-size @stretch action style font keymap value=? value->text)
     (super-new)
 
     (define/public (dependencies)

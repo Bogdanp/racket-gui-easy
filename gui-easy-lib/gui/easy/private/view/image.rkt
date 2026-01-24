@@ -4,6 +4,7 @@
          (prefix-in gui: racket/gui)
          racket/match
          racket/math
+         "../class.rkt"
          "../observable.rkt"
          "common.rkt"
          "view.rkt")
@@ -19,7 +20,7 @@
 
 (define (make-image% gui-canvas%)
   (class* object% (view<%>)
-    (init-field @image @size @mode @margin @min-size @stretch)
+    (init-private-field @image @size @mode @margin @min-size @stretch)
     (super-new)
 
     (define @props

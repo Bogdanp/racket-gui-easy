@@ -3,6 +3,7 @@
 (require racket/class
          (prefix-in gui: racket/gui)
          racket/match
+         "../class.rkt"
          "../observable.rkt"
          "common.rkt"
          "view.rkt")
@@ -12,7 +13,7 @@
 
 (define (make-progress% gui-gauge%)
   (class* object% (view<%>)
-    (init-field @label @enabled? @range @value @margin @min-size @stretch style)
+    (init-private-field @label @enabled? @range @value @margin @min-size @stretch style)
     (super-new)
 
     (define/public (dependencies)
