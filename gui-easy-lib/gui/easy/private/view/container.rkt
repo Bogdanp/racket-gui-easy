@@ -25,7 +25,8 @@
 
     (define/public (update-children v what val)
       (for ([c (in-list (hash-ref deps-to-children what null))])
-        (send c update (get-child v c) what val)))
+        (define child-v (get-child v c #f))
+        (when child-v (send c update child-v what val))))
 
     (define/public (destroy-children v)
       (for ([(c w) (in-hash (get-children-to-widgets v))])
