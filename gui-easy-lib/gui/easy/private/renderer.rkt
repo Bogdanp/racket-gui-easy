@@ -41,13 +41,13 @@
 (define renderer%
   (class* object% (renderer<%>)
     (init-private-field tree)
-    (define id (next-id!))
     (super-new)
 
     (define depss null)
+    (define id (next-id!))
+    (define/public (get-id) id)
     (define root #f)
     (define/public (get-root) root)
-    (define/public (get-id) id)
 
     (define/public (render parent)
       (parameterize ([current-renderer this])
