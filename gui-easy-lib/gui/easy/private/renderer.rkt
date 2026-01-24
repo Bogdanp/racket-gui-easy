@@ -70,7 +70,7 @@
            (parameterize ([current-renderer this])
              (send tree destroy root))
            (set! root #f)))
-       #;high-priority? #f))
+       #;high-priority? #t))
 
     (define (do-add-dependencies deps tree root) ;; noqa
       (define s
