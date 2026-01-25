@@ -45,7 +45,16 @@
           ['center (values #f #f)]
           [(list x y) (values x y)]))
       (define the-window
-        (new (context-mixin clazz)
+        (new (class (context-mixin clazz)
+               (inherit show)
+               (super-new)
+               (define done (make-semaphore))
+               (define/augment (on-close)
+                 (inner (void) on-close)
+                 (semaphore-post done))
+               (define/public (show-with-yield) ; redundant for dialog, useful for window
+                 (show #t)
+                 (gui:yield done)))
              [parent parent]
              [label (peek @title)]
              [alignment (peek @alignment)]

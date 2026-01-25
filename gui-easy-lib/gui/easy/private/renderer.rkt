@@ -100,27 +100,43 @@
   (begin0 r
     (hash-set! renderers id r)))
 
-(define (render tree [parent #f])
+(define (render tree [parent #f]
+                #:wait? [wait? (send tree is-dialog?)])
   (define r (new renderer% [tree tree]))
   (define id (send r get-id))
   (define root (send r render (and parent (renderer-root parent))))
   (log-gui-easy-debug "rendered window ~a" id)
-  (begin0 r
-    (hash-set! renderers id r)
-    (send root show #t)
-    (when (send tree is-dialog?)
-      (send r destroy)
-      (log-gui-easy-debug "destroyed window ~a" id))))
+  (hash-set! renderers id r)
+  (cond
+    [(send tree is-dialog?)
+     (if wait?
+         (send root show #t)
+         (send root show-without-yield))]
+    [else
+     (if wait?
+         (send root show-with-yield)
+         (send root show #t))])
+  (cond
+    [wait?
+     (send r destroy)
+     (log-gui-easy-debug "destroyed window ~a" id)]
+    [else r]))
 
-(define (render-popup-menu parent tree x y)
+(define (render-popup-menu parent tree x y #:wait? [wait? #t])
   (define r (new renderer% [tree tree]))
   (define id (send r get-id))
-  (define menu (send r render #f))
+  (define done (make-semaphore))
+  (define menu (send r render (lambda () (semaphore-post done))))
   (define window (send parent get-root))
   (log-gui-easy-debug "rendered popup menu ~a" id)
   (send window popup-menu menu x y)
-  (send r destroy)
-  (log-gui-easy-debug "destroyed popup menu ~a" id))
+  (cond
+    [wait?
+     (gui:yield done)
+     (send r destroy)
+     (log-gui-easy-debug "destroyed popup menu ~a" id)]
+    [else
+     r]))
 
 (define (render-menu-bar tree)
   (define r (new renderer% [tree tree]))

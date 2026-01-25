@@ -41,21 +41,42 @@
 }
 
 @defproc[(render [view (is-a?/c window-view<%>)]
-                 [parent (or/c #f renderer?) #f]) renderer?]{
+                 [parent (or/c #f renderer?) #f]
+                 [#:wait? wait? any/c (send view is-dialog?)])
+         (if wait? void? renderer?)]{
   Renders the view hierarchy represented by @racket[view].
 
   When a @racket[parent] renderer is provided, renders the view as a
   child of the root view of @racket[parent].  This is useful when you
   need to render a modal dialog on top of an existing window.
+
+  If @racket[wait?] is true, then @racket[render] does not return
+  until the rendered view is closed. If @racket[wait?] is @racket[#false],
+  @racket[render] returns immediately, and @racket[renderer-destroy]
+  could be called on the resulting renderer when the rendered view is
+  no longer needed.
+
+  @history[#:changed "0.26" @elem{Added the @racket[#:wait?] argument.}]
+
 }
 
 @defproc[(render-popup-menu [parent renderer?]
                             [view (is-a?/c popup-menu-view<%>)]
                             [x gui:position-integer?]
-                            [y gui:position-integer?]) void?]{
+                            [y gui:position-integer?]
+                            [#:wait? wait? any/c #t])
+         (if wait? void? renderer?)]{
 
   Renders the popup menu represented by @racket[view] as a child of
   @racket[parent].
+
+  The @racket[wait?] argument determines the result in the same way as
+  for @racket[render]. Note that on some platforms, however,
+  @racket[render-popup-menu] will not return until the popup menu is
+  selected or dismissed, even if @racket[wait?] is @racket[#false].
+
+  @history[#:changed "0.26" @elem{Added the @racket[#:wait?] argument.}]
+
 }
 
 @defproc[(render-menu-bar [view (is-a?/c menu-bar-view<%>)]) renderer?]{
@@ -127,7 +148,7 @@ packages in the Racket ecosystem, into their projects.
                           (listof (or/c 'no-caption 'no-sheet 'resize-border 'close-button))
                           '(close-button)]
                  [#:mixin mix (make-mixin-contract gui:dialog%) values]
-                 [child (is-a?/c view<%>)] ...+) (is-a?/c window-view<%>)]{
+                 [child (is-a?/c view<%>)] ...+) (is-a?/c dialog-view<%>)]{
 
   Returns a representation of a dialog.
 }

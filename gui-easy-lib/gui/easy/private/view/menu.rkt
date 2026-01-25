@@ -23,7 +23,7 @@
 
 (define popup-menu-view<%>
   (interface (view<%>)
-    [create (->m #f (is-a?/c gui:popup-menu%))]))
+    [create (->m (procedure-arity-includes/c 0)  (is-a?/c gui:popup-menu%))]))
 
 (define (make-popup-menu% gui-popup-menu%)
   (class* container% (popup-menu-view<%>)
@@ -33,8 +33,10 @@
     (define/public (dependencies)
       (child-dependencies))
 
-    (define/public (create _parent)
-      (define the-menu (new (context-mixin gui-popup-menu%)))
+    (define/public (create done)
+      (define the-menu (new (context-mixin gui-popup-menu%)
+                            [popdown-callback (lambda (menu evt)
+                                                (done))]))
       (begin0 the-menu
         (for ([c (in-list (get-children))])
           (add-child the-menu c (send c create the-menu)))))
