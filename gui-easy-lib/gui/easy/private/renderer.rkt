@@ -100,7 +100,8 @@
   (begin0 r
     (hash-set! renderers id r)))
 
-(define (render tree [parent #f]
+(define (render tree
+                [parent #f]
                 #:wait? [wait? (send tree is-dialog?)])
   (define r (new renderer% [tree tree]))
   (define id (send r get-id))
