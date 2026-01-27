@@ -199,6 +199,7 @@
   [input (->* [(maybe-obs/c any/c)]
               [(-> (or/c 'input 'return 'has-focus 'lost-focus) string? any)
                #:label (maybe-obs/c maybe-label/c)
+               #:choices (or/c #f (maybe-obs/c (listof gui:label-string?)))
                #:enabled? (maybe-obs/c boolean?)
                #:background-color (maybe-obs/c (or/c #f (is-a?/c gui:color%)))
                #:style (listof (or/c 'single 'multiple 'hscroll 'password
