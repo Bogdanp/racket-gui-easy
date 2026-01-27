@@ -14,11 +14,11 @@
 
 (define (input% clazz)
   (class* object% (view<%>)
-    (init-private-field @label @content @enabled? @background-color @margin @min-size @stretch action style font keymap value=? value->text)
+    (init-private-field @label @content @choices @enabled? @background-color @margin @min-size @stretch action style font keymap value=? value->text)
     (super-new)
 
     (define/public (dependencies)
-      (filter obs? (list @label @content @enabled? @background-color @margin @min-size @stretch)))
+      (filter obs? (list @label @content @choices @enabled? @background-color @margin @min-size @stretch)))
 
     (define/public (create parent)
       (define content (peek @content))
@@ -101,6 +101,12 @@
 
            [else
             (void)])]
+        [@choices
+         (define m (send v get-menu))
+         (for ([i (in-list (send m get-items))])
+           (send i delete))
+         (for ([label (in-list val)])
+           (send v append label))]
         [@enabled?
          (send v enable val)]
         [@background-color
@@ -125,6 +131,7 @@
       (send v clear-context))))
 
 (define (input @content [action void]
+               #:choices [@choices #f]
                #:label [@label #f]
                #:enabled? [@enabled? #t]
                #:background-color [@background-color #f]
@@ -139,7 +146,12 @@
                #:value->text [value->text values])
   (new (input%
         (mix
-         (class gui:text-field%
+         (class (if @choices
+                    (class gui:combo-field%
+                      (init-field [style style])
+                      (super-new [choices (peek @choices)]
+                                 [style (remq 'single style)]))
+                    gui:text-field%)
            (super-new)
            (define/override (on-focus focused?)
              (action
@@ -147,6 +159,7 @@
               (send this get-value))))))
        [@label @label]
        [@content @content]
+       [@choices @choices]
        [@enabled? @enabled?]
        [@background-color @background-color]
        [@margin @margin]

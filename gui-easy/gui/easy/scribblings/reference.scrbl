@@ -652,6 +652,7 @@ packages in the Racket ecosystem, into their projects.
 @defproc[(input [value (maybe-obs/c any/c)]
                 [action (-> (or/c 'input 'return 'has-focus 'lost-focus) string? any) void]
                 [#:label label (maybe-obs/c maybe-label/c) #f]
+                [#:choices choices (or/c #f (maybe-obs/c (listof gui:label-string?))) #f]
                 [#:enabled? enabled? (maybe-obs/c boolean?) #t]
                 [#:background-color background-color (maybe-obs/c (or/c #f (is-a?/c gui:color%))) #f]
                 [#:style style (listof (or/c 'single 'multiple 'hscroll 'password
@@ -683,10 +684,15 @@ packages in the Racket ecosystem, into their projects.
   are rendered to strings.  If not provided, @racket[value] must be
   either a @racket[string?] or an observable of strings.
 
+  If @racket[choices] is not @racket[#f], then the text field has an
+  associated popup menu of suggested content that the user can select
+  to fill the field.
+
   @history[
     #:changed "0.21" @elem{
       @racket[input] also responds to the @racket['has-focus] and
       @racket['lost-focus] events.}
+    #:changed "0.27" @elem{Added the @racket[#:choices] argument.}
   ]
 }
 
