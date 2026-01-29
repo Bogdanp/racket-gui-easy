@@ -34,8 +34,11 @@
 ;; a panel, etc.). It does the former by keeping track of the child
 ;; view%s directly and generating a mapping (deps-to-children) from
 ;; dependencies to child view%s. It does the latter by storing a mapping
-;; of child view%s to a list of GUI widgets on the context of the
+;; of child view%s to a [tree]list of GUI widgets on the context of the
 ;; container widget (get-children-to-widgets).
+;;
+;; Children and their dependencies are static, but a child's widgets
+;; are added and removed dynamically.
 (define container%
   (class object%
     (init-private-field children)
