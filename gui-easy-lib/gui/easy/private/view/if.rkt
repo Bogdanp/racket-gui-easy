@@ -22,7 +22,7 @@
 (define if-view%
   (class* container% (view<%>)
     (init-private-field @cond-e then-proc else-proc)
-    (inherit add-child get-child has-child? remove-child)
+    (inherit add-child-widget get-child-widgets has-child-widgets? remove-child-widgets)
     (super-new)
 
     (define/public (dependencies)
@@ -72,9 +72,9 @@
     (define/private (get-else-view v)
       (send v get-context 'else-view #f))
     (define/private (has-then-view? v)
-      (has-child? v (get-then-view v)))
+      (has-child-widgets? v (get-then-view v)))
     (define/private (has-else-view? v)
-      (has-child? v (get-else-view v)))
+      (has-child-widgets? v (get-else-view v)))
 
     (define-syntax-rule (define-adder id view-proc view-id deps-id)
       (define (id pane)
@@ -83,7 +83,7 @@
         (define widget (send view-id create pane))
         (send pane set-context 'view-id view-id)
         (send pane set-context 'deps-id (send (current-renderer) add-dependencies deps view-id widget))
-        (add-child pane view-id widget)))
+        (add-child-widget pane view-id widget)))
 
     (define-adder create&add-then-view then-proc then-view then-deps)
     (define-adder create&add-else-view else-proc else-view else-deps)
@@ -93,10 +93,10 @@
         (define view-id (send pane get-context 'view-id))
         (define deps-id (send pane get-context 'deps-id))
         (send (current-renderer) remove-dependencies deps-id)
-        (define widget (get-child pane view-id))
-        (send pane delete-child widget)
-        (send view-id destroy widget)
-        (remove-child pane view-id)
+        (for ([widget (in-child-widgets (get-child-widgets pane view-id))])
+          (send pane delete-child widget)
+          (send view-id destroy widget))
+        (remove-child-widgets pane view-id)
         (send pane remove-context 'view-id)
         (send pane remove-context 'deps-id)))
 

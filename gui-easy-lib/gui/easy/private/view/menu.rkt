@@ -27,19 +27,19 @@
 
 (define (make-popup-menu% gui-popup-menu%)
   (class* container% (popup-menu-view<%>)
-    (inherit add-child get-children update-children destroy-children child-dependencies)
+    (inherit add-child-widget get-children update-children destroy-children child-dependencies)
     (super-new)
 
     (define/public (dependencies)
       (child-dependencies))
 
     (define/public (create done)
-      (define the-menu (new (context-mixin gui-popup-menu%)
-                            [popdown-callback (lambda (menu evt)
-                                                (done))]))
+      (define the-menu
+        (new (context-mixin gui-popup-menu%)
+             [popdown-callback (λ (_menu _evt) (done))]))
       (begin0 the-menu
         (for ([c (in-list (get-children))])
-          (add-child the-menu c (send c create the-menu)))))
+          (add-child-widget the-menu c (send c create the-menu)))))
 
     (define/public (update v what val)
       (update-children v what val))
@@ -67,7 +67,7 @@
         root-menu-bar)))
   (class* container% (menu-bar-view<%>)
     (init-private-field @enabled?)
-    (inherit add-child get-children update-children destroy-children child-dependencies)
+    (inherit add-child-widget get-children update-children destroy-children child-dependencies)
     (super-new)
 
     (define/public (dependencies)
@@ -95,7 +95,7 @@
          (begin0 the-menu-bar
            (send the-menu-bar enable (peek @enabled?))
            (for ([c (in-list (get-children))])
-             (add-child the-menu-bar c (send c create the-menu-bar))))]))
+             (add-child-widget the-menu-bar c (send c create the-menu-bar))))]))
 
     (define/public (update v what val)
       (case/dep what
@@ -115,7 +115,7 @@
 (define (make-menu% gui-menu%)
   (class* container% (menu-view<%>)
     (init-private-field @label @enabled? @help)
-    (inherit add-child get-children update-children destroy-children child-dependencies)
+    (inherit add-child-widget get-children update-children destroy-children child-dependencies)
     (super-new)
 
     (define/public (dependencies)
@@ -132,7 +132,7 @@
       (begin0 the-menu
         (send the-menu enable (peek @enabled?))
         (for ([c (in-list (get-children))])
-          (add-child the-menu c (send c create the-menu)))))
+          (add-child-widget the-menu c (send c create the-menu)))))
 
     (define/public (update v what val)
       (case/dep what

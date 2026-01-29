@@ -27,7 +27,7 @@
 (define (window-like% clazz)
   (class* container% (window-view<%>)
     (init-private-field @title @size @alignment @position @min-size @stretch style)
-    (inherit child-dependencies add-child get-children update-children destroy-children)
+    (inherit child-dependencies add-child-widget get-children update-children destroy-children)
     (super-new)
 
     (define/public (dependencies)
@@ -71,7 +71,7 @@
         (send the-window center 'both))
       (begin0 the-window
         (for ([c (in-list (get-children))])
-          (add-child the-window c (send c create the-window)))))
+          (add-child-widget the-window c (send c create the-window)))))
 
     (define/public (update v what val)
       (case/dep what

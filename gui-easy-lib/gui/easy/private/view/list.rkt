@@ -19,7 +19,7 @@
     (init-private-field
      @entries @alignment @enabled? @spacing @margin @min-size @stretch
      make-view style key-proc)
-    (inherit add-child get-child has-child? remove-child destroy-children)
+    (inherit add-child-widget get-child-widgets has-child-widgets? remove-child-widgets destroy-children)
     (super-new [children null])
 
     (define (make-keyed-obs k last-e)
@@ -43,9 +43,10 @@
         (define (handle val)
           (gui:queue-callback
            (lambda ()
-             (when (has-child? v child-v)
+             (when (has-child-widgets? v child-v)
                (parameterize ([current-renderer renderer])
-                 (send child-v update (get-child v child-v) dep val))))))
+                 (for ([w (in-child-widgets (get-child-widgets v child-v))])
+                   (send child-v update w dep val)))))))
         (obs-observe! dep handle)
         (hash-update! deps-to-handlers
                       (cons child-v dep)
@@ -108,7 +109,7 @@
             (define v (make-view k (make-keyed-obs k e)))
             (define w (send v create the-panel)) ;; noqa
             (add-child-handlers! the-panel v)
-            (add-child the-panel v w)
+            (add-child-widget the-panel v w)
             (hash-set! keys-to-children k v)))))
 
     (define/public (update v what val)
@@ -125,18 +126,18 @@
                    (define child-v (make-view k (make-keyed-obs k e)))
                    (define child-w (send child-v create v))
                    (add-child-handlers! v child-v)
-                   (add-child v child-v child-w)
+                   (add-child-widget v child-v child-w)
                    (hash-set! keys-to-children k child-v)))))
            (unless (equal? new-keys (send v get-context 'current-keys null))
              (send v set-context 'current-keys new-keys)
-             (for ([(old-k old-v) (in-hash keys-to-children)]
-                   #:unless (member old-k new-keys))
-               (define old-w (get-child v old-v))
+             (for* ([(old-k old-v) (in-hash keys-to-children)]
+                    #:unless (member old-k new-keys)
+                    [old-w (in-child-widgets (get-child-widgets v old-v))])
                (define focused? (send old-w has-focus?))
                (send old-v destroy old-w)
                (send v delete-child old-w)
                (remove-child-handlers! v old-v)
-               (remove-child v old-v)
+               (remove-child-widgets v old-v)
                (hash-remove! keys-to-children old-k)
                (when focused?
                  (define children (send v get-children))
@@ -145,8 +146,10 @@
                    [else (send (last children) focus)])))
              (send v change-children
                    (λ (_)
-                     (for/list ([k (in-list new-keys)])
-                       (get-child v (hash-ref keys-to-children k)))))))]
+                     (for*/list ([k (in-list new-keys)]
+                                 [c (in-value (hash-ref keys-to-children k))]
+                                 [w (in-child-widgets (get-child-widgets v c))])
+                       w)))))]
         [@alignment
          (send/apply v set-alignment val)]
         [@enabled?

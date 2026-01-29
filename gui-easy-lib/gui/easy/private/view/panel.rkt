@@ -18,7 +18,7 @@
 (define (make-panel% %)
   (class* container% (view<%>)
     (init-private-field @alignment @enabled? @spacing @margin @min-size @stretch style)
-    (inherit child-dependencies add-child get-children update-children destroy-children)
+    (inherit child-dependencies add-child-widget get-children update-children destroy-children)
     (super-new)
 
     (define/public (dependencies)
@@ -48,7 +48,7 @@
       (begin0 the-panel
         (with-container-sequence the-panel
           (for ([c (in-list (get-children))])
-            (add-child the-panel c (send c create the-panel))))))
+            (add-child-widget the-panel c (send c create the-panel))))))
 
     (define/public (update v what val)
       (case/dep what
