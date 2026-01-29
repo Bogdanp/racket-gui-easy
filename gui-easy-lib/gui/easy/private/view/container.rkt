@@ -74,7 +74,7 @@
        #;failure-result
        make-child-widgets))
 
-    (define/public (get-child-widgets v c [failure-result null])
+    (define/public (get-child-widgets v c [failure-result make-child-widgets])
       (hash-ref (get-children-to-widgets v) c failure-result))
 
     (define/public (has-child-widgets? v c)
