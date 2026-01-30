@@ -112,3 +112,6 @@
            (loop)))))))
   (λ ()
     (channel-put stop-ch #t)))
+
+(module+ main
+  (start-debugger))
