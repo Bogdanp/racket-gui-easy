@@ -110,15 +110,23 @@
          (cond
            [selection
             (send target select selection)]
-
            [(send target get-selection)
-            => (λ (actual-selection)
-                 (send target select actual-selection #f))])]
+            => (λ (current-selection)
+                 (send target select current-selection #f))]
+           [else
+            (void)])]
         [else
-         (for ([idx (in-list (send target get-selections))])
-           (send target select idx #f))
+         ;; Avoid deselecting anything in the new selection and avoid
+         ;; selecting anything already selected. Either of those
+         ;; operations can cancel a sequence of selection operations
+         ;; (eg. holding down shift to expand a selection).
+         (define current-selections (send target get-selections))
+         (for ([idx (in-list current-selections)])
+           (unless (memv idx selection)
+             (send target select idx #f)))
          (for ([idx (in-list selection)])
-           (send target select idx))]))
+           (unless (memv idx current-selections)
+             (send target select idx)))]))
 
     (define/private (resize-columns v widths)
       (for ([spec (in-list widths)])
