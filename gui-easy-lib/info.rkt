@@ -9,6 +9,6 @@
     "draw-lib"
     "gui-lib"
     "pict-lib"
-    "version-case"))
+    "version-case-lib"))
 (define build-deps
   '("rackunit-lib"))
